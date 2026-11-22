@@ -66718,3 +66718,34 @@ attribute; stored, it is no limit, as the node already stored it.
 hydration.exs`: a reverse list in one partition and a projected list
 ported (`audit::list_order`); its lists across auto buckets are Elixir's
 in-process `Flow.list`.
+
+### Flow test audit: batch items and history requests (22 Nov)
+
+`flow/many_item_opts_test.exs`: per-item cancel options and empty id or
+lease refusals ported (`audit::many_items`); tuple and keyword shapes are
+Elixir's in-process forms. `flow/history_query_test.exs`,
+`flow/history_api_test.exs`, `flow/history_values_test.exs` and
+`flow/history_read_test.exs`: ranges, event-id order within a
+millisecond, cursors and value hydration ported
+(`audit::history_requests`); hot and cold reads, projector and storage
+failure markers are Elixir's. Two gaps closed:
+
+- G36. RED: `values: true` with `payload_max_bytes: 65537` answered the
+  events (the option was not read), and a created event's payload came
+  without `payload_size`. History reads `payload_max_bytes` (default and
+  ceiling 65536) and hydrates each value with `record::hydrated`, the
+  record view's Elixir hydration, now public: value and size, or size
+  and `_omitted` above the bound.
+- G37. Found while testing G36's `_missing` marker: with history kept to
+  3 events, a payload written at version 1 and named by the version-4
+  event read as missing after a named value changed again, because kept
+  versions were capped by count and the oldest version went first.
+  Decision: `FlowMeta::retain` only inserts; `store::write` calls
+  `prune_retained(oldest kept event version)` after the history is
+  trimmed, keeping per kind and name the version current at the oldest
+  event and every later one. The `_missing` branch was then unreachable
+  and was not kept. Cost: a prune per write of a Flow holding kept
+  versions (none on the benchmark path, which replaces no values).
+
+Mutation checks: never omitting, dropping the size, no ceiling, no prune
+and an exclusive floor each fail a test.

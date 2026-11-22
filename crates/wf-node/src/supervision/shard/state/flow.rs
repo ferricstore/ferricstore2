@@ -123,7 +123,12 @@ impl ShardState {
                 .map(|event| {
                     let term = history::event_term(event, &entry.record, &key.0, meta);
                     if query.values {
-                        super::value::with_values(term, &entry.record, meta, event.refs)
+                        super::value::with_values(
+                            term,
+                            &entry.record,
+                            meta,
+                            (event.refs, query.max_bytes),
+                        )
                     } else {
                         term
                     }

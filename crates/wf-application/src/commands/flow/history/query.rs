@@ -4,6 +4,7 @@
 use super::super::FlowError;
 use super::super::create::partition_key;
 use super::super::opts::Opts;
+use super::super::record::DEFAULT_PAYLOAD_MAX_BYTES;
 use super::super::term::Term;
 use super::HistoryEvent;
 
@@ -40,6 +41,9 @@ pub struct HistoryQuery {
     /// Each event also shows the payload, result and error it named
     /// (ADR-016 phase C).
     pub values: bool,
+    /// The largest value shown; a larger one is omitted with its size
+    /// (audit gap G36).
+    pub max_bytes: u64,
 }
 
 const ALLOWED: &[&str] = &[
@@ -58,7 +62,7 @@ const ALLOWED: &[&str] = &[
     "include_cold",
     "consistent_projection",
     "values",
-    "max_bytes",
+    "payload_max_bytes",
 ];
 
 fn event_id(opts: &Opts<'_>, key: &str) -> Result<Option<(u64, u64)>, FlowError> {
@@ -79,6 +83,21 @@ fn event_id(opts: &Opts<'_>, key: &str) -> Result<Option<(u64, u64)>, FlowError>
         canonical(ms).ok_or_else(invalid)?,
         canonical(version).ok_or_else(invalid)?,
     )))
+}
+
+/// `payload_max_bytes`, as Elixir's `PayloadReturn.history_options` reads
+/// it: the default ceiling when absent, refused above it.
+fn max_bytes(opts: &Opts<'_>) -> Result<u64, FlowError> {
+    let max_bytes = opts
+        .non_neg_integer("payload_max_bytes")?
+        .unwrap_or(DEFAULT_PAYLOAD_MAX_BYTES);
+    if max_bytes > DEFAULT_PAYLOAD_MAX_BYTES {
+        return Err(FlowError::flow(
+            "payload_max_bytes",
+            &format!("exceeds maximum {DEFAULT_PAYLOAD_MAX_BYTES}"),
+        ));
+    }
+    Ok(max_bytes)
 }
 
 /// Reads `FLOW.HISTORY`.
@@ -113,6 +132,7 @@ pub fn parse(args: &Term) -> Result<HistoryQuery, FlowError> {
         to_version: opts.non_neg_integer("to_version")?,
         rev: opts.boolean("rev", false)?,
         values: opts.boolean("values", false)?,
+        max_bytes: max_bytes(&opts)?,
         event: opts.binary_or_nil("event")?,
         worker: opts.binary_or_nil("worker")?,
     };

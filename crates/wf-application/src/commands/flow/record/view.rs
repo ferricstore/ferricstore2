@@ -30,21 +30,29 @@ pub struct View<'a> {
 /// Elixir's `ValueHydration.apply_value_result`: the value and its size, or
 /// its size and an omitted flag when it is above `max_bytes`.
 fn hydrate(entries: &mut Vec<(&str, Term)>, kind: &str, value: Option<&[u8]>, max_bytes: u64) {
-    let Some(value) = value else {
-        return;
-    };
+    if let Some(value) = value {
+        entries.extend(hydrated(kind, value, max_bytes));
+    }
+}
+
+/// Elixir's value hydration for one stored value of `kind` (`payload`,
+/// `result` or `error`): the value and its stored size, or the size and an
+/// omitted flag when it is above `max_bytes`. History events use it too
+/// (audit gap G36).
+#[must_use]
+pub fn hydrated(kind: &str, value: &[u8], max_bytes: u64) -> [(&'static str, Term); 2] {
     let size = u64::try_from(value.len()).unwrap_or(u64::MAX);
     let (field, size_field, omitted_field) = match kind {
         "payload" => ("payload", "payload_size", "payload_omitted"),
         "result" => ("result", "result_size", "result_omitted"),
         _ => ("error", "error_size", "error_omitted"),
     };
-    if size > max_bytes {
-        entries.push((omitted_field, Term::Bool(true)));
+    let shown = if size > max_bytes {
+        (omitted_field, Term::Bool(true))
     } else {
-        entries.push((field, value_codec::load(value)));
-    }
-    entries.push((size_field, Term::int(size)));
+        (field, value_codec::load(value))
+    };
+    [shown, (size_field, Term::int(size))]
 }
 
 /// A read's payload fields for `value`, read from the stored value a Flow

@@ -23,8 +23,8 @@ pub struct Retained {
 }
 
 impl FlowMeta {
-    /// Keeps a replaced version; the oldest go once more are kept than the
-    /// history holds events, since no event can name them then.
+    /// Keeps a replaced version; [`Self::prune_retained`] drops it once no
+    /// kept history event can name it.
     pub fn retain(&mut self, (kind, name, version): (u8, &[u8], u64), bytes: &[u8]) {
         if version == 0 {
             return;
@@ -35,18 +35,27 @@ impl FlowMeta {
                 bytes: bytes.to_vec(),
             },
         );
-        let cap = usize::try_from(self.history_max_events.max(1)).unwrap_or(usize::MAX);
-        while self.retained.len() > cap {
-            let Some(oldest) = self
-                .retained
-                .keys()
-                .min_by_key(|(_, _, version)| *version)
-                .cloned()
-            else {
-                break;
-            };
-            self.retained.remove(&oldest);
+    }
+
+    /// Drops the kept versions no history event from version `oldest` on
+    /// can name (audit gap G37): per kind and name, every version older
+    /// than the newest one at or before `oldest`, which was current at the
+    /// oldest event. A version an event names is never dropped while that
+    /// event is kept, however many other values change.
+    pub fn prune_retained(&mut self, oldest: u64) {
+        let mut floors: std::collections::BTreeMap<(u8, Vec<u8>), u64> =
+            std::collections::BTreeMap::new();
+        for (kind, name, version) in self.retained.keys() {
+            if *version <= oldest {
+                let floor = floors.entry((*kind, name.clone())).or_insert(*version);
+                *floor = (*floor).max(*version);
+            }
         }
+        self.retained.retain(|(kind, name, version), _| {
+            floors
+                .get(&(*kind, name.clone()))
+                .is_none_or(|floor| version >= floor)
+        });
     }
 
     /// A kept version, if any.

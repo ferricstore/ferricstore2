@@ -316,6 +316,15 @@ impl History {
         }
     }
 
+    /// The version of the oldest kept event: the field after its kind and
+    /// time.
+    pub(crate) fn first_version(&self) -> Option<u64> {
+        let mut cursor = Cursor(&self.bytes);
+        cursor.u8()?;
+        cursor.varint()?;
+        cursor.varint()
+    }
+
     /// How many events are kept.
     pub(crate) const fn len(&self) -> u32 {
         self.count

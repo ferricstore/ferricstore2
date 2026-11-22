@@ -168,6 +168,19 @@ Gaps found so far:
   option a command does not read is ignored, `return` is refused where
   the command takes none ("ERR flow return option is not supported"), and
   any other key is "ERR native unknown flow option X".
+- G36 (closed): `FLOW.HISTORY` with `values: true` showed each value
+  bare and unbounded, and read `max_bytes` (no Elixir history option)
+  instead of `payload_max_bytes`, so a ceiling above 65536 was not
+  refused. History values now come with their stored size and are
+  omitted above `payload_max_bytes`, as Elixir's `HistoryValues`
+  hydration does; the record view's hydration is shared (`hydrated`).
+- G37 (closed): replaced value versions were capped by count (as many as
+  history holds events), so a churning named value could evict a payload
+  version an event still in history named, which then read as missing.
+  A kept version is dropped only when no kept event can name it: per
+  kind and name, versions older than the one current at the oldest kept
+  event go, at each write (Elixir releases a value once no history event
+  names it).
 - P1 (open, performance): a batch's shared payload is logged in each
   Flow's after-image; Elixir logs it once per command. Clients see the
   same results; the log carries the payload once per Flow.
@@ -901,34 +914,34 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | create parses binary tuple and map item shapes | open |
-| 24 | terminal item parsers preserve map values and lease tuple shapes | open |
-| 38 | cancel and transition preserve optional lease and partition keys | open |
-| 59 | merge applies item opts over base opts and pins partition key | open |
-| 67 | invalid item opts keep existing error messages | open |
-| 77 | item parsers reject empty ids and required lease tokens at the boundary | open |
+| 7 | create parses binary tuple and map item shapes | internal: Elixir's in-process tuple and keyword item shapes (the wire's map and list items are G3 and G4) |
+| 24 | terminal item parsers preserve map values and lease tuple shapes | internal: as line 7 |
+| 38 | cancel and transition preserve optional lease and partition keys | ported (`audit::many_items::a_cancel_items_own_metadata_and_attributes_apply`; its tuple shape is Elixir's) |
+| 59 | merge applies item opts over base opts and pins partition key | internal: Elixir's `ManyItemOpts.merge` (item options over shared ones: G3, `audit::create_many`) |
+| 67 | invalid item opts keep existing error messages | ported (`audit::many_items::items_with_empty_ids_or_lease_tokens_are_refused`; its keyword-list error is Elixir's) |
+| 77 | item parsers reject empty ids and required lease tokens at the boundary | ported (same test) |
 
 ## `flow/history_read_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 26 | filtered reverse hot reads scan the bounded history window | open |
-| 44 | history availability is not normalized to an empty result | open |
-| 55 | cold history batches require exact results and preserve storage failures | open |
-| 84 | history sweep limits stay bounded when mutable configuration is invalid | open |
-| 95 | history projector failures do not expose internal reasons | open |
-| 105 | history decode context distinguishes missing state from corruption and read failures | open |
+| 26 | filtered reverse hot reads scan the bounded history window | internal: Elixir's hot and cold history reads (scan windows, batch results, storage failures, LMDB sweep limits, projector, decode contexts) |
+| 44 | history availability is not normalized to an empty result | internal: Elixir's hot and cold history reads (scan windows, batch results, storage failures, LMDB sweep limits, projector, decode contexts) |
+| 55 | cold history batches require exact results and preserve storage failures | internal: Elixir's hot and cold history reads (scan windows, batch results, storage failures, LMDB sweep limits, projector, decode contexts) |
+| 84 | history sweep limits stay bounded when mutable configuration is invalid | internal: Elixir's hot and cold history reads (scan windows, batch results, storage failures, LMDB sweep limits, projector, decode contexts) |
+| 95 | history projector failures do not expose internal reasons | internal: Elixir's hot and cold history reads (scan windows, batch results, storage failures, LMDB sweep limits, projector, decode contexts) |
+| 105 | history decode context distinguishes missing state from corruption and read failures | internal: Elixir's hot and cold history reads (scan windows, batch results, storage failures, LMDB sweep limits, projector, decode contexts) |
 
 ## `flow/history_query_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 20 | filtering is false when query has no filters | open |
-| 24 | fetch_count only asks scan count for filtered queries | open |
-| 33 | apply filters by event worker timestamp version and event id ranges | open |
-| 73 | apply reverses before taking count for reverse queries | open |
-| 86 | range validators reject inverted ranges | open |
-| 96 | event id ranges compare versions within a millisecond as numbers | open |
+| 20 | filtering is false when query has no filters | internal: Elixir's `HistoryQuery.filtering?` |
+| 24 | fetch_count only asks scan count for filtered queries | internal: Elixir's history scan count |
+| 33 | apply filters by event worker timestamp version and event id ranges | ported (`audit::history_filters::history_filters_by_event_range_time_order_event_worker_and_version`) |
+| 73 | apply reverses before taking count for reverse queries | ported (`audit::history_requests::event_ids_within_a_millisecond_compare_by_version_number`, its reverse page) |
+| 86 | range validators reject inverted ranges | ported (`audit::history_requests::history_ranges_run_forward`) |
+| 96 | event id ranges compare versions within a millisecond as numbers | ported (`audit::history_requests::event_ids_within_a_millisecond_compare_by_version_number`) |
 
 ## `flow/fencing_retry_test.exs`
 
@@ -975,11 +988,11 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | validates history time range before reading storage | open |
-| 12 | rejects non-keyword options | open |
-| 17 | rejects value hydration above the configured ceiling before reading storage | open |
-| 22 | prepare rejects malformed history event cursors | open |
-| 36 | an omitted count respects a configured maximum below the built-in default | open |
+| 7 | validates history time range before reading storage | ported (`audit::history_requests::history_ranges_run_forward`) |
+| 12 | rejects non-keyword options | internal: Elixir's keyword lists |
+| 17 | rejects value hydration above the configured ceiling before reading storage | fixed (`audit::history_requests::history_cursors_are_event_ids_and_values_stay_bounded`; G36) |
+| 22 | prepare rejects malformed history event cursors | ported (same test) |
+| 36 | an omitted count respects a configured maximum below the built-in default | internal: Elixir's configured `flow_max_count` |
 
 ## `flow/child_policy_test.exs`
 
@@ -1070,9 +1083,9 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | history hydration marks storage failures without exposing their reason | open |
-| 21 | history file-reference size is the exact stored byte count | open |
-| 32 | history hydration marks corrupted typed values | open |
+| 8 | history hydration marks storage failures without exposing their reason | internal: Elixir's storage read failures (the node's values are in memory or its cold files) |
+| 21 | history file-reference size is the exact stored byte count | fixed (`audit::history_requests::history_values_carry_their_size_and_are_omitted_above_the_bound`; G36: sizes and omission; G37: `...a_value_an_event_still_names_stays_readable_in_history`) |
+| 32 | history hydration marks corrupted typed values | internal: Elixir's typed value corruption marker |
 
 ## `flow/create_running_validation_test.exs`
 

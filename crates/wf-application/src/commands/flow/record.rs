@@ -15,7 +15,7 @@ pub use include::{DEFAULT_PAYLOAD_MAX_BYTES, Include, Values};
 pub use retained::{
     RETAINED_ERROR, RETAINED_NAMED, RETAINED_PAYLOAD, RETAINED_RESULT, Retained, RetainedMap,
 };
-pub use view::{View, attached, payload_fields};
+pub use view::{View, attached, hydrated, payload_fields};
 
 /// Elixir's default terminal retention: 7 days.
 pub const DEFAULT_RETENTION_TTL_MS: u64 = 604_800_000;
