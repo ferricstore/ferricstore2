@@ -98,13 +98,12 @@ telemetry and in-process API). No row is open.
   as the approval request checks its dimensions.
 - G54 (closed): extending a governed Flow's lease left its credit lease
   to expire, so a long-running Flow lost the credit it held. As Elixir's
-  `maybe_renew_governance_limit/2`, an extension now renews the credit
-  lease to at least the command time plus the new lease length (an
-  internal `Op::Renew` on the limit, sent once the extension is durable,
-  as credit releases are). Recorded decision: Elixir renews first and
-  refuses the extension when the credit lease has already lapsed; the
-  node extends and the renewal finds no lease, since the shard holding
-  the Flow cannot consult the limit's shard within one step.
+  `maybe_renew_governance_limit/2`, the credit lease is renewed first, to
+  at least the command time plus the new lease length, and the extension
+  is refused ("ERR flow limit lease expired") when the credit lease has
+  already lapsed: the Flow's shard hands a governed extension to a
+  renewer, which renews on the limit's shard (an internal `Op::Renew`)
+  and then sends the extension back marked renewed.
 
 ## Recorded decisions
 

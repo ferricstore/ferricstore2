@@ -207,9 +207,6 @@ impl ShardState {
                 ) {
                     self.fifo_entry(&write.record, priority, explicit)?;
                 }
-                if let Change::ExtendLease { lease_ms, .. } = mutation.change {
-                    self.note_renewal(&meta, (lease_ms, now));
-                }
                 let mut event = HistoryEvent::of(&write.record, priority, &meta, &key.0);
                 event.retry = history.and_then(|entry| entry.retry);
                 self.put(

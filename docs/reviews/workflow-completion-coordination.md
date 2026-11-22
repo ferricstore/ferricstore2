@@ -67044,6 +67044,24 @@ repair, the limit cleaner), its model unit tests (whose rules the node's
 wire tests cover, or are type-level governance), its API argument types
 and its index-query helpers. With them the steps 11-15 map has no open
 row: 1,308 Elixir tests, 160 ported, 26 fixed by node changes (G39-G54),
-98 covered by existing node tests, the rest Elixir-internal. Two recorded
-decisions bound the port: type-level governance stays Elixir's in-process
-API, and a credit renewal follows a lease extension instead of gating it.
+98 covered by existing node tests, the rest Elixir-internal. One recorded
+decision bounds the port: type-level governance stays Elixir's in-process
+API.
+
+### G54 revised: renew the credit lease first (22 Nov)
+
+The first G54 renewed a governed Flow's credit lease after the extension
+was durable, so an extension whose credit lease had already lapsed went
+through and the worker kept running without capacity. Elixir renews
+first and refuses the extension. RED: a governed claim with a 100 ms
+lease, extended at 1,200 ms, was not refused "ERR flow limit lease
+expired". Now the Flow's shard checks, before applying an extension,
+whether the Flow holds a credit and the command holds its current lease
+(`ShardState::unrenewed_extension`); if so it hands the request to
+`credit::renew_first`, which sends `Op::Renew` to the limit's shard and,
+on success, sends the extension back marked `renewed`, or answers it
+with the renewal's refusal. Ungoverned extensions take no extra step;
+the post-durable renewal note is gone. A claim's spend keeps the credit
+lease to the Flow's lease deadline, so the two lapse together. Disabling
+the renew-first check, applying the extension after a refused renewal,
+or dropping the renewal's deadline update each fails a test (3 of 3).

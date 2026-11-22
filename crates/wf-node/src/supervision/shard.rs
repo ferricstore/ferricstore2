@@ -180,9 +180,9 @@ pub(crate) struct Links {
     pub(crate) release: Releases,
     /// Wakes the queued schedules of targets that finished (audit G47).
     pub(crate) wake: Wakes,
-    /// Renews the credit leases of governed Flows whose lease was extended
+    /// Renews a governed Flow's credit lease before its lease is extended
     /// (audit G54).
-    pub(crate) renew: Renewals,
+    pub(crate) renew: RenewFirst,
     /// Items sent to this shard and not yet taken (ADR-017).
     pub(crate) backlog: Arc<AtomicUsize>,
 }
@@ -190,8 +190,10 @@ pub(crate) struct Links {
 /// Delivers limit credits for release.
 pub(crate) type Releases = Arc<dyn Fn(Vec<Credit>) + Send + Sync>;
 
-/// Delivers credit leases to renew.
-pub(crate) type Renewals = Arc<dyn Fn(Vec<state::credit::Renewal>) + Send + Sync>;
+/// Renews a credit lease, then sends the extension it holds back to its
+/// Flow's shard, or answers the extension with the renewal's refusal.
+pub(crate) type RenewFirst =
+    Arc<dyn Fn(state::credit::Renewal, Box<FlowCommand>, Partition, Done<Term>) + Send + Sync>;
 
 /// Delivers finished targets' schedules to wake.
 pub(crate) type Wakes = Arc<dyn Fn(Vec<state::schedule::Wake>) + Send + Sync>;
@@ -247,14 +249,6 @@ fn release_once_durable(release: Releases, credits: Vec<Credit>) -> Finish {
     })
 }
 
-fn renew_once_durable(renew: Renewals, renewals: Vec<state::credit::Renewal>) -> Finish {
-    Box::new(move |durable: Result<(), ServiceError>| {
-        if durable.is_ok() {
-            renew(renewals);
-        }
-    })
-}
-
 fn wake_once_durable(wake: Wakes, wakes: Vec<state::schedule::Wake>) -> Finish {
     Box::new(move |durable: Result<(), ServiceError>| {
         if durable.is_ok() {
@@ -306,7 +300,12 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
                     request.fail(ServiceError::Reroute);
                     return None;
                 }
-                handle(&mut state, (links.index, now), request, &mut logged)
+                handle(
+                    &mut state,
+                    (links.index, now),
+                    request,
+                    (&mut logged, &links.renew),
+                )
             })
             .collect();
         // Parents of children that finished this round, on this shard.
@@ -315,11 +314,6 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         let credits = state.take_credit_releases();
         if !credits.is_empty() && serving {
             finishes.push(release_once_durable(Arc::clone(&links.release), credits));
-        }
-        // Credit leases of extended Flows renew once durable.
-        let renewals = state.take_credit_renewals();
-        if !renewals.is_empty() && serving {
-            finishes.push(renew_once_durable(Arc::clone(&links.renew), renewals));
         }
         // Queued schedules whose targets finished wake once durable.
         let wakes = state.take_schedule_wakes();

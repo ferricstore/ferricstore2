@@ -111,6 +111,9 @@ pub enum Change {
         lease_ms: u64,
         /// Reply `OK` instead of the record (`return: ok_on_success`).
         ok_on_success: bool,
+        /// The node renewed the Flow's credit lease first (audit G54); a
+        /// client never sets it.
+        renewed: bool,
     },
 }
 
@@ -304,6 +307,7 @@ fn change(name: &str, opts: &Opts<'_>) -> Result<Change, FlowError> {
         _ => Change::ExtendLease {
             lease_ms: lease_ms(opts)?,
             ok_on_success: matches!(opts.get("return"), Some(Term::Bin(mode)) if mode.eq_ignore_ascii_case(b"ok_on_success")),
+            renewed: false,
         },
     })
 }

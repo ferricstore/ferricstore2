@@ -22,13 +22,16 @@ use wf_application::commands::flow::{FlowCommand, Term};
 use wf_application::commands::queue::{ClaimFlows, ClaimedFlow, Partition, ServiceError};
 
 use crate::supervision::shard::state::credit::CreditPool;
-use crate::supervision::shard::{Releases, Renewals, Request};
+use crate::supervision::shard::{Releases, Request};
 
 use super::claim;
 use super::router::Router;
 
 mod admit;
+mod renew;
 pub(crate) mod running;
+
+pub(crate) use renew::renew_first;
 
 const ANSWER: Duration = Duration::from_secs(30);
 const MAX_CHUNK: u64 = 1_000;
@@ -331,42 +334,6 @@ pub(crate) fn run(
 }
 
 /// The shards' credit releaser, routing through the router once it exists.
-/// Renews the credit leases of governed Flows whose lease was extended
-/// (audit G54): each goes to its limit's shard, after the extension is
-/// durable.
-pub(crate) fn renewer(router: Arc<OnceLock<Weak<Router>>>) -> Renewals {
-    Arc::new(move |renewals| {
-        let Some(router) = router.get().and_then(Weak::upgrade) else {
-            return;
-        };
-        for (credit, ttl_ms, now_ms) in renewals {
-            let fields = Fields {
-                ttl_ms: Some(ttl_ms),
-                now_ms: Some(now_ms),
-                ..Fields::default()
-            };
-            let command = limit::Command::internal(
-                Op::Renew,
-                credit.scope.clone(),
-                credit.shard_id,
-                fields,
-                Configuration::default(),
-            );
-            let partition = Partition::parse(&credit.scope);
-            router.send(
-                router.route(&partition),
-                Request::Flow {
-                    command: Box::new(FlowCommand::Governance(Box::new(GovernanceCommand::Limit(
-                        command,
-                    )))),
-                    partition,
-                    done: Box::new(|_| {}),
-                },
-            );
-        }
-    })
-}
-
 pub(crate) fn releaser(router: Arc<OnceLock<Weak<Router>>>) -> Releases {
     Arc::new(move |credits| {
         let Some(router) = router.get().and_then(Weak::upgrade) else {

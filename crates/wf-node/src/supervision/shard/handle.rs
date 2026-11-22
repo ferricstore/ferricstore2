@@ -2,6 +2,8 @@
 //! on the shard state, adds it to the round's log, and returns what to call
 //! once the round is durable.
 
+use std::sync::Arc;
+
 use wf_application::commands::flow::cleanup::Cleaned;
 use wf_application::commands::flow::governance::{Command as GovernanceCommand, Listed};
 use wf_application::commands::flow::info::{Read, Tally};
@@ -14,7 +16,7 @@ use wf_domain::workflow::Outcome;
 use super::super::completer::Finish;
 use super::command::Logged;
 use super::state::{self, ShardState};
-use super::{Done, Request};
+use super::{Done, RenewFirst, Request};
 
 /// Completes fast-path Flows; outcomes keep their positions.
 fn complete(
@@ -180,7 +182,7 @@ pub(super) fn handle(
     state: &mut ShardState,
     (index, now): (u16, u64),
     request: Request,
-    logged: &mut Vec<Logged>,
+    (logged, renew): (&mut Vec<Logged>, &RenewFirst),
 ) -> Option<Finish> {
     let finish: Finish = match request {
         Request::Capture { snapshot, done } => capture(state, (index, now), snapshot, logged, done),
@@ -216,6 +218,17 @@ pub(super) fn handle(
             partition,
             done,
         } => {
+            // A governed Flow's credit lease is renewed before its own
+            // lease is extended (audit G54); the extension waits for it.
+            if let Some(renewal) = state.unrenewed_extension(now, &command, &partition) {
+                let renew = Arc::clone(renew);
+                return Some(Box::new(
+                    move |durable: Result<(), ServiceError>| match durable {
+                        Ok(()) => renew(renewal, command, partition, done),
+                        Err(error) => done(Err(error)),
+                    },
+                ));
+            }
             let (result, change) = state.execute(now, *command, partition);
             logged.extend(change);
             Box::new(move |durable| done(durable.and(result)))

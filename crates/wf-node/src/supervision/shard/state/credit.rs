@@ -8,8 +8,11 @@
 use std::collections::VecDeque;
 use std::sync::{Mutex, PoisonError};
 
+use wf_application::commands::flow::FlowCommand;
 use wf_application::commands::flow::effect::Credit;
+use wf_application::commands::flow::mutate::Change;
 use wf_application::commands::flow::record::FlowMeta;
+use wf_application::commands::queue::Partition;
 use wf_domain::workflow::WorkflowRecord;
 
 use super::{Key, ShardState};
@@ -61,21 +64,38 @@ impl CreditPool {
 pub(crate) type Renewal = (Credit, u64, u64);
 
 impl ShardState {
-    /// Queues the renewal of a governed Flow's credit lease when its own
-    /// lease is extended, as Elixir's `maybe_renew_governance_limit/2`.
-    pub(super) fn note_renewal(&mut self, meta: &FlowMeta, (lease_ms, now): (u64, u64)) {
-        if let Some(credit) = meta
-            .governance
+    /// The credit lease to renew before extending the lease of the Flow
+    /// `command` names, as Elixir's `maybe_renew_governance_limit/2`: only
+    /// for a governed Flow whose current lease the command holds, and only
+    /// once (audit G54).
+    pub(crate) fn unrenewed_extension(
+        &self,
+        wall: u64,
+        command: &FlowCommand,
+        partition: &Partition,
+    ) -> Option<Renewal> {
+        let FlowCommand::Mutate(mutation) = command else {
+            return None;
+        };
+        let Change::ExtendLease {
+            lease_ms,
+            renewed: false,
+            ..
+        } = mutation.change
+        else {
+            return None;
+        };
+        let entry = self.hot(&(partition.clone(), mutation.id.clone()))?;
+        let held =
+            entry.record.lease().is_some_and(|lease| {
+                mutation.lease_token.as_deref() == Some(lease.token.as_bytes())
+            }) && entry.record.fence().get() == mutation.fence;
+        let credit = entry
+            .meta
             .as_deref()
-            .and_then(|governance| governance.credit.clone())
-        {
-            self.credit_renewals.push((credit, lease_ms, now));
-        }
-    }
-
-    /// The renewals to deliver once this round is durable.
-    pub(crate) fn take_credit_renewals(&mut self) -> Vec<Renewal> {
-        std::mem::take(&mut self.credit_renewals)
+            .and_then(|meta| meta.governance.as_deref())
+            .and_then(|governance| governance.credit.clone())?;
+        held.then(|| (credit, lease_ms, mutation.now_ms.unwrap_or(wall)))
     }
 
     /// Queues the credit of a Flow leaving `running`.

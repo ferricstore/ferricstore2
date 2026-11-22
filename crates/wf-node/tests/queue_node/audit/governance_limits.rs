@@ -492,3 +492,37 @@ fn a_governed_retry_still_wakes_a_waiting_claim() -> TestResult {
     in_use(&node, "waker", 0)?;
     Ok(())
 }
+
+#[test]
+fn an_extension_is_refused_once_its_credit_lease_lapsed() -> TestResult {
+    // Elixir's `maybe_renew_governance_limit/2` renews the credit lease
+    // before extending the Flow's lease, and refuses the extension when the
+    // credit lease has already lapsed: the worker no longer holds capacity.
+    // (A claim's spend keeps the credit lease to the Flow's lease, so it
+    // lapses with it.)
+    let node = open(&directory("audit-limits-lapsed")?, 4)?;
+    create_due(&node, "lapsed", &["lapsing"], "queued")?;
+    lease(&node, "lapsed", 1, 100)?;
+    let mut entries = claim_entries("lapsed", Some("lapsed"), 1_001);
+    entries.retain(|(key, _)| *key != "lease_ms");
+    entries.push(("lease_ms", int(100)));
+    let job = claimed(&node, &entries)?
+        .into_iter()
+        .next()
+        .ok_or("nothing claimed")?;
+    let refused = run(
+        &node,
+        "FLOW.EXTEND_LEASE",
+        &with(
+            lease_fields(&job),
+            &[("lease_ms", int(1_000)), ("now_ms", int(1_200))],
+        ),
+    )?;
+    assert_eq!(
+        refused.err().map(|error| error.to_string()),
+        Some("ERR flow limit lease expired".to_owned())
+    );
+    let kept = super::get(&node, "lapsing", &[("partition_key", text(P))])?;
+    assert_eq!(field(&kept, "lease_deadline_ms"), int(1_101));
+    Ok(())
+}
