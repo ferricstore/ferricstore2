@@ -173,6 +173,8 @@ pub(crate) struct Links {
     pub(crate) leased: Arc<AtomicU64>,
     /// The earliest lease deadline, `u64::MAX` with none (audit gap G24).
     pub(crate) expiry: Arc<AtomicU64>,
+    /// Due-indexed Flows by claim priority (audit gap G25).
+    pub(crate) by_priority: Arc<[AtomicU64; 3]>,
     pub(crate) waiters: Waiters,
     /// Delivers the credits of Flows that left `running` (ADR-014 step 15).
     pub(crate) release: Releases,
@@ -305,6 +307,9 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         links
             .expiry
             .store(state.earliest_lease(), Ordering::Relaxed);
+        for (published, count) in links.by_priority.iter().zip(state.ready_by_priority()) {
+            published.store(count, Ordering::Relaxed);
+        }
         // A FIFO lane whose head left it has a new head to claim.
         let freed = state.take_freed();
         if !freed.is_empty()

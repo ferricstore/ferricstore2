@@ -19,6 +19,8 @@ pub(crate) struct ShardLink {
     pub(crate) leased: Arc<AtomicU64>,
     /// The earliest lease deadline, published after each round.
     pub(crate) expiry: Arc<AtomicU64>,
+    /// Due-indexed Flows by claim priority, published after each round.
+    pub(crate) by_priority: Arc<[AtomicU64; 3]>,
     /// Items sent and not yet taken by the shard (ADR-017).
     pub(crate) backlog: Arc<AtomicUsize>,
 }
@@ -38,6 +40,9 @@ pub(crate) struct Router {
     /// Set once a replicated round was lost: the node serves nothing more
     /// until it reopens (ADR-018).
     pub(crate) poisoned: Arc<AtomicBool>,
+    /// Turns claims take to start sharing their limit at another shard
+    /// (audit gap G25).
+    pub(crate) claim_turn: std::sync::atomic::AtomicUsize,
 }
 
 pub(crate) fn shard_index(partition: &Partition, shards: u16) -> Option<usize> {
@@ -114,10 +119,37 @@ impl Router {
             .any(|shard| shard.expiry.load(Ordering::Relaxed) <= now)
     }
 
+    /// The shards holding due-indexed Flows of the highest priority any
+    /// shard holds, weighted by how many.
+    fn top_priority_weights(&self) -> Option<Vec<(usize, u64)>> {
+        (0..3).rev().find_map(|priority: usize| {
+            let weights: Vec<(usize, u64)> = self
+                .shards
+                .iter()
+                .enumerate()
+                .filter_map(|(index, shard)| {
+                    let count = shard.by_priority.get(priority)?.load(Ordering::Relaxed);
+                    (count > 0).then_some((index, count))
+                })
+                .collect();
+            (!weights.is_empty()).then_some(weights)
+        })
+    }
+
     /// Per shard, the indexed Flows the claim may take: due-indexed Flows,
     /// plus leased ones when it reclaims. Shards with none are left out.
     fn weights(&self, request: &ClaimFlows) -> Vec<(usize, u64)> {
         let running = request.running_only();
+        // Higher priorities first across shards, as Elixir drains them
+        // (audit gap G25): weight shards by the highest priority any holds.
+        // Expired leases are reclaimed in separate passes (G24); due work
+        // goes to the shards holding the highest priority.
+        if !running
+            && request.priority.is_none()
+            && let Some(weights) = self.top_priority_weights()
+        {
+            return weights;
+        }
         self.shards
             .iter()
             .enumerate()
@@ -139,15 +171,32 @@ impl Router {
     }
 }
 
-/// Splits `limit` over weighted shards: proportional floors, then the rest
-/// one at a time in order. Shards with a zero share are left out.
-pub(crate) fn split(limit: usize, weights: &[(usize, u64)]) -> Vec<(usize, usize)> {
-    let total: u128 = weights.iter().map(|(_, weight)| u128::from(*weight)).sum();
-    let wanted = u128::try_from(limit).unwrap_or(0);
-    let mut shares: Vec<(usize, u128)> = weights
+/// Splits `limit` over weighted shards: one each first (when the limit
+/// reaches that far, from the shard `turn` names on, so small claims take
+/// turns), then the rest by weight, proportional floors and then one at a
+/// time from `turn` on. Shards with a zero share are left out.
+pub(crate) fn split(limit: usize, weights: &[(usize, u64)], turn: usize) -> Vec<(usize, usize)> {
+    let count = weights.len();
+    if count == 0 {
+        return Vec::new();
+    }
+    let start = turn.checked_rem(count).unwrap_or(0);
+    let mut order: Vec<(usize, u64)> = weights
+        .iter()
+        .skip(start)
+        .chain(weights.iter().take(start))
+        .copied()
+        .collect();
+    if limit <= count {
+        order.truncate(limit);
+        return order.into_iter().map(|(index, _)| (index, 1)).collect();
+    }
+    let rest = u128::try_from(limit.saturating_sub(count)).unwrap_or(0);
+    let total: u128 = order.iter().map(|(_, weight)| u128::from(*weight)).sum();
+    let mut shares: Vec<(usize, u128)> = order
         .iter()
         .map(|(index, weight)| {
-            let share = wanted
+            let share = rest
                 .checked_mul(u128::from(*weight))
                 .and_then(|scaled| scaled.checked_div(total))
                 .unwrap_or(0);
@@ -155,17 +204,16 @@ pub(crate) fn split(limit: usize, weights: &[(usize, u64)]) -> Vec<(usize, usize
         })
         .collect();
     let assigned: u128 = shares.iter().map(|(_, share)| *share).sum();
-    let mut rest = wanted.saturating_sub(assigned);
+    let mut left = rest.saturating_sub(assigned);
     for (_, share) in &mut shares {
-        if rest == 0 {
+        if left == 0 {
             break;
         }
         *share = share.saturating_add(1);
-        rest = rest.saturating_sub(1);
+        left = left.saturating_sub(1);
     }
     shares
         .into_iter()
-        .filter(|(_, share)| *share > 0)
-        .filter_map(|(index, share)| Some((index, usize::try_from(share).ok()?)))
+        .filter_map(|(index, share)| Some((index, usize::try_from(share.saturating_add(1)).ok()?)))
         .collect()
 }

@@ -26,6 +26,7 @@ mod history_limits;
 mod leases;
 mod multi_state_claims;
 mod named_values;
+mod partition_scopes;
 mod payload_refs;
 mod policy_commands;
 mod policy_lifecycle;

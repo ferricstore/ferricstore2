@@ -106,7 +106,10 @@ fn attempt(router: &Router, mut run: Box<ClaimRun>) {
     if holders.is_empty() {
         return settle(router, run);
     }
-    let shares = split(run.request.limit, &holders);
+    let turn = router
+        .claim_turn
+        .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let shares = split(run.request.limit, &holders, turn);
     claim_round(router, run, shares);
 }
 
@@ -268,7 +271,10 @@ fn peeked_round(mut run: Box<ClaimRun>, parts: &[(usize, usize, Peeked)]) {
         return settle(&router, run);
     }
     let remaining = run.request.limit.saturating_sub(run.claimed.len());
-    let shares = split(remaining, &counts)
+    let turn = router
+        .claim_turn
+        .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let shares = split(remaining, &counts, turn)
         .into_iter()
         .map(|(index, share)| {
             let available = counts

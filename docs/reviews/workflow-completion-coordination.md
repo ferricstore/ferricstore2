@@ -66527,3 +66527,18 @@ The claim and completion paths gained checks in G21 and G24, so the SDK
 queue benchmark (400k Flows, 4 clients, 3 alternating runs) compared
 e4c7c3b (before G21) with 5df0ff3: 274-282k against 274-286k Flows/s and
 8.4-8.5 against 8.4-8.6 ms CPU per 1k Flows, within noise.
+
+### Flow test audit: claim scopes and fairness (22 Nov)
+
+`flow_test/sections/flow_native_due_index_mirrors_create_claim_due.exs`
+ported (`audit::partition_scopes`). G25 closed. RED: a limit-1 claim over
+any partition took the priority-0 Flow (`low`) while a priority-2 Flow
+waited on another shard. Decision: shards publish their due-indexed counts
+per priority after each round (three atomics beside `ready`); a claim
+without a priority filter weights the shards holding the highest priority
+any holds (reclaiming claims too: expired leases go through G24's passes);
+`split` gives each chosen shard one Flow first, from a turn that rotates
+per claim, then the rest by weight, so small claims take turns and a
+skewed pair yields one each. A shard chosen for a priority whose Flows are
+not yet due answers nothing, and the claim's later rounds ask the others,
+as before.

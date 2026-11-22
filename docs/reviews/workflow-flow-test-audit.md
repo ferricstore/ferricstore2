@@ -107,6 +107,15 @@ Gaps found so far:
   the ratio, then due Flows, then expired leases for the rest), but only
   when some shard's earliest lease deadline (published after each round)
   has passed; otherwise one pass takes the same Flows.
+- G25 (closed): a claim's limit was split over shards by their ready
+  counts and the rest given in shard order, so priority held only within a
+  shard (a limit-1 claim took a priority-0 Flow while a priority-2 one
+  waited on another shard), limit-1 claims kept taking the same shard, and
+  a limit of 2 over a skewed pair took both from one shard. Shards publish
+  ready counts per priority; a claim without a priority filter goes to the
+  shards holding the highest priority any holds; the split gives every
+  chosen shard one Flow first (from a turn that rotates per claim, so
+  small claims take turns) and the rest by weight.
 - P1 (open, performance): a batch's shared payload is logged in each
   Flow's after-image; Elixir logs it once per command. Clients see the
   same results; the log carries the payload once per Flow.
@@ -601,23 +610,23 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | Flow native due index mirrors create and claim_due | open |
-| 117 | FLUSHDB clears native Flow secondary indexes after durable deletes | open |
-| 166 | flow_claim_due validates record due time when native due score is stale | open |
-| 209 | flow_claim_due keeps metadata-indexed flows claimable through generic fallback | open |
-| 243 | flow_claim_due restores native overfetch beyond requested limit | open |
-| 282 | partition_key scopes claim, complete, retry, get, and history | open |
-| 344 | flow_claim_due only scans the selected partition | open |
-| 398 | flow_claim_due can scan selected partition_keys in one call | open |
-| 452 | flow_create without partition auto-spreads and default claim_due fetches across buckets | open |
-| 510 | flow_claim_due can scan any partition and selected states | open |
-| 570 | flow_claim_due omitted state claims any due state | open |
-| 595 | flow_claim_due any partition drains higher priority across shards first | open |
-| 647 | flow_claim_due any partition rotates start shard per type | open |
-| 706 | flow_claim_due any partition spreads small limits across shards under skew | open |
-| 756 | flow_claim_due skips stale due index members without starving live work | open |
-| 779 | flow_claim_due single-key native scan continues after stale candidate batch | open |
-| 820 | flow_claim_due multi-key native scan continues after stale candidate batch | open |
+| 8 | Flow native due index mirrors create and claim_due | ported (`audit::partition_scopes::a_partition_scopes_claims_reads_completions_and_history`; its index tables are Elixir's) |
+| 117 | FLUSHDB clears native Flow secondary indexes after durable deletes | internal: FLUSHDB (KV) and Elixir's native index tables |
+| 166 | flow_claim_due validates record due time when native due score is stale | internal: Elixir's stale native due scores |
+| 209 | flow_claim_due keeps metadata-indexed flows claimable through generic fallback | internal: Elixir's generic claim fallback |
+| 243 | flow_claim_due restores native overfetch beyond requested limit | internal: Elixir's native overfetch |
+| 282 | partition_key scopes claim, complete, retry, get, and history | ported (`audit::partition_scopes::a_partition_scopes_claims_reads_completions_and_history`) |
+| 344 | flow_claim_due only scans the selected partition | ported (`audit::partition_scopes::claims_take_one_partition_listed_ones_or_every_auto_bucket`) |
+| 398 | flow_claim_due can scan selected partition_keys in one call | ported (same test) |
+| 452 | flow_create without partition auto-spreads and default claim_due fetches across buckets | ported (same test) |
+| 510 | flow_claim_due can scan any partition and selected states | ported (`audit::partition_scopes::any_partition_and_unnamed_states_take_every_due_flow`) |
+| 570 | flow_claim_due omitted state claims any due state | ported (same test) |
+| 595 | flow_claim_due any partition drains higher priority across shards first | fixed (`audit::partition_scopes::any_partition_claims_take_higher_priority_first_and_share_shards`; G25) |
+| 647 | flow_claim_due any partition rotates start shard per type | fixed (same test; G25) |
+| 706 | flow_claim_due any partition spreads small limits across shards under skew | fixed (same test; G25) |
+| 756 | flow_claim_due skips stale due index members without starving live work | internal: Elixir's stale due index members |
+| 779 | flow_claim_due single-key native scan continues after stale candidate batch | internal: Elixir's native scan batches |
+| 820 | flow_claim_due multi-key native scan continues after stale candidate batch | internal: Elixir's native scan batches |
 
 ## `flow_user_value_atoms_test.exs`
 

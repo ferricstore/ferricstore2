@@ -27,16 +27,21 @@ impl ShardState {
     }
 
     fn count(&mut self, queue: &Queue, added: bool) {
-        let counter = if queue.state == RUNNING {
-            &mut self.leased
-        } else {
-            &mut self.ready
+        let step = |counter: &mut u64| {
+            *counter = if added {
+                counter.saturating_add(1)
+            } else {
+                counter.saturating_sub(1)
+            };
         };
-        *counter = if added {
-            counter.saturating_add(1)
-        } else {
-            counter.saturating_sub(1)
-        };
+        if queue.state == RUNNING {
+            step(&mut self.leased);
+            return;
+        }
+        step(&mut self.ready);
+        if let Some(counter) = self.ready_by_priority.get_mut(usize::from(queue.priority)) {
+            step(counter);
+        }
     }
 
     pub(super) fn index(&mut self, key: &Key, entry: &Entry) {

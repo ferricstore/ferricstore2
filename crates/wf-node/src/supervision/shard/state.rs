@@ -94,6 +94,8 @@ pub(crate) struct ShardState {
     retention_ms: u64,
     next_sequence: u64,
     ready: u64,
+    /// Due-indexed Flows by claim priority 0 to 2 (audit gap G25).
+    ready_by_priority: [u64; 3],
     leased: u64,
     /// Shared values by reference (ADR-014 step 5).
     shared: Map<Vec<u8>, value::Shared>,
@@ -161,6 +163,7 @@ impl ShardState {
             retention_ms,
             next_sequence: 0,
             ready: 0,
+            ready_by_priority: [0; 3],
             leased: 0,
             shared: Map::default(),
             held: value::Held::default(),
@@ -199,6 +202,11 @@ impl ShardState {
     /// Records in the due index, claimable now or later.
     pub(crate) const fn ready(&self) -> u64 {
         self.ready
+    }
+
+    /// Due-indexed Flows by claim priority 0 to 2.
+    pub(crate) const fn ready_by_priority(&self) -> [u64; 3] {
+        self.ready_by_priority
     }
 
     /// The earliest lease deadline of a running Flow, `u64::MAX` with none.

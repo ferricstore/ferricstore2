@@ -53,6 +53,7 @@ impl Started {
                 ready: Arc::new(AtomicU64::new(0)),
                 leased: Arc::new(AtomicU64::new(0)),
                 expiry: Arc::new(AtomicU64::new(u64::MAX)),
+                by_priority: Arc::new([AtomicU64::new(0), AtomicU64::new(0), AtomicU64::new(0)]),
                 waiters: waiters.clone(),
                 release: credit::releaser(Arc::clone(&release_router)),
                 backlog: Arc::new(AtomicUsize::new(0)),
@@ -66,6 +67,7 @@ impl Started {
             admission: config.admission,
             role,
             poisoned,
+            claim_turn: std::sync::atomic::AtomicUsize::new(0),
         });
         let _set = release_router.set(Arc::downgrade(&router));
         Ok(Self {
@@ -90,6 +92,7 @@ fn start_shards(
         let ready = Arc::new(AtomicU64::new(state.ready()));
         let leased = Arc::new(AtomicU64::new(state.leased()));
         let expiry = Arc::new(AtomicU64::new(state.earliest_lease()));
+        let by_priority = Arc::new(state.ready_by_priority().map(AtomicU64::new));
         let backlog = Arc::new(AtomicUsize::new(0));
         let shard_links = Links {
             index: u16::try_from(index).map_err(|_| NodeError::InvalidShards)?,
@@ -98,6 +101,7 @@ fn start_shards(
             ready: Arc::clone(&ready),
             leased: Arc::clone(&leased),
             expiry: Arc::clone(&expiry),
+            by_priority: Arc::clone(&by_priority),
             waiters: shared.waiters.clone(),
             release: Arc::clone(&shared.release),
             backlog: Arc::clone(&backlog),
@@ -113,6 +117,7 @@ fn start_shards(
             ready,
             leased,
             expiry,
+            by_priority,
             backlog,
         });
     }
