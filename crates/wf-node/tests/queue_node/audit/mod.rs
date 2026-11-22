@@ -24,6 +24,7 @@ mod create_many;
 mod history_filters;
 mod history_limits;
 mod leases;
+mod multi_state_claims;
 mod named_values;
 mod payload_refs;
 mod policy_commands;

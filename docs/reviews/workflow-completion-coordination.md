@@ -66513,3 +66513,17 @@ deadlines, so claims with nothing expired (the benchmark's usual case)
 keep one fan-out. P1 recorded open: shared batch payloads are logged per
 Flow. Elixir's hot and cold history tiers, LMDB seeks and configured
 defaults are internal.
+
+### Flow test audit: multi-state claims; cost of G21 and G24 (22 Nov)
+
+`flow_test/sections/claim_due_multi_state_claims_earliest_due_job_instead_
+first_listed_state.exs` ported (`audit::multi_state_claims`, eight tests,
+stable over five runs); no gap. Its pipelined reclaim test is recorded as
+an Elixir inconsistency, not ported: its pipeline batching reclaims before
+ready work where its single limit-one claim prefers ready work, and the
+node keeps the single claim's rule for both.
+
+The claim and completion paths gained checks in G21 and G24, so the SDK
+queue benchmark (400k Flows, 4 clients, 3 alternating runs) compared
+e4c7c3b (before G21) with 5df0ff3: 274-282k against 274-286k Flows/s and
+8.4-8.5 against 8.4-8.6 ms CPU per 1k Flows, within noise.

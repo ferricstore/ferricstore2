@@ -531,49 +531,49 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | claim_due multi-state claims earliest due job instead of first listed state | open |
-| 46 | pipeline_claim_due_batch groups interleaved independent partitions | open |
-| 99 | pipeline_claim_due_batch batches distinct partition claims without overclaiming | open |
-| 167 | pipeline_claim_due_batch singleton partition list claims across shards | open |
-| 205 | pipeline_claim_due_batch singleton auto partition scans across shards | open |
-| 243 | pipeline_claim_due_batch singleton any partition scans across shards | open |
-| 280 | pipeline_claim_due_batch accepts omitted NOW option | open |
-| 303 | flow_claim_due BLOCK waits without polling and wakes after due create | open |
-| 343 | flow_claim_due BLOCK re-registers after a spurious wake loses the claim | open |
-| 389 | flow_claim_due BLOCK wakes when due create uses default state | open |
-| 428 | flow_claim_due BLOCK uses claim limit as waiter credit capacity | open |
-| 482 | flow_claim_due BLOCK times out with an empty claim | open |
-| 498 | flow_claim_due BLOCK is not consumed by retry policy backoff wake | open |
-| 563 | flow_claim_due BLOCK wakes for retry scheduled before waiter registers | open |
-| 623 | pipeline_claim_due_batch preserves sequential reclaim preference | open |
-| 680 | pipeline_read_batch hydrates Flow GET payloads with per-command caps | open |
-| 718 | flow_create idempotent retry returns matching existing record and rejects conflicts | open |
-| 758 | flow_create idempotent retry matches large blob-backed payloads | open |
-| 806 | flow due index stays derived and does not persist per-flow zset members | open |
+| 8 | claim_due multi-state claims earliest due job instead of first listed state | ported (`audit::multi_state_claims::a_claim_over_several_states_takes_the_earliest_due`) |
+| 46 | pipeline_claim_due_batch groups interleaved independent partitions | ported (`audit::multi_state_claims::claims_per_partition_take_one_each_without_overclaiming`; pipelined claims are answered one by one) |
+| 99 | pipeline_claim_due_batch batches distinct partition claims without overclaiming | ported (same test) |
+| 167 | pipeline_claim_due_batch singleton partition list claims across shards | ported (`audit::multi_state_claims::a_claim_spans_listed_auto_and_any_partitions`) |
+| 205 | pipeline_claim_due_batch singleton auto partition scans across shards | ported (same test) |
+| 243 | pipeline_claim_due_batch singleton any partition scans across shards | ported (same test) |
+| 280 | pipeline_claim_due_batch accepts omitted NOW option | ported (`audit::multi_state_claims::a_claim_without_a_clock_takes_work_due_in_the_past`) |
+| 303 | flow_claim_due BLOCK waits without polling and wakes after due create | covered (`blocking::a_blocking_claim_wakes_for_a_create`) |
+| 343 | flow_claim_due BLOCK re-registers after a spurious wake loses the claim | internal: Elixir's waiter registry (the node's waits use an epoch against lost wakeups, ADR-013) |
+| 389 | flow_claim_due BLOCK wakes when due create uses default state | ported (`audit::multi_state_claims::a_blocking_claim_wakes_for_a_create_in_the_default_state`) |
+| 428 | flow_claim_due BLOCK uses claim limit as waiter credit capacity | ported (`audit::multi_state_claims::one_waking_claim_takes_up_to_its_limit_and_the_others_keep_waiting`) |
+| 482 | flow_claim_due BLOCK times out with an empty claim | covered (`blocking::a_blocking_claim_returns_nothing_at_its_deadline`) |
+| 498 | flow_claim_due BLOCK is not consumed by retry policy backoff wake | ported (`audit::multi_state_claims::a_blocking_claim_wakes_for_a_retry_due_after_its_backoff`) |
+| 563 | flow_claim_due BLOCK wakes for retry scheduled before waiter registers | ported (same test) |
+| 623 | pipeline_claim_due_batch preserves sequential reclaim preference | internal: Elixir's pipeline batching reclaims before ready work, unlike its single limit-one claim (`flow_claim_due limit one prefers ready queued work before expired lease reclaim`); the node answers each pipelined claim as a single one |
+| 680 | pipeline_read_batch hydrates Flow GET payloads with per-command caps | covered (`audit::records_and_claims::a_read_returns_the_payload_only_when_asked_and_within_its_cap`) |
+| 718 | flow_create idempotent retry returns matching existing record and rejects conflicts | ported (`audit::multi_state_claims::an_idempotent_create_answers_the_existing_flow_or_a_conflict`) |
+| 758 | flow_create idempotent retry matches large blob-backed payloads | ported (same test) |
+| 806 | flow due index stays derived and does not persist per-flow zset members | internal: Elixir's due index storage |
 
 ## `flow/workflow_sdk_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 188 | create derives type, state and partition key from attrs | open |
-| 208 | derived partition keys cannot collide through component delimiters | open |
-| 226 | create_many groups by shard in core by passing per-item partition keys | open |
-| 244 | workflow commands cannot override the declared flow type | open |
-| 270 | partition builders reject non-scalar values without raising | open |
-| 281 | child builds child specs with workflow defaults | open |
-| 297 | fanout wraps flow_spawn_children with parent guard defaults and aliases | open |
-| 329 | children and waiting_children query by parent with partition inherited from job | open |
-| 350 | claim_due applies state defaults and wraps returned records as jobs | open |
-| 367 | ok follows on_ok transition and carries lease/fencing guards | open |
-| 386 | ok can complete terminal states | open |
-| 404 | error applies state retry policy and exhausted target | open |
-| 425 | install_policy writes DSL retry policy into embedded API | open |
-| 445 | install_policy writes each declared state execution mode | open |
-| 461 | install_policy can explicitly patch an existing policy | open |
-| 470 | worker polls claim_due and applies ok result | open |
-| 497 | run_once and handle convert handler return values to ok or error commands | open |
-| 531 | handle does not convert storage mutation failures into a second command | open |
-| 554 | reclaim_once wraps reclaimed records as jobs | open |
+| 188 | create derives type, state and partition key from attrs | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 208 | derived partition keys cannot collide through component delimiters | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 226 | create_many groups by shard in core by passing per-item partition keys | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 244 | workflow commands cannot override the declared flow type | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 270 | partition builders reject non-scalar values without raising | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 281 | child builds child specs with workflow defaults | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 297 | fanout wraps flow_spawn_children with parent guard defaults and aliases | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 329 | children and waiting_children query by parent with partition inherited from job | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 350 | claim_due applies state defaults and wraps returned records as jobs | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 367 | ok follows on_ok transition and carries lease/fencing guards | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 386 | ok can complete terminal states | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 404 | error applies state retry policy and exhausted target | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 425 | install_policy writes DSL retry policy into embedded API | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 445 | install_policy writes each declared state execution mode | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 461 | install_policy can explicitly patch an existing policy | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 470 | worker polls claim_due and applies ok result | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 497 | run_once and handle convert handler return values to ok or error commands | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 531 | handle does not convert storage mutation failures into a second command | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
+| 554 | reclaim_once wraps reclaimed records as jobs | internal: Elixir's in-process workflow DSL tested against a stub store (a client library; the node serves the commands it sends, tested per command) |
 
 ## `flow_value_payload_test.exs`
 
