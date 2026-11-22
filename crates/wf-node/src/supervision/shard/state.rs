@@ -201,6 +201,16 @@ impl ShardState {
         self.ready
     }
 
+    /// The earliest lease deadline of a running Flow, `u64::MAX` with none.
+    pub(crate) fn earliest_lease(&self) -> u64 {
+        self.queues
+            .iter()
+            .filter(|(queue, _)| queue.state == RUNNING)
+            .filter_map(|(_, due)| due.first_key_value().map(|((deadline, _), _)| *deadline))
+            .min()
+            .unwrap_or(u64::MAX)
+    }
+
     /// Leased running records, reclaimable once their lease expires.
     pub(crate) const fn leased(&self) -> u64 {
         self.leased

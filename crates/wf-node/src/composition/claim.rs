@@ -20,6 +20,8 @@ use crate::supervision::waiters::{Parked, Wake};
 use super::admission::Class;
 use super::router::{Router, split};
 
+mod phased;
+
 /// Most claim rounds in one attempt.
 const MAX_ROUNDS: u8 = 4;
 
@@ -57,6 +59,9 @@ pub(crate) fn start(
     credits: Option<Arc<CreditPool>>,
     reply: Reply<Vec<ClaimedFlow>>,
 ) {
+    if phased::applies(router, &request) {
+        return phased::claim(router, request, credits, reply);
+    }
     let partitions: Option<Arc<[Partition]>> = request
         .partitions
         .as_ref()

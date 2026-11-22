@@ -96,6 +96,20 @@ Gaps found so far:
   text), and `result_ref`, `error_ref` and `reason_ref` on a mutation say
   `ERR flow <name> input is not supported; use <value>` instead of the
   unknown-option refusal.
+- G23 (closed): a history event took its command's time, so a claim whose
+  time was behind the Flow's last change got an earlier event id
+  (`2000-2` after `10000-1`). An event's time is never below the last
+  event's, as Elixir's stream ids only rise.
+- G24 (closed): a claim's `reclaim_ratio` was applied by each shard to its
+  share of the limit, so a limit split into ones took due work and
+  reclaimed nothing. A non-blocking claim with a ratio and a limit above
+  one runs Elixir's three passes over every shard (expired leases up to
+  the ratio, then due Flows, then expired leases for the rest), but only
+  when some shard's earliest lease deadline (published after each round)
+  has passed; otherwise one pass takes the same Flows.
+- P1 (open, performance): a batch's shared payload is logged in each
+  Flow's after-image; Elixir logs it once per command. Clients see the
+  same results; the log carries the payload once per Flow.
 
 ## `flow_write_contract_test.exs`
 
@@ -444,26 +458,26 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | flow_history supports range reverse event and worker filters | open |
-| 125 | flow_history filtered cold query finds recent tail events beyond oldest scan window | open |
-| 173 | flow_history filtered cold query returns latest matching page | open |
-| 224 | flow_history filtered cold query keeps old head window before filtering | open |
-| 287 | flow_history filtered cold query finds retained middle events beyond sampled edges | open |
-| 337 | flow_terminals and flow_failures list terminal records by state and time range | open |
-| 431 | flow_terminals returns completed failed and cancelled records with the same timestamp | open |
-| 478 | cold terminal query seeks to filtered time window instead of sampling prefix head | open |
-| 538 | flow_history event ids stay monotonic when claim time is behind record time | open |
-| 568 | flow_history falls back to bounded history key scan when Flow index misses | open |
-| 617 | flow history hot max keeps only latest configured hot events | open |
-| 672 | flow history hot-only count returns latest events when hot window is larger than total | open |
-| 710 | flow history max events hard-caps stored history records | open |
-| 771 | flow history max events defaults to 100k and rejects invalid caps | open |
-| 791 | flow history LMDB filtered scans stay bounded to requested history count | open |
-| 801 | flow history hard default is clamped by configured maximum | open |
-| 818 | flow history configured maximum cannot exceed hard cap | open |
-| 828 | flow history uses configured default hot max when omitted | open |
-| 859 | flow history default hot max keeps no events hot | open |
-| 875 | flow history hot max accepts zero | open |
+| 8 | flow_history supports range reverse event and worker filters | ported (`audit::history_filters::history_filters_by_event_range_time_order_event_worker_and_version`) |
+| 125 | flow_history filtered cold query finds recent tail events beyond oldest scan window | ported (`audit::history_filters::version_windows_return_their_events_and_the_latest_page`; scan windows are Elixir's storage) |
+| 173 | flow_history filtered cold query returns latest matching page | ported (same test, the latest page) |
+| 224 | flow_history filtered cold query keeps old head window before filtering | ported (same test) |
+| 287 | flow_history filtered cold query finds retained middle events beyond sampled edges | ported (same test) |
+| 337 | flow_terminals and flow_failures list terminal records by state and time range | ported (`audit::history_filters::terminal_and_failure_lists_filter_by_state_and_time`; FLOW.TERMINALS is retired, read as the SDK's FLOW.QUERY text) |
+| 431 | flow_terminals returns completed failed and cancelled records with the same timestamp | ported (same test, three Flows finished at one time) |
+| 478 | cold terminal query seeks to filtered time window instead of sampling prefix head | internal: Elixir's LMDB seek for cold terminal rows |
+| 538 | flow_history event ids stay monotonic when claim time is behind record time | fixed (`audit::history_filters::history_keeps_its_cap_and_its_event_ids_rise`; G23) |
+| 568 | flow_history falls back to bounded history key scan when Flow index misses | internal: Elixir's history key scan fallback |
+| 617 | flow history hot max keeps only latest configured hot events | internal: Elixir's hot and cold history tiers |
+| 672 | flow history hot-only count returns latest events when hot window is larger than total | internal: Elixir's hot-only reads |
+| 710 | flow history max events hard-caps stored history records | ported (`audit::history_filters::history_keeps_its_cap_and_its_event_ids_rise`) |
+| 771 | flow history max events defaults to 100k and rejects invalid caps | ported (same test) |
+| 791 | flow history LMDB filtered scans stay bounded to requested history count | internal: Elixir's LMDB scan bound |
+| 801 | flow history hard default is clamped by configured maximum | internal: Elixir's configured history defaults |
+| 818 | flow history configured maximum cannot exceed hard cap | ported (same test; the node's maximum is the hard cap, 1000000) |
+| 828 | flow history uses configured default hot max when omitted | internal: Elixir's configured hot default |
+| 859 | flow history default hot max keeps no events hot | internal: Elixir's configured hot default |
+| 875 | flow history hot max accepts zero | ported (same test) |
 
 ## `flow_test/sections/flow_create_stores_debug_lineage_metadata_indexes_it.exs`
 
@@ -493,25 +507,25 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | flow_claim_due automatically reclaims expired leases by ratio | open |
-| 49 | flow_claim_due can disable automatic expired lease reclaim | open |
-| 79 | flow_claim_due limit one prefers ready queued work before expired lease reclaim | open |
-| 119 | expired running lease reclaim is partition scoped | open |
-| 199 | flow_transition atomically moves state, due index, and history | open |
-| 250 | flow_transition rejects direct moves into running state | open |
-| 271 | flow_transition_many atomically moves one-partition batch | open |
-| 325 | flow_transition_many rejects direct moves into running state | open |
-| 359 | flow_transition_many shared payload keeps per-flow refs and values | open |
-| 414 | flow_transition_many shared payload is encoded once in the replicated command | open |
-| 453 | independent flow_transition_many shared payload is encoded once per shard | open |
-| 494 | flow_transition_many rolls back when any item fails guard | open |
-| 545 | flow_transition_many independent keeps successful items when one item fails | open |
-| 577 | flow transition pipeline batch preserves duplicate key ordering | open |
-| 601 | flow_transition_many spans shards and rolls back failing shard group | open |
-| 655 | flow many commands route auto-partition records by their real state key | open |
-| 758 | flow_complete_many atomically completes one-partition batch | open |
-| 807 | flow_complete_many rolls back when any item fails guard | open |
-| 864 | flow_complete_many spans shards and rolls back failing shard group | open |
+| 8 | flow_claim_due automatically reclaims expired leases by ratio | fixed (`audit::reclaim_batches::expired_leases_are_reclaimed_by_ratio_off_or_after_ready_work`; G24) |
+| 49 | flow_claim_due can disable automatic expired lease reclaim | ported (same test) |
+| 79 | flow_claim_due limit one prefers ready queued work before expired lease reclaim | ported (same test) |
+| 119 | expired running lease reclaim is partition scoped | ported (`audit::reclaim_batches::a_running_claim_reclaims_only_its_partition`; the stuck list as the SDK's FLOW.QUERY text) |
+| 199 | flow_transition atomically moves state, due index, and history | ported (`audit::reclaim_batches::a_transition_moves_state_due_time_and_history_but_never_into_running`) |
+| 250 | flow_transition rejects direct moves into running state | ported (same test) |
+| 271 | flow_transition_many atomically moves one-partition batch | ported (`audit::batch_moves::a_transition_batch_moves_a_partition_together_or_not_at_all`) |
+| 325 | flow_transition_many rejects direct moves into running state | ported (same test) |
+| 359 | flow_transition_many shared payload keeps per-flow refs and values | ported (`audit::batch_moves::a_shared_batch_payload_gives_each_flow_its_own_reference`) |
+| 414 | flow_transition_many shared payload is encoded once in the replicated command | open perf P1: a batch's shared payload is logged once per Flow (after-images); Elixir logs it once per command |
+| 453 | independent flow_transition_many shared payload is encoded once per shard | open perf P1 (same, per shard for an independent batch) |
+| 494 | flow_transition_many rolls back when any item fails guard | ported (`audit::batch_moves::a_transition_batch_moves_a_partition_together_or_not_at_all`) |
+| 545 | flow_transition_many independent keeps successful items when one item fails | ported (`audit::batch_moves::an_independent_transition_batch_keeps_its_successes`) |
+| 577 | flow transition pipeline batch preserves duplicate key ordering | covered (`audit::records_and_claims::each_command_of_an_independent_batch_answers_for_itself`, two transitions in order) |
+| 601 | flow_transition_many spans shards and rolls back failing shard group | ported (`audit::batch_moves::a_transition_batch_moves_a_partition_together_or_not_at_all`; all-or-none per partition, Elixir's unit is the shard) |
+| 655 | flow many commands route auto-partition records by their real state key | ported (`audit::batch_moves::items_without_a_partition_go_to_their_own_auto_partition`) |
+| 758 | flow_complete_many atomically completes one-partition batch | ported (`audit::batch_moves::a_completion_batch_finishes_a_partition_together_or_not_at_all`) |
+| 807 | flow_complete_many rolls back when any item fails guard | ported (same test) |
+| 864 | flow_complete_many spans shards and rolls back failing shard group | ported (same test; per partition) |
 
 ## `flow_test/sections/claim_due_multi_state_claims_earliest_due_job_instead_first_listed_state.exs`
 

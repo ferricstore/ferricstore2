@@ -66498,3 +66498,18 @@ result_ref is not supported by this server` against Elixir's `result_ref
 input is not supported; use result`). A create batch without
 `independent` is all-or-none per partition here, where Elixir's unit is
 the shard; the port states the node's rule.
+
+### Flow test audit: history filters, reclaim and batches (22 Nov)
+
+`flow_test/sections/flow_history_supports_range_reverse_event_worker_
+filters.exs` and `.../flow_claim_due_automatically_reclaims_expired_leases_
+ratio.exs` ported (`audit::history_filters`, `audit::reclaim_batches`,
+`audit::batch_moves`). G23 closed (RED: event ids `10000-1`, `2000-2`): an
+event's time is never below the last event's, read from the packed
+history's last record without decoding it. G24 closed (RED: a limit-4
+claim with ratio 50 took four fresh Flows and reclaimed none): Elixir's
+three router passes, gated on the shards' published earliest lease
+deadlines, so claims with nothing expired (the benchmark's usual case)
+keep one fan-out. P1 recorded open: shared batch payloads are logged per
+Flow. Elixir's hot and cold history tiers, LMDB seeks and configured
+defaults are internal.

@@ -17,6 +17,8 @@ pub(crate) struct ShardLink {
     pub(crate) ready: Arc<AtomicU64>,
     /// Leased running Flows, published after each round.
     pub(crate) leased: Arc<AtomicU64>,
+    /// The earliest lease deadline, published after each round.
+    pub(crate) expiry: Arc<AtomicU64>,
     /// Items sent and not yet taken by the shard (ADR-017).
     pub(crate) backlog: Arc<AtomicUsize>,
 }
@@ -102,6 +104,14 @@ impl Router {
             }
             None => self.weights(request),
         }
+    }
+
+    /// Whether a lease on some shard has expired by `now`, as of the
+    /// shards' last rounds.
+    pub(crate) fn any_expired(&self, now: u64) -> bool {
+        self.shards
+            .iter()
+            .any(|shard| shard.expiry.load(Ordering::Relaxed) <= now)
     }
 
     /// Per shard, the indexed Flows the claim may take: due-indexed Flows,

@@ -267,7 +267,18 @@ impl History {
     pub(crate) fn push(&mut self, event: &HistoryEvent, cap: u64) {
         let start = self.bytes.len();
         let mut encoded = Vec::with_capacity(64);
-        if encode(&mut encoded, event).is_none() {
+        // Event ids rise, as Elixir's stream ids do: an event stamped before
+        // the last one (a claim whose time is behind the Flow's) takes the
+        // last one's time (audit gap G23).
+        let floor = self.last_at();
+        let written = if event.at < floor {
+            let mut later = event.clone();
+            later.at = floor;
+            encode(&mut encoded, &later)
+        } else {
+            encode(&mut encoded, event)
+        };
+        if written.is_none() {
             return;
         }
         // Most Flows keep a few events: grow exactly instead of doubling.
@@ -290,6 +301,19 @@ impl History {
             .last_start
             .saturating_sub(u32::try_from(length).unwrap_or(u32::MAX));
         true
+    }
+
+    /// The time of the newest event, or 0 with none: the field after its
+    /// kind byte.
+    fn last_at(&self) -> u64 {
+        let start = usize::try_from(self.last_start).unwrap_or(usize::MAX);
+        match self.bytes.get(start..) {
+            Some(last) if self.count > 0 => {
+                let mut cursor = Cursor(last);
+                cursor.u8().and_then(|_| cursor.varint()).unwrap_or(0)
+            }
+            _ => 0,
+        }
     }
 
     /// How many events are kept.

@@ -52,6 +52,7 @@ impl Started {
                 role: role.clone(),
                 ready: Arc::new(AtomicU64::new(0)),
                 leased: Arc::new(AtomicU64::new(0)),
+                expiry: Arc::new(AtomicU64::new(u64::MAX)),
                 waiters: waiters.clone(),
                 release: credit::releaser(Arc::clone(&release_router)),
                 backlog: Arc::new(AtomicUsize::new(0)),
@@ -88,6 +89,7 @@ fn start_shards(
         let (sender, receiver) = mpsc::channel();
         let ready = Arc::new(AtomicU64::new(state.ready()));
         let leased = Arc::new(AtomicU64::new(state.leased()));
+        let expiry = Arc::new(AtomicU64::new(state.earliest_lease()));
         let backlog = Arc::new(AtomicUsize::new(0));
         let shard_links = Links {
             index: u16::try_from(index).map_err(|_| NodeError::InvalidShards)?,
@@ -95,6 +97,7 @@ fn start_shards(
             role: shared.role.clone(),
             ready: Arc::clone(&ready),
             leased: Arc::clone(&leased),
+            expiry: Arc::clone(&expiry),
             waiters: shared.waiters.clone(),
             release: Arc::clone(&shared.release),
             backlog: Arc::clone(&backlog),
@@ -109,6 +112,7 @@ fn start_shards(
             requests: sender,
             ready,
             leased,
+            expiry,
             backlog,
         });
     }
