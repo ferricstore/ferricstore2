@@ -37,6 +37,8 @@ const MAX_TYPE_BYTES: usize = 128;
 const MAX_STATE_BYTES: usize = 64;
 const MAX_CORRELATION_ID_BYTES: usize = 256;
 const MAX_REF_BYTES: usize = 256;
+/// Parent, root and correlation ids, as Elixir's references (audit gap G32).
+const MAX_LINEAGE_BYTES: usize = 4_096;
 const MAX_PARTITION_KEY_BYTES: usize = 256;
 const MAX_HISTORY_HOT_MAX_EVENTS: u64 = 10_000;
 const MAX_HISTORY_MAX_EVENTS: u64 = 1_000_000;
@@ -99,21 +101,19 @@ pub struct CreateFlow {
     pub payload_ref: Option<Vec<u8>>,
 }
 
-fn too_long(key: &str, max: usize) -> FlowError {
-    FlowError::flow(key, &format!("is longer than {max} bytes"))
-}
-
 fn bounded(key: &str, value: Option<&[u8]>, max: usize) -> Result<(), FlowError> {
     match value {
-        Some(value) if value.len() > max => Err(too_long(key, max)),
+        Some(value) if value.len() > max => {
+            Err(FlowError::flow(key, &format!("is longer than {max} bytes")))
+        }
         _ => Ok(()),
     }
 }
 
 fn ref_size(key: &str, value: Option<&[u8]>) -> Result<(), FlowError> {
     match value {
-        Some(value) if value.len() > MAX_REF_BYTES => Err(FlowError::rejected(format!(
-            "ERR flow {key} too large (max {MAX_REF_BYTES} bytes)"
+        Some(value) if value.len() > MAX_LINEAGE_BYTES => Err(FlowError::rejected(format!(
+            "ERR flow {key} too large (max {MAX_LINEAGE_BYTES} bytes)"
         ))),
         _ => Ok(()),
     }

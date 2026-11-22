@@ -15,6 +15,9 @@ use super::create::{self, CreateFlow, MaxActive};
 use super::opts::Opts;
 use super::term::Term;
 
+/// The longest new child group id.
+const MAX_GROUP_ID_BYTES: usize = 128;
+
 /// A spawn request.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SpawnChildren {
@@ -69,11 +72,23 @@ fn exhaust_to(opts: &Opts<'_>) -> Result<(Vec<u8>, Vec<u8>), FlowError> {
         Some(exhaust) => (pick(exhaust.get(b"success")), pick(exhaust.get(b"failure"))),
         None => (pick(opts.get("success")), pick(opts.get("failure"))),
     };
-    success.zip(failure).ok_or_else(|| {
+    let (success, failure) = success.zip(failure).ok_or_else(|| {
         FlowError::rejected(
             "ERR flow exhaust_to must include success and failure states".to_owned(),
         )
-    })
+    })?;
+    bounded_state(&success)?;
+    bounded_state(&failure)?;
+    Ok((success, failure))
+}
+
+/// A state a group moves its parent into is a new state, held to 64 bytes
+/// as Elixir holds it (audit gap G33).
+fn bounded_state(state: &[u8]) -> Result<(), FlowError> {
+    if state.len() > 64 {
+        return Err(FlowError::flow("state", "is longer than 64 bytes"));
+    }
+    Ok(())
 }
 
 fn child(item: &Term, opts: &Opts<'_>, parent_partition: &[u8]) -> Result<CreateFlow, FlowError> {
@@ -230,6 +245,10 @@ pub fn parse(args: &Term) -> Result<SpawnChildren, FlowError> {
     let partition_key = create::partition_key(&opts)?
         .ok_or_else(|| FlowError::flow("partition_key", "is required"))?;
     let group_id = opts.required_binary("group_id")?;
+    // A new group's id is bounded as Elixir bounds it (audit gap G33).
+    if group_id.len() > MAX_GROUP_ID_BYTES {
+        return Err(FlowError::flow("group_id", "is longer than 128 bytes"));
+    }
     if group_id.starts_with(b"__") {
         return Err(FlowError::rejected(
             "ERR flow group_id is reserved".to_owned(),
@@ -241,6 +260,7 @@ pub fn parse(args: &Term) -> Result<SpawnChildren, FlowError> {
     let wait_state = opts
         .binary_or_nil("wait_state")?
         .filter(|state| !state.is_empty());
+    wait_state.as_deref().map_or(Ok(()), bounded_state)?;
     let lease_token = match opts.get("lease_token") {
         None | Some(Term::Nil) => None,
         Some(Term::Bin(token)) if !token.is_empty() => Some(token.clone()),

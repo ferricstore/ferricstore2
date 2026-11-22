@@ -66655,3 +66655,30 @@ part was reverted, so attribute names stay as written. Reading the stored
 key instead of the policy's fails the test. Its LMDB rows, migration
 worker, value discovery API and out-of-range integers (the protocol's are
 64-bit) are Elixir's.
+
+### Flow test audit: read API and input limits (22 Nov)
+
+`flow/read_api_test.exs`: a 256-byte attribute value and a lineage query
+in an auto partition ported (`audit::read_api`); the NUL-bearing value was
+already in `flow_info`; the rest is Elixir's scan counts, LMDB rows,
+configured limits, `:auto` atoms and retired reads whose time checks the
+SDK builder makes before sending.
+
+`flow/flow_input_limits_test.exs` ported (`audit::input_limits`). Two gaps
+closed:
+
+- G32. RED: a create with a 300-byte `parent_flow_id` answered "ERR flow
+  parent_flow_id too large (max 256 bytes)"; a 257-byte correlation id
+  answered that text too, where Elixir says "is longer than 256 bytes".
+  Lineage ids now take Elixir's 4096-byte reference bound
+  (`MAX_LINEAGE_BYTES`); `payload_ref` and attached value references keep
+  their 256 bytes.
+- G33. RED: `SPAWN_CHILDREN` with a 129-byte group id answered `OK`, and
+  so did a 65-byte wait state. Group ids take 128 bytes, and the wait and
+  exhaust states 64, with Elixir's texts.
+
+Mutation checks: each bound loosened (group id, success, failure and wait
+states, lineage at 256 or unbounded) fails a test; the failure state's
+first survived until the test gave it its own case. Its Flows stored
+before the limits came through Elixir's uncapped internal create, which
+the node has no form of.

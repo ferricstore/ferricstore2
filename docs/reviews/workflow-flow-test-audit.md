@@ -149,6 +149,14 @@ Gaps found so far:
   moves them. GET reads the key from the type's current policy (searches
   never depended on it). Attribute names stay as written: Elixir makes
   attribute index changes future-only.
+- G32 (closed): parent, root and correlation ids were bounded at 256 bytes
+  with "too large (max 256 bytes)", so a 300-byte parent or root id
+  Elixir takes was refused and a long correlation id got the wrong text.
+  They take Elixir's 4096-byte reference bound, and a new correlation id
+  its own 256 ("is longer than 256 bytes").
+- G33 (closed): a child group's id, wait state and exhaust states were not
+  bounded: a 129-byte group id or a 65-byte state was accepted. They take
+  128 and 64 bytes, with Elixir's texts.
 - P1 (open, performance): a batch's shared payload is logged in each
   Flow's after-image; Elixir logs it once per command. Clients see the
   same results; the log carries the payload once per Flow.
@@ -743,37 +751,37 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 28 | terminal query timestamps reject values above the exact integer ceiling | open |
-| 33 | stuck query timestamps reject values above the exact integer ceiling | open |
-| 38 | candidate scan counts cover disjoint RAM and LMDB index entries | open |
-| 42 | candidate selection never prefers a failed count over a successful count | open |
-| 51 | query callers may lower but cannot raise the bounded candidate scan ceiling | open |
-| 56 | attribute discovery fails closed on corrupt query-index values | open |
-| 68 | attribute discovery rejects query-index key and value mismatches | open |
-| 81 | attribute discovery decodes typed values inside query-index key components | open |
-| 95 | attribute discovery retains maximum-size string values outside the LMDB key | open |
-| 111 | attribute discovery propagates expired query-index deletion failures | open |
-| 124 | an omitted count respects a configured maximum below the built-in default | open |
-| 143 | relationship queries scan auto partitions instead of passing atoms into key builders | open |
-| 165 | list applies terminal-only filtering before truncating active state indexes | open |
+| 28 | terminal query timestamps reject values above the exact integer ceiling | internal: Elixir's retired `terminals` read; the SDK's FQL builder checks times against the same ceiling before sending (`_bounded_time`) |
+| 33 | stuck query timestamps reject values above the exact integer ceiling | internal: Elixir's retired `stuck` read; same SDK check |
+| 38 | candidate scan counts cover disjoint RAM and LMDB index entries | internal: Elixir's RAM and LMDB candidate scan counts |
+| 42 | candidate selection never prefers a failed count over a successful count | internal: Elixir's candidate scoring |
+| 51 | query callers may lower but cannot raise the bounded candidate scan ceiling | internal: Elixir's `query_scan_limit` option (the node has no scan limit: counts are exact) |
+| 56 | attribute discovery fails closed on corrupt query-index values | internal: Elixir's LMDB query-index rows |
+| 68 | attribute discovery rejects query-index key and value mismatches | internal: Elixir's LMDB query-index rows |
+| 81 | attribute discovery decodes typed values inside query-index key components | ported (`flow_info::discovery_counts_policy_indexed_values_of_live_flows` keeps `acme\0north` whole) |
+| 95 | attribute discovery retains maximum-size string values outside the LMDB key | ported (`audit::read_api::attribute_discovery_keeps_a_256_byte_value_whole`) |
+| 111 | attribute discovery propagates expired query-index deletion failures | internal: Elixir's LMDB expired-row deletion |
+| 124 | an omitted count respects a configured maximum below the built-in default | internal: Elixir's configured `flow_max_count` |
+| 143 | relationship queries scan auto partitions instead of passing atoms into key builders | internal: Elixir's `:auto` partition atom (the SDK requires a partition name) |
+| 165 | list applies terminal-only filtering before truncating active state indexes | ported (`audit::read_api::a_lineage_query_finds_a_flow_in_its_auto_partition`; its terminal-only list has no SDK form) |
 
 ## `flow/flow_input_limits_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 9 | public create takes a 256-byte id and rejects a longer one without writing it | open |
-| 23 | a batch with one long id writes none of its items | open |
-| 38 | start and claim rejects a long id | open |
-| 45 | spawned children are new Flows and take the same limit | open |
-| 58 | a Flow created with a longer id before the limit keeps working | open |
-| 92 | a new Flow takes a 256-byte partition key and rejects a longer one | open |
-| 119 | children inherit a parent's longer partition key but cannot open a new one | open |
-| 149 | a Flow stored under a longer partition key keeps working | open |
-| 179 | new Flows take a type up to 128 bytes, a state up to 64 and a correlation id up to 256 | open |
-| 211 | a claim or start takes a worker name up to 256 bytes | open |
-| 229 | a transition, step or reschedule moves only into a state up to 64 bytes | open |
-| 243 | a child group takes a group id up to 128 bytes and states up to 64 | open |
-| 268 | a Flow stored with a longer type and state can still be claimed and completed | open |
+| 9 | public create takes a 256-byte id and rejects a longer one without writing it | ported (`audit::input_limits::ids_take_256_bytes_and_a_longer_one_writes_nothing`) |
+| 23 | a batch with one long id writes none of its items | ported (same test) |
+| 38 | start and claim rejects a long id | ported (same test) |
+| 45 | spawned children are new Flows and take the same limit | ported (`audit::input_limits::a_child_group_takes_a_128_byte_id_and_64_byte_states`) |
+| 58 | a Flow created with a longer id before the limit keeps working | internal: Elixir's uncapped internal create; the node has no form of it, so no Flow predates its limits |
+| 92 | a new Flow takes a 256-byte partition key and rejects a longer one | ported (`audit::input_limits::partitions_take_256_bytes_on_every_new_flow_path`) |
+| 119 | children inherit a parent's longer partition key but cannot open a new one | ported (child group test: a child naming a 300-byte partition is refused; its inherited longer key predates the limit) |
+| 149 | a Flow stored under a longer partition key keeps working | internal: as line 58 |
+| 179 | new Flows take a type up to 128 bytes, a state up to 64 and a correlation id up to 256 | fixed (`audit::input_limits::types_states_correlations_and_workers_stay_bounded`; G32) |
+| 211 | a claim or start takes a worker name up to 256 bytes | ported (same test) |
+| 229 | a transition, step or reschedule moves only into a state up to 64 bytes | ported (`audit::input_limits::moves_into_a_state_take_64_bytes`; its reschedule has no wire command) |
+| 243 | a child group takes a group id up to 128 bytes and states up to 64 | fixed (child group test; G33; Elixir's spawns name no wait_state, which the node checks first, so each case names one) |
+| 268 | a Flow stored with a longer type and state can still be claimed and completed | internal: as line 58 |
 
 ## `flow_signal_test.exs`
 
@@ -813,32 +821,32 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 10 | results returns empty map for no history ops | open |
-| 14 | results sends cold or consistent ops through read callback | open |
-| 35 | results prepares consistent cold ops once before reading without per-op consistency | open |
-| 67 | results returns prepare error for consistent cold ops without reading | open |
-| 91 | results batches hot rank requests and hydrates ranked events | open |
-| 118 | results fail every hot request closed when the rank batch reply is short | open |
-| 141 | results fail a malformed hot rank result closed without raising | open |
-| 161 | results batch fetches decode contexts for hot history entries | open |
-| 218 | results fails a hot read closed when its batched decode context is missing | open |
-| 239 | results preserves an explicit decode context error | open |
-| 262 | results skips hot index and fallback scan when record disables hot history | open |
-| 290 | results falls back when hot rank index is unavailable or empty | open |
+| 10 | results returns empty map for no history ops | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 14 | results sends cold or consistent ops through read callback | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 35 | results prepares consistent cold ops once before reading without per-op consistency | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 67 | results returns prepare error for consistent cold ops without reading | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 91 | results batches hot rank requests and hydrates ranked events | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 118 | results fail every hot request closed when the rank batch reply is short | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 141 | results fail a malformed hot rank result closed without raising | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 161 | results batch fetches decode contexts for hot history entries | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 218 | results fails a hot read closed when its batched decode context is missing | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 239 | results preserves an explicit decode context error | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 262 | results skips hot index and fallback scan when record disables hot history | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
+| 290 | results falls back when hot rank index is unavailable or empty | internal: Elixir's pipelined history read callbacks (hot rank index, cold reads, decode contexts); hot and cold history tiers are Elixir's |
 
 ## `flow/fifo_lane_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | member round-trips an exact 128-bit state-entry sequence and id | open |
-| 15 | member byte order preserves sequence order beyond float precision | open |
-| 22 | native lane rank uses encoded sequence order beyond float precision | open |
-| 38 | decoder rejects truncation and an empty id | open |
-| 43 | running records remain in the lane of their logical run state | open |
-| 58 | running members sort ahead of queued members while preserving entry order within each class | open |
-| 91 | native fifo head lookup resolves all lanes and due scores in one request | open |
-| 124 | terminal records do not have active lane entries | open |
-| 135 | lane keys remain colocated with their partition | open |
+| 8 | member round-trips an exact 128-bit state-entry sequence and id | internal: Elixir's FifoLane member codec |
+| 15 | member byte order preserves sequence order beyond float precision | internal: Elixir's FifoLane member byte order |
+| 22 | native lane rank uses encoded sequence order beyond float precision | internal: Elixir's native lane rank |
+| 38 | decoder rejects truncation and an empty id | internal: Elixir's FifoLane member decoder |
+| 43 | running records remain in the lane of their logical run state | internal: Elixir's lane keys; a running Flow holding its run state's lane is in `flow_fifo::fifo_lanes_take_one_head_per_partition_and_keep_order_across_a_restart` |
+| 58 | running members sort ahead of queued members while preserving entry order within each class | internal: Elixir's native lane scores; running heads ahead of queued ones in entry order: same node test |
+| 91 | native fifo head lookup resolves all lanes and due scores in one request | internal: Elixir's native head lookup |
+| 124 | terminal records do not have active lane entries | internal: Elixir's lane index entries; a finished head freeing its lane is in `flow_fifo::a_finished_head_wakes_a_parked_claim_for_its_lane` |
+| 135 | lane keys remain colocated with their partition | internal: Elixir's lane key hash tags (the node's lanes live on the partition's shard) |
 
 ## `flow/claim_due_api_test.exs`
 
