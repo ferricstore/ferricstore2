@@ -160,6 +160,9 @@ pub struct Failure {
     pub reason: Reason,
     /// Where, for a parser failure.
     pub position: Option<Position>,
+    /// The parameters a text request left out, named in its reply (audit
+    /// gap G39).
+    pub missing: Vec<String>,
 }
 
 impl Failure {
@@ -169,6 +172,7 @@ impl Failure {
         Self {
             reason,
             position: None,
+            missing: Vec::new(),
         }
     }
 
@@ -240,6 +244,60 @@ impl Failure {
         })
     }
 
+    /// Elixir's `missing_parameter_diagnostic`: the detail, hint and
+    /// context naming what a text request left out (at most 16 names).
+    fn missing_diagnostic(&self) -> Vec<(&'static str, Term)> {
+        let names = |count: usize| {
+            Term::List(
+                self.missing
+                    .iter()
+                    .take(count)
+                    .map(|name| Term::text(name))
+                    .collect(),
+            )
+        };
+        match self.missing.as_slice() {
+            [] => Vec::new(),
+            [name] => vec![
+                ("context", map(vec![("missing_parameters", names(1))])),
+                (
+                    "detail",
+                    Term::Bin(format!("Missing named parameter: @{name}.").into_bytes()),
+                ),
+                (
+                    "hint",
+                    Term::Bin(format!("Add {name} to the parameters object.").into_bytes()),
+                ),
+            ],
+            [first, ..] => vec![
+                (
+                    "context",
+                    map(vec![
+                        (
+                            "missing_parameter_count",
+                            Term::int(self.missing.len() as u64),
+                        ),
+                        ("missing_parameters", names(16)),
+                    ]),
+                ),
+                (
+                    "detail",
+                    Term::Bin(
+                        format!(
+                            "Missing {} named parameters; first: @{first}.",
+                            self.missing.len()
+                        )
+                        .into_bytes(),
+                    ),
+                ),
+                (
+                    "hint",
+                    Term::text("Add the missing names to the parameters object."),
+                ),
+            ],
+        }
+    }
+
     /// The error map Elixir replies with; a parser failure adds its detail,
     /// hint, context and position.
     #[must_use]
@@ -263,6 +321,7 @@ impl Failure {
                 ]),
             ));
         }
+        entries.extend(self.missing_diagnostic());
         entries.extend([
             ("code", Term::text(code)),
             ("message", Term::text(message)),

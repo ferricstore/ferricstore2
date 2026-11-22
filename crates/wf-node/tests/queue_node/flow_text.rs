@@ -214,3 +214,50 @@ fn a_retry_limit_and_target_given_as_text_override_the_policy() -> TestResult {
     );
     Ok(())
 }
+
+#[test]
+fn a_text_query_decodes_its_parameters_by_field_type() -> TestResult {
+    // `FLOW.QUERY` as text (audit gap G39): `FQL1 query [name value ...]`,
+    // integer bounds sent as digits.
+    let node = open(&directory("flow-text-query")?, 4)?;
+    for (id, at) in [("early", 1_000), ("late", 5_000)] {
+        exec(
+            &node,
+            "FLOW.CREATE",
+            &[
+                text(id),
+                text("TYPE"),
+                text("tq"),
+                text("PARTITION"),
+                text("p"),
+                text("NOW"),
+                Term::Int(at),
+            ],
+        )??;
+    }
+    let query = "FROM runs WHERE partition_key = @tenant AND updated_at_ms BETWEEN @from AND @until ORDER BY updated_at_ms ASC LIMIT 10 RETURN RECORDS";
+    let reply = exec(
+        &node,
+        "FLOW.QUERY",
+        &[
+            text("FQL1"),
+            text(query),
+            text("tenant"),
+            text("p"),
+            text("from"),
+            text("0"),
+            text("until"),
+            text("2000"),
+        ],
+    )??;
+    let records = field(&reply, &["records"]);
+    let Term::List(records) = records else {
+        return Err(format!("records expected, got {reply:?}").into());
+    };
+    let ids: Vec<Term> = records
+        .iter()
+        .map(|record| field(record, &["id"]))
+        .collect();
+    assert_eq!(ids, [text("early")]);
+    Ok(())
+}

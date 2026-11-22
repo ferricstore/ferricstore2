@@ -66809,3 +66809,31 @@ and embedding API; `flow_workflow_demo_test.exs` is covered by the ports
 of its steps. No row of the steps 1-10 map is open. Gaps found and closed
 in this pass of the audit: G10-G38 (G37 revised), with P1 and P2 open as
 performance and memory notes.
+
+### Flow test audit: steps 11-15 begin; FQL surface; G39 (22 Nov)
+
+New map `docs/reviews/workflow-flow-test-audit-11-15.md`: 85 Elixir files,
+1,308 tests behind ADR-014 steps 11-15. Triage first: 42 `flow/query`
+files test Elixir's persisted query engine (LMDB projections, row and
+tuple codecs, index registry, lifecycle and retirement, planners,
+statistics, admission and memory budgets); the node evaluates FLOW.QUERY
+in memory from its shard catalogs, so those are internal. Then the
+client-facing FQL files: `reference_parser_test.exs` (as
+`query::fql::reference_tests` and `query::reference_bind_tests`),
+`binder_test.exs`, `request_test.exs`, `error_test.exs` (as
+`query::error_tests`), `reference_evaluator_test.exs` and
+`cursor_test.exs`, mapped to the node's tests or ported; every parser,
+binder, error-payload and evaluator case matched without change.
+
+G39 closed. RED: `FLOW.QUERY FQL1 <query> partition tenant-a ...` through
+the text path answered that the text form is not supported yet. Elixir's
+native parser reads it (`native_ast_parser_test.exs`: pairs, at most 64,
+unique names) and `Binder.bind_text` decodes values by declared type,
+naming missing parameters in the error. `query::parse_text` does both,
+sharing the typed path's bind and finish; `bind::declared` lists each
+parameter's declared type; `Failure::missing` adds Elixir's
+`missing_parameter_diagnostic`. A value that is not an integer's digits
+binds as nil, so the binder's key checks (missing, unexpected) still come
+first, as Elixir's. Dropping integer decoding, the missing names, the
+64-pair bound or the uniqueness check each fail a test. Recorded
+decision: the node's cursors carry no nonce.

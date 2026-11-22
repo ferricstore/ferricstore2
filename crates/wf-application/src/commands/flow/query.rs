@@ -15,12 +15,18 @@ pub mod answer;
 mod bind;
 pub mod cursor;
 mod error;
+#[cfg(test)]
+mod error_tests;
 pub mod field;
 pub mod fql;
 pub mod indexes;
+#[cfg(test)]
+mod reference_bind_tests;
 pub mod run;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod text_tests;
 #[cfg(test)]
 mod validation_tests;
 
@@ -162,6 +168,90 @@ pub fn parse(args: &Term) -> Result<Query, FlowError> {
     }
     let parsed = fql::parse(text).map_err(|failure| failed(failure.diagnose(text)))?;
     let parsed = bind::bind(parsed, params).map_err(|reason| failed(Failure::new(reason)))?;
+    Ok(finish(parsed, text))
+}
+
+/// Reads `FLOW.QUERY` in its text form (audit gap G39), as Elixir's native
+/// parser reads it: `version query [name value ...]`. A value decodes to
+/// the type its field declares (`Binder.bind_text`: integers from their
+/// digits, all else as text), and a missing parameter is named in the
+/// failure.
+///
+/// # Errors
+/// Elixir's text for malformed arguments, or the query failure.
+pub fn parse_text(args: &[Term]) -> Result<Query, FlowError> {
+    let [Term::Bin(version), Term::Bin(text), rest @ ..] = args else {
+        return Err(bad_request(
+            "ERR wrong number of arguments for 'flow.query' command",
+        ));
+    };
+    let mut pairs: Vec<(Vec<u8>, Vec<u8>)> = Vec::new();
+    for pair in rest.chunks(2) {
+        let [Term::Bin(name), Term::Bin(value)] = pair else {
+            return Err(bad_request(
+                "ERR FLOW.QUERY parameters must be name/value pairs",
+            ));
+        };
+        if name.is_empty() {
+            return Err(bad_request(
+                "ERR FLOW.QUERY parameters must be name/value pairs",
+            ));
+        }
+        if pairs.len() >= MAX_PARAMETERS {
+            return Err(bad_request(
+                "ERR FLOW.QUERY accepts at most 64 named parameters",
+            ));
+        }
+        if pairs.iter().any(|(seen, _)| seen == name) {
+            return Err(bad_request("ERR FLOW.QUERY parameter names must be unique"));
+        }
+        pairs.push((name.clone(), value.clone()));
+    }
+    if version.as_slice() != VERSION {
+        return Err(failed(Failure::new(Reason::UnsupportedQueryVersion)));
+    }
+    let parsed = fql::parse(text).map_err(|failure| failed(failure.diagnose(text)))?;
+    let declared = bind::declared(&parsed);
+    let missing: Vec<String> = declared
+        .iter()
+        .filter(|(name, _)| {
+            !pairs
+                .iter()
+                .any(|(given, _)| given.as_slice() == name.as_bytes())
+        })
+        .map(|(name, _)| name.clone())
+        .collect();
+    let params: Vec<(Vec<u8>, Term)> = pairs
+        .into_iter()
+        .map(|(name, value)| {
+            let integer = declared.iter().any(|(declared, kind)| {
+                declared.as_bytes() == name.as_slice() && *kind == field::ValueType::Integer
+            });
+            // A value that is not an integer's digits binds as nil, which
+            // the binder refuses as the wrong type after its key checks.
+            let term = if integer {
+                std::str::from_utf8(&value)
+                    .ok()
+                    .and_then(|digits| digits.parse::<i64>().ok())
+                    .map_or(Term::Nil, Term::Int)
+            } else {
+                Term::Bin(value)
+            };
+            (name, term)
+        })
+        .collect();
+    let parsed = bind::bind(parsed, &params).map_err(|reason| {
+        let mut failure = Failure::new(reason);
+        if reason == Reason::MissingParameter {
+            failure.missing = missing;
+        }
+        failed(failure)
+    })?;
+    Ok(finish(parsed, text))
+}
+
+/// The bound query with its cursor and digest.
+fn finish(parsed: fql::Parsed, text: &[u8]) -> Query {
     let cursor = match parsed.cursor {
         Some(Value::Literal(Literal::Keyword(token))) => Some(token),
         _ => None,
@@ -173,7 +263,7 @@ pub fn parse(args: &Term) -> Result<Query, FlowError> {
         ))
         .finalize()
         .into();
-    Ok(Query {
+    Query {
         mode: parsed.mode,
         source: parsed.source,
         shape: parsed.shape,
@@ -182,7 +272,7 @@ pub fn parse(args: &Term) -> Result<Query, FlowError> {
         limit: parsed.limit,
         cursor,
         projection: parsed.projection,
-        text: text.clone(),
+        text: text.to_vec(),
         digest,
-    })
+    }
 }

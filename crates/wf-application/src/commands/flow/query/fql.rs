@@ -15,6 +15,8 @@
 mod clause;
 mod lex;
 mod project;
+#[cfg(test)]
+mod reference_tests;
 mod tail;
 #[cfg(test)]
 mod tests;
@@ -171,6 +173,7 @@ impl Failure {
         QueryFailure {
             reason: self.reason,
             position: Position::of(query, self.byte),
+            missing: Vec::new(),
         }
     }
 }

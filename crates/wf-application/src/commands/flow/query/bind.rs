@@ -89,6 +89,25 @@ fn values_mut(predicate: &mut Predicate) -> Vec<&mut Value> {
     }
 }
 
+/// Each parameter and the type its field declares, in order of first use:
+/// how text values decode (audit gap G39).
+pub(super) fn declared(parsed: &Parsed) -> Vec<(String, ValueType)> {
+    let mut found: Vec<(String, ValueType)> = Vec::new();
+    let used = parsed
+        .predicates
+        .iter()
+        .flat_map(values)
+        .chain(parsed.cursor.as_ref());
+    for value in used {
+        if let Value::Parameter(kind, name) = value
+            && !found.iter().any(|(seen, _)| seen == name)
+        {
+            found.push((name.clone(), *kind));
+        }
+    }
+    found
+}
+
 /// The parameter names in order of first use.
 fn names(parsed: &Parsed) -> Result<Vec<String>, Reason> {
     let mut names: Vec<String> = Vec::new();

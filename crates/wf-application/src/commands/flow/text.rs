@@ -149,7 +149,7 @@ const FORMS: &[Form] = &[
 ];
 
 /// Text forms with item lists, not read by this server yet.
-const NOT_YET: [&str; 8] = [
+const NOT_YET: [&str; 7] = [
     "FLOW.CREATE_MANY",
     "FLOW.COMPLETE_MANY",
     "FLOW.RETRY_MANY",
@@ -157,7 +157,6 @@ const NOT_YET: [&str; 8] = [
     "FLOW.CANCEL_MANY",
     "FLOW.TRANSITION_MANY",
     "FLOW.SPAWN_CHILDREN",
-    "FLOW.QUERY",
 ];
 
 /// Reads one FLOW text command.
@@ -184,6 +183,10 @@ pub fn parse_with_clock(
         return Err(FlowError::rejected(format!(
             "ERR {name} as a text command is not supported by this server yet"
         )));
+    }
+    if name == "FLOW.QUERY" {
+        return super::query::parse_text(args)
+            .map(|query| Parsed::Command(FlowCommand::Query(Box::new(query))));
     }
     if name == "FLOW.QUERY.INDEXES" {
         let args: Vec<Term> = args.iter().map(word).collect();
