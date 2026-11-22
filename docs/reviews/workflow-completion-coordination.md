@@ -66776,3 +66776,22 @@ test.exs` and `flow/idempotent_create_after_progress_test.exs`
 `flow/partition_key_test.exs` and `flow/record_read_test.exs` are a
 client-side helper and Elixir's scan windows. G38's spawn change moved the
 child list and group id reads out of `children::parse` (over 100 lines).
+
+### Flow test audit: retention values; G37 revised (22 Nov)
+
+`flow_test/sections/flushdb_clears_flow_lmdb_terminal_projections.exs`
+ported (`audit::retention_values`); `FLUSHDB` is a key-value command,
+out of scope. Its "retention cleanup deletes owned payload refs from
+trimmed history" shows Elixir keeps a replaced payload readable after its
+events leave the history (history of one event), until retention cleanup
+removes the Flow. That contradicts G37's first fix (e875c88), which
+pruned kept versions no kept event could name, and the test I wrote for
+it (`a_value_no_kept_event_names_is_released`, asserting nil for those
+payloads); I had assumed Elixir's `HistoryValueRelease` frees them sooner.
+RED for the revision: that test rewritten to Elixir's rule
+(`replaced_values_stay_readable_while_the_flow_lives`) read nil for
+payloads 0 and 1. Decision: `FlowMeta::retain` keeps every replaced
+version until the Flow is removed; `prune_retained`,
+`History::first_version` and the write-time prune are gone. Restoring the
+old count cap fails the tests. P2 recorded: those versions sit in memory
+for a hot Flow, where Elixir keeps them on disk.

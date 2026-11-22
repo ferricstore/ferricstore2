@@ -46,6 +46,7 @@ mod priority_shards;
 mod read_api;
 mod reclaim_batches;
 mod records_and_claims;
+mod retention_values;
 mod shared_values;
 mod signal;
 mod spawn_limits;

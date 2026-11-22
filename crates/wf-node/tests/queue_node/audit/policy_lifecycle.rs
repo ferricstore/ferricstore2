@@ -75,7 +75,7 @@ pub(super) fn plus<'a>(
 }
 
 /// `FLOW.POLICY.SET` in the text form the SDK sends through `COMMAND_EXEC`.
-fn text_set(node: &QueueNode, args: &[Term]) -> TestResult<Term> {
+pub(super) fn text_set(node: &QueueNode, args: &[Term]) -> TestResult<Term> {
     let parsed = flow::text::parse(b"FLOW.POLICY.SET", args)?;
     let flow::text::Parsed::Command(command) = parsed else {
         return Err("not a command".into());

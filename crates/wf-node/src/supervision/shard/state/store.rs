@@ -136,13 +136,6 @@ impl ShardState {
                 events.push(event, flow_meta.history_max_events);
             }
         }
-        let mut meta = meta;
-        if let Some(meta) = meta.as_deref_mut()
-            && !meta.retained.is_empty()
-            && let Some(oldest) = events.first_version()
-        {
-            meta.prune_retained(oldest);
-        }
         if let Some(meta) = meta.as_deref()
             && (!meta.value_refs.is_empty() || meta.payload_ref.is_some())
         {

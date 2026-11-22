@@ -174,18 +174,23 @@ Gaps found so far:
   refused. History values now come with their stored size and are
   omitted above `payload_max_bytes`, as Elixir's `HistoryValues`
   hydration does; the record view's hydration is shared (`hydrated`).
-- G37 (closed): replaced value versions were capped by count (as many as
-  history holds events), so a churning named value could evict a payload
-  version an event still in history named, which then read as missing.
-  A kept version is dropped only when no kept event can name it: per
-  kind and name, versions older than the one current at the oldest kept
-  event go, at each write (Elixir releases a value once no history event
-  names it).
+- G37 (closed, revised): replaced value versions were capped by count (as
+  many as history holds events), so a churning named value could evict a
+  payload version an event still in history named. The first fix
+  (e875c88) pruned versions no kept event could name; Elixir's "retention
+  cleanup deletes owned payload refs from trimmed history" then showed
+  that Elixir keeps a replaced value readable after its events leave the
+  history, until retention cleanup removes the Flow. The node now keeps
+  every replaced version for as long as the Flow lives.
 - G38 (closed): `RUN_STEPS_MANY` and `SPAWN_CHILDREN` took any number of
   items (and step batches any number of items times steps), so one
   request could admit unbounded work. Both are capped as batches are, at
   100000 items (G15), and a step batch's items times steps at 100000,
   with Elixir's texts.
+- P2 (open, memory): a hot Flow keeps its replaced value versions in
+  memory (`FlowMeta::retained`) until it is removed, where Elixir keeps
+  them in its value store on disk; a long-lived Flow that replaces values
+  often grows. A finished Flow carries them to its cold file.
 - P1 (open, performance): a batch's shared payload is logged in each
   Flow's after-image; Elixir logs it once per command. Clients see the
   same results; the log carries the payload once per Flow.
@@ -963,11 +968,11 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | FLUSHDB clears Flow LMDB terminal projections | open |
-| 134 | retention cleanup deletes owned payload refs from trimmed history | open |
-| 214 | terminal retention expires queryable flow history | open |
-| 247 | terminal ttl override must be positive | open |
-| 272 | flow create inherits retention defaults from policy | open |
+| 8 | FLUSHDB clears Flow LMDB terminal projections | out of scope: `FLUSHDB` is a key-value command the workflow-only node does not serve |
+| 134 | retention cleanup deletes owned payload refs from trimmed history | fixed (`audit::retention_values::a_replaced_payload_reads_until_retention_removes_the_flow`; G37 as revised) |
+| 214 | terminal retention expires queryable flow history | ported (`audit::retention_values::a_finished_flows_history_ends_with_its_retention`) |
+| 247 | terminal ttl override must be positive | ported (`audit::retention_values::a_completions_own_retention_must_be_positive`) |
+| 272 | flow create inherits retention defaults from policy | ported (`audit::retention_values::a_create_takes_its_types_retention_defaults`; type-wide retention through the text form) |
 
 ## `flow_stats_test.exs`
 

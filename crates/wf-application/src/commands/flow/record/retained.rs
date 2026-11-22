@@ -23,8 +23,9 @@ pub struct Retained {
 }
 
 impl FlowMeta {
-    /// Keeps a replaced version; [`Self::prune_retained`] drops it once no
-    /// kept history event can name it.
+    /// Keeps a replaced version for as long as the Flow lives: Elixir keeps
+    /// a replaced value readable after its events leave the history, until
+    /// retention cleanup removes the Flow (audit gap G37).
     pub fn retain(&mut self, (kind, name, version): (u8, &[u8], u64), bytes: &[u8]) {
         if version == 0 {
             return;
@@ -35,27 +36,6 @@ impl FlowMeta {
                 bytes: bytes.to_vec(),
             },
         );
-    }
-
-    /// Drops the kept versions no history event from version `oldest` on
-    /// can name (audit gap G37): per kind and name, every version older
-    /// than the newest one at or before `oldest`, which was current at the
-    /// oldest event. A version an event names is never dropped while that
-    /// event is kept, however many other values change.
-    pub fn prune_retained(&mut self, oldest: u64) {
-        let mut floors: std::collections::BTreeMap<(u8, Vec<u8>), u64> =
-            std::collections::BTreeMap::new();
-        for (kind, name, version) in self.retained.keys() {
-            if *version <= oldest {
-                let floor = floors.entry((*kind, name.clone())).or_insert(*version);
-                *floor = (*floor).max(*version);
-            }
-        }
-        self.retained.retain(|(kind, name, version), _| {
-            floors
-                .get(&(*kind, name.clone()))
-                .is_none_or(|floor| version >= floor)
-        });
     }
 
     /// A kept version, if any.

@@ -46,7 +46,7 @@ pub(in crate::supervision::shard::state) fn with_values(
             ("error", RETAINED_ERROR),
         ];
         for ((name, kind), version) in kinds.into_iter().zip(refs) {
-            // A version an event names is kept while the event is (audit gap
+            // Replaced versions are kept while the Flow lives (audit gap
             // G37); each is shown as Elixir's history hydration shows it:
             // the value and its size, omitted above `max_bytes` (G36).
             let Some(bytes) = version.and_then(|v| version_bytes(record, meta, kind, v)) else {

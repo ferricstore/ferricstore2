@@ -279,10 +279,12 @@ fn a_value_an_event_still_names_stays_readable_in_history() -> TestResult {
 }
 
 #[test]
-fn a_value_no_kept_event_names_is_released() -> TestResult {
-    // Elixir releases a replaced value once no history event names it
-    // (`HistoryValueRelease`); the node drops the kept version then (audit
-    // gap G37), while the version an event still names reads.
+fn replaced_values_stay_readable_while_the_flow_lives() -> TestResult {
+    // Elixir keeps a replaced payload readable after its events left the
+    // history, until retention cleanup removes the Flow ("retention cleanup
+    // deletes owned payload refs from trimmed history", in
+    // `audit::retention_values`); the node keeps every replaced version
+    // while the Flow lives (audit gap G37).
     let node = open(&directory("audit-history-value-released")?, 4)?;
     ok(
         &node,
@@ -322,13 +324,13 @@ fn a_value_no_kept_event_names_is_released() -> TestResult {
             "payload_ref",
         ));
     }
-    // History keeps versions 3 and 4: payloads 2 and 3 are named.
+    // History keeps versions 3 and 4 only; every payload still reads.
     let read = ok(&node, "FLOW.VALUE.MGET", &[("refs", Term::List(refs))])?;
     assert_eq!(
         read,
         Term::List(vec![
-            Term::Nil,
-            Term::Nil,
+            text("payload 0"),
+            text("payload 1"),
             text("payload 2"),
             text("payload 3")
         ])
