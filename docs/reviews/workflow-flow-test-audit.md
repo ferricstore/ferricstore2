@@ -988,11 +988,11 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 61 | dedicated no-op configuration carries no schema or metadata | open |
-| 79 | shared binding validates and seals required typed scope | open |
-| 115 | dedicated storage scope leaves partition bytes untouched | open |
-| 122 | provider output cannot introduce fields or malformed values | open |
-| 132 | schema configuration rejects ambiguous and redefined field identities | open |
+| 61 | dedicated no-op configuration carries no schema or metadata | internal: Elixir's embedding metadata extension API (providers, scopes, schemas); it has no wire form |
+| 79 | shared binding validates and seals required typed scope | internal: Elixir's embedding metadata extension API (providers, scopes, schemas); it has no wire form |
+| 115 | dedicated storage scope leaves partition bytes untouched | internal: Elixir's embedding metadata extension API (providers, scopes, schemas); it has no wire form |
+| 122 | provider output cannot introduce fields or malformed values | internal: Elixir's embedding metadata extension API (providers, scopes, schemas); it has no wire form |
+| 132 | schema configuration rejects ambiguous and redefined field identities | internal: Elixir's embedding metadata extension API (providers, scopes, schemas); it has no wire form |
 
 ## `flow/history_api_test.exs`
 
@@ -1109,42 +1109,42 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 23 | below level 5 COMPLETE_MANY answers OK past a refused state write | open |
-| 29 | at level 5 COMPLETE_MANY fails on a refused state write, as FLOW.COMPLETE does | open |
+| 23 | below level 5 COMPLETE_MANY answers OK past a refused state write | internal: Elixir's raft-backend corruption fixture and feature levels |
+| 29 | at level 5 COMPLETE_MANY fails on a refused state write, as FLOW.COMPLETE does | internal: Elixir's raft-backend corruption fixture and feature levels |
 
 ## `flow_batch_indexed_attributes_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 23 | below level 5 a Flow closed by COMPLETE_MANY keeps the indexed names it had | open |
-| 34 | at level 5 Flows closed in batches are indexed as single commands index them | open |
+| 23 | below level 5 a Flow closed by COMPLETE_MANY keeps the indexed names it had | internal: Elixir's older releases below feature level 5 |
+| 34 | at level 5 Flows closed in batches are indexed as single commands index them | ported (`audit::batch_indexing::flows_closed_in_batches_are_indexed_as_single_commands_index_them`) |
 
 ## `flow_workflow_demo_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 18 | demo logs full workflow lifecycle and query results | open |
+| 18 | demo logs full workflow lifecycle and query results | covered: its steps (create, claim, complete, a list, a correlation lookup, info, history) are ported across `audit::*`; it logs them to stdout |
 
 ## `flow_batch_waiter_correctness_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | a failed independent create does not suppress a committed item's waiter wake | open |
+| 7 | a failed independent create does not suppress a committed item's waiter wake | ported (`audit::batch_indexing::a_failed_independent_create_does_not_keep_a_claim_from_waking`) |
 
 ## `flow/retention_cleanup_error_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 26 | a failed Flow storage flush answers a client error | open |
+| 26 | a failed Flow storage flush answers a client error | internal: Elixir's LMDB writer flush failure |
 
 ## `flow/payload_return_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | uses the configured payload return size as a hard ceiling | open |
+| 7 | uses the configured payload return size as a hard ceiling | internal: Elixir's configured payload return ceiling (the default 65536 ceiling is ported in `audit::claim_api`, `audit::history_requests` and `audit::metadata_shapes`) |
 
 ## `flow/lmdb_writer/quarantine_flow_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 21 | an undecodable Flow record is quarantined while the rest of its shard keeps projecting | open |
+| 21 | an undecodable Flow record is quarantined while the rest of its shard keeps projecting | internal: Elixir's LMDB writer quarantine |

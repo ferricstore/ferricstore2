@@ -15,6 +15,7 @@ mod active_timeout_children;
 mod active_timeouts;
 mod attribute_queries;
 mod attributes;
+mod batch_indexing;
 mod batch_moves;
 mod batches;
 mod children_joins;

@@ -66795,3 +66795,17 @@ version until the Flow is removed; `prune_retained`,
 `History::first_version` and the write-time prune are gone. Restoring the
 old count cap fails the tests. P2 recorded: those versions sit in memory
 for a hot Flow, where Elixir keeps them on disk.
+
+### Flow test audit: steps 1-10 complete (22 Nov)
+
+The last files: `flow_batch_indexed_attributes_test.exs` and
+`flow_batch_waiter_correctness_test.exs` ported (`audit::batch_indexing`;
+a parked claim woken by the created item of an independent batch whose
+other item failed); `flow_batch_state_write_error_test.exs`,
+`flow/retention_cleanup_error_test.exs`, `flow/payload_return_test.exs`,
+`flow/lmdb_writer/quarantine_flow_test.exs` and
+`flow/metadata_extension_test.exs` are Elixir's fixtures, configuration
+and embedding API; `flow_workflow_demo_test.exs` is covered by the ports
+of its steps. No row of the steps 1-10 map is open. Gaps found and closed
+in this pass of the audit: G10-G38 (G37 revised), with P1 and P2 open as
+performance and memory notes.
