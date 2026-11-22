@@ -9,6 +9,7 @@
 //! `running` by lease deadline, for reclaim (ADR-013). Terminal records are
 //! kept until their retention ends, then removed by a logged sweep.
 
+mod batch;
 mod capture;
 mod catalog;
 mod children;
@@ -37,10 +38,10 @@ mod store;
 mod timeout;
 mod value;
 
+pub(crate) use batch::{BatchItems, BatchReplies, Unit};
 pub(crate) use claim::Peeked;
 pub(crate) use create_many::CreateItems;
 pub(crate) use key::{Key, Map, Parts, flow_key};
-pub(crate) use mutate::{BatchItems, BatchReplies};
 pub(crate) use policy::{PolicyCommand, PolicyReply};
 pub(crate) use schedule::{ScheduleOp, ScheduleReply};
 

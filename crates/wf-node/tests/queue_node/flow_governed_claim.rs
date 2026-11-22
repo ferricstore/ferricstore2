@@ -243,3 +243,49 @@ fn a_policy_running_limit_governs_claims_across_restarts() -> TestResult {
     assert_eq!(claim(&node, "tp", 1_005, None)??.len(), 1);
     Ok(())
 }
+
+#[test]
+fn a_refused_batch_keeps_its_flows_credit() -> TestResult {
+    // A batch put back after a Flow left `running` (audit gap G28) must not
+    // release that Flow's credit: the Flow runs on, and the limit holds.
+    let node = open(&directory("flow-governed-refused-batch")?, 4)?;
+    lease(&node, "g5", 1)?;
+    create(&node, "held", "tr", 1_000)?;
+    create(&node, "waiting", "tr", 1_000)?;
+    let held = first(claim(&node, "tr", 1_001, Some("g5"))?)?;
+    let item = |id: Term, token: Term, fence: i64| {
+        map(vec![
+            ("id", id),
+            ("lease_token", token),
+            ("fencing_token", Term::Int(fence)),
+        ])
+    };
+    let refused = run(
+        &node,
+        "FLOW.COMPLETE_MANY",
+        vec![
+            ("partition_key", text("p")),
+            (
+                "items",
+                Term::List(vec![
+                    item(
+                        Term::Bin(held.id.clone()),
+                        Term::Bin(held.lease_token.clone()),
+                        i64::try_from(held.fence)?,
+                    ),
+                    item(text("waiting"), text("no-lease"), 0),
+                ]),
+            ),
+            ("now_ms", Term::Int(1_002)),
+        ],
+    )?;
+    assert!(refused.is_err(), "{refused:?}");
+    assert_eq!(credits(&node, "g5", "0")?, (Term::Int(0), Term::Int(1)));
+    assert!(matches!(
+        claim(&node, "tr", 1_003, Some("g5"))?,
+        Err(ServiceError::Governance(_))
+    ));
+    complete(&node, &held, 1_004)?;
+    assert_eq!(claim(&node, "tr", 1_005, Some("g5"))??.len(), 1);
+    Ok(())
+}

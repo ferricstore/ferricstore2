@@ -276,6 +276,8 @@ fn mixed_partitions() -> (String, String, String) {
 
 #[test]
 fn flow_create_many_spans_shards_and_rolls_back_failing_shard_group() -> TestResult {
+    // Elixir rolls back the failing item's shard; the node's unit is its
+    // partition (G27), so another partition on that shard is created.
     let node = node("audit-many-mixed")?;
     let (same_a, same_b, other) = mixed_partitions();
     ok(
@@ -305,9 +307,8 @@ fn flow_create_many_spans_shards_and_rolls_back_failing_shard_group() -> TestRes
         ],
     )??;
     let exists = Term::List(vec![text("error"), text("ERR flow already exists")]);
-    assert_eq!(reply, Term::List(vec![exists.clone(), exists, text("ok")]));
-    assert_eq!(created(&node, "s", &same_b)?, Term::Nil);
-    assert_eq!(names(&node, "s", &same_b)?, Vec::<Term>::new());
+    assert_eq!(reply, Term::List(vec![exists, text("ok"), text("ok")]));
+    assert_eq!(names(&node, "s", &same_b)?, vec![text("created")]);
     assert_eq!(names(&node, "o", &other)?, vec![text("created")]);
     Ok(())
 }

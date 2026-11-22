@@ -21,8 +21,8 @@ use wf_application::commands::queue::{
 
 use crate::supervision::scheduler::Job;
 use crate::supervision::shard::Request;
-use crate::supervision::shard::state::BatchItems;
 use crate::supervision::shard::state::CreateItems;
+use crate::supervision::shard::state::{BatchItems, Unit};
 
 use super::QueueNode;
 use super::admission::{Class, occupied};
@@ -143,9 +143,8 @@ impl QueueNode {
     }
 }
 
-/// `FLOW.CREATE_MANY` (audit gap G2): items grouped by shard, each group
-/// all or nothing unless the batch is independent; a batch naming one
-/// partition is one group.
+/// `FLOW.CREATE_MANY` (audit gaps G2 and G27): items grouped by shard and
+/// decided in units, as mutation batches are.
 fn batch_create(router: &Router, mut batch: CreateMany, reply: Reply<Term>) {
     let total = batch.items.len();
     let mut per_shard: Vec<CreateItems> = (0..router.shards.len()).map(|_| Vec::new()).collect();
@@ -159,7 +158,7 @@ fn batch_create(router: &Router, mut batch: CreateMany, reply: Reply<Term>) {
         return reply(Err(error));
     }
     let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
-    let atomic = !batch.independent;
+    let unit = Unit::of(batch.independent, batch.atomic());
     let gather = Arc::new(ItemGather::new(
         total,
         parts,
@@ -179,7 +178,7 @@ fn batch_create(router: &Router, mut batch: CreateMany, reply: Reply<Term>) {
             index,
             Request::CreateBatch {
                 items,
-                atomic,
+                unit,
                 done: Box::new(move |result| part.part(result)),
             },
         );
@@ -199,8 +198,8 @@ fn batch_mutation(router: &Router, mut batch: ManyMutation, reply: Reply<Term>) 
         return reply(Err(error));
     }
     let parts = per_shard.iter().filter(|items| !items.is_empty()).count();
-    let atomic = batch.atomic();
-    if atomic && parts > 1 {
+    let unit = Unit::of(batch.independent, batch.atomic());
+    if unit == Unit::Batch && parts > 1 {
         return reply(Err(ServiceError::rejected(
             "ERR flow batch crosses shards".to_owned(),
         )));
@@ -224,7 +223,7 @@ fn batch_mutation(router: &Router, mut batch: ManyMutation, reply: Reply<Term>) 
             index,
             Request::FlowBatch {
                 items,
-                atomic,
+                unit,
                 done: Box::new(move |result| part.part(result)),
             },
         );

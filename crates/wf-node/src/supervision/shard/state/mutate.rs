@@ -8,14 +8,13 @@
 
 use wf_application::commands::flow::history::HistoryEvent;
 use wf_application::commands::flow::mutate::{Change, Mutation};
-use wf_application::commands::flow::record::{FlowMeta, Include};
+use wf_application::commands::flow::record::Include;
 use wf_application::commands::flow::{Term, term};
 use wf_application::commands::queue::{Partition, ServiceError};
 use wf_domain::lease::{ExtendLease, LeaseGuard, LeaseToken};
 use wf_domain::retry::{JitterSample, PolicyRetry};
 use wf_domain::workflow::{
     self, Cancel, CommittedCommand, Operation, Outcome, StepContinue, Terminal, Transition,
-    WorkflowRecord,
 };
 use wf_types::identity::RecordId;
 use wf_types::version::{Fence, TimestampMillis};
@@ -246,89 +245,4 @@ impl ShardState {
             _ => term::Term::text("OK"),
         }
     }
-}
-
-/// A batch's items on this shard: request position, mutation, partition.
-pub(crate) type BatchItems = Vec<(usize, Mutation, Partition)>;
-/// Per-item replies by request position.
-pub(crate) type BatchReplies = Vec<(usize, Result<Term, ServiceError>)>;
-
-impl ShardState {
-    /// Decides a batch's items on this shard. An atomic batch changes
-    /// nothing unless every item succeeds: after the first failure the
-    /// earlier items are put back and their changes are not logged.
-    pub(crate) fn mutate_batch(
-        &mut self,
-        wall: u64,
-        items: BatchItems,
-        atomic: bool,
-    ) -> (BatchReplies, Vec<super::Logged>) {
-        let mut replies = Vec::with_capacity(items.len());
-        let mut logged = Vec::new();
-        let mut saved: Vec<(Key, Option<Saved>)> = Vec::new();
-        for (position, mutation, partition) in items {
-            let key: Key = flow_key(partition.clone(), mutation.id.clone());
-            // A finished Flow on disk is loaded first, so the save holds it
-            // (ADR-016); one that cannot be read fails like a refusal.
-            let loaded = self.warm(&key);
-            if atomic && loaded.is_ok() {
-                saved.push((key.clone(), self.save(&key)));
-            }
-            match loaded.and_then(|()| self.try_mutate(wall, &mutation, partition)) {
-                Ok((reply, change)) => {
-                    logged.extend(change);
-                    replies.push((position, Ok(reply)));
-                }
-                Err(error) if atomic => {
-                    self.roll_back(saved);
-                    let mut failed: BatchReplies = replies
-                        .into_iter()
-                        .map(|(earlier, _)| (earlier, Err(error.clone())))
-                        .collect();
-                    failed.push((position, Err(error)));
-                    return (failed, Vec::new());
-                }
-                Err(error) => replies.push((position, Err(error))),
-            }
-        }
-        (replies, logged)
-    }
-
-    /// Puts back the Flows an atomic batch changed, latest first.
-    fn roll_back(&mut self, saved: Vec<(Key, Option<Saved>)>) {
-        for (key, entry) in saved.into_iter().rev() {
-            self.restore_saved(key, entry);
-        }
-    }
-
-    fn save(&self, key: &Key) -> Option<Saved> {
-        self.hot(key).map(|entry| Saved {
-            record: entry.record.clone(),
-            priority: entry.priority,
-            meta: entry.meta.clone(),
-            history: entry.history.clone(),
-        })
-    }
-
-    fn restore_saved(&mut self, key: Key, saved: Option<Saved>) {
-        match saved {
-            Some(saved) => {
-                self.reinstate(
-                    key,
-                    (saved.record, saved.priority, saved.meta, saved.history),
-                );
-            }
-            None => {
-                self.take_entry(&key);
-            }
-        }
-    }
-}
-
-/// A Flow as it was before an atomic batch touched it.
-struct Saved {
-    record: WorkflowRecord,
-    priority: u8,
-    meta: Option<Box<FlowMeta>>,
-    history: super::events::History,
 }

@@ -116,6 +116,23 @@ Gaps found so far:
   shards holding the highest priority any holds; the split gives every
   chosen shard one Flow first (from a turn that rotates per claim, so
   small claims take turns) and the rest by weight.
+- G26 (closed): an all-or-none batch that failed before its last item
+  answered only the items up to the failure, and the reply gather turned
+  the missing ones into `ERR flow store unavailable`. Every item of a
+  failed unit now answers the failure.
+- G27 (closed): a batch whose items name their own partitions decided each
+  item alone, so a stale item left its partition's other items moved.
+  Each partition is now all or none in a mutation or create batch (Elixir
+  uses the shard, which a client cannot see; a create batch here used the
+  shard too).
+- G28 (closed): a batch put back after an item failed kept the child
+  events and credit releases its earlier items queued, so the parent
+  counted a child as finished while it still ran (and logged it), and a
+  governed Flow's credit was released while it still held its lease. A
+  unit's queued child events and credit releases are dropped with it.
+- G29 (closed): a batch's `return` option other than `ok_on_success` was
+  ignored, so `return: full` created the Flows; every batch command now
+  takes `items` or `ok_on_success` and refuses the rest, as Elixir does.
 - P1 (open, performance): a batch's shared payload is logged in each
   Flow's after-image; Elixir logs it once per command. Clients see the
   same results; the log carries the payload once per Flow.
@@ -492,21 +509,21 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | flow_create stores debug lineage metadata and indexes it | open |
-| 64 | flow_create stores default root without indexing one unique root per flow | open |
-| 82 | flow_by_parent root and correlation query lineage indexes | open |
-| 200 | lineage before_id cursor requires an explicit reverse timestamp boundary | open |
-| 226 | lineage before_id cursor paginates equal timestamps without duplicates | open |
-| 259 | cold lineage query seeks to filtered time window instead of sampling prefix head | open |
-| 334 | reverse cold lineage query samples from the newest side of a filtered window | open |
+| 8 | flow_create stores debug lineage metadata and indexes it | ported (`audit::lineage::a_flow_keeps_its_lineage_and_lineage_queries_find_it`; its index tables are Elixir's) |
+| 64 | flow_create stores default root without indexing one unique root per flow | ported (same test) |
+| 82 | flow_by_parent root and correlation query lineage indexes | ported (`audit::lineage::lineage_queries_take_windows_states_order_and_counts`; its terminal-only query as a state, since the SDK refuses terminal_only with a lineage query) |
+| 200 | lineage before_id cursor requires an explicit reverse timestamp boundary | internal: Elixir's `before_id` lineage cursor; the SDK's FLOW.QUERY text has none |
+| 226 | lineage before_id cursor paginates equal timestamps without duplicates | internal: same |
+| 259 | cold lineage query seeks to filtered time window instead of sampling prefix head | internal: Elixir's LMDB scan limit and cold projection (the SDK refuses include_cold and consistent_projection) |
+| 334 | reverse cold lineage query samples from the newest side of a filtered window | internal: same |
 | 396 | flow_create_many creates one-partition batch atomically | fixed (G2) |
-| 428 | flow write APIs return ok and reject return option | open |
+| 428 | flow write APIs return ok and reject return option | fixed (`audit::lineage::batch_writes_answer_ok` and `...::batch_commands_refuse_other_return_modes`; G29) |
 | 495 | flow_create_many lets item attrs override common attrs | fixed (G2) |
 | 524 | flow_create_many auto-partitions missing partition and rolls back duplicate batches | fixed (G2) |
 | 566 | flow_create_many independent keeps successful items when one create fails | fixed (G2) |
-| 592 | flow_create_many independent auto-partitions without client-side grouping | open |
-| 624 | flow_create_many independent auto-partitioned flows are claimable by partition keys | open |
-| 668 | flow_claim_due partition_keys tries later shards when an earlier stale candidate claims nothing | open |
+| 592 | flow_create_many independent auto-partitions without client-side grouping | ported (`audit::lineage::an_independent_batch_without_partitions_spreads_and_stays_claimable`) |
+| 624 | flow_create_many independent auto-partitioned flows are claimable by partition keys | ported (same test) |
+| 668 | flow_claim_due partition_keys tries later shards when an earlier stale candidate claims nothing | internal: Elixir's stale native index member and claim cursor table |
 | 755 | flow_create_many idempotent retry returns existing records without duplicate writes | fixed (G2) |
 | 794 | flow_create_many idempotency conflict rolls back same shard group | fixed (G2) |
 | 824 | flow_spawn_children wait none creates full child flows and advances parent | open |
@@ -632,43 +649,43 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 11 | create rejects payloads with atom keys or atom values | open |
-| 33 | create accepts payloads whose only atoms are true, false and nil | open |
-| 59 | create_many rejects an item payload with atoms before writing any item | open |
-| 77 | complete and fail reject atoms in result and error values | open |
-| 115 | value_put rejects values containing atoms | open |
-| 123 | signal rejects atoms in named values before recording the signal | open |
-| 141 | complete_many rejects atoms in an atom-keyed map item result | open |
-| 163 | complete_many rejects atoms in a string-keyed map item result | open |
-| 185 | create_many rejects atoms in a tagged tuple item payload | open |
-| 213 | transition_many rejects atoms in item values | open |
-| 229 | retry_many rejects atoms in an item error | open |
-| 252 | fail_many rejects atoms in the batch error | open |
-| 274 | cancel rejects atoms in the reason | open |
-| 289 | instance cancel rejects atoms in the reason | open |
-| 304 | cancel_many rejects atoms in an item reason | open |
-| 318 | batch, signal, value and cancel paths accept string keys with true, false and nil | open |
+| 11 | create rejects payloads with atom keys or atom values | internal: the protocol carries no atoms, so a client cannot send one |
+| 33 | create accepts payloads whose only atoms are true, false and nil | ported (`audit::plain_values::booleans_and_nil_read_back_from_a_payload`) |
+| 59 | create_many rejects an item payload with atoms before writing any item | internal: the protocol carries no atoms, so a client cannot send one |
+| 77 | complete and fail reject atoms in result and error values | internal: the protocol carries no atoms, so a client cannot send one |
+| 115 | value_put rejects values containing atoms | internal: the protocol carries no atoms, so a client cannot send one |
+| 123 | signal rejects atoms in named values before recording the signal | internal: the protocol carries no atoms, so a client cannot send one |
+| 141 | complete_many rejects atoms in an atom-keyed map item result | internal: the protocol carries no atoms, so a client cannot send one |
+| 163 | complete_many rejects atoms in a string-keyed map item result | internal: the protocol carries no atoms, so a client cannot send one |
+| 185 | create_many rejects atoms in a tagged tuple item payload | internal: the protocol carries no atoms, so a client cannot send one |
+| 213 | transition_many rejects atoms in item values | internal: the protocol carries no atoms, so a client cannot send one |
+| 229 | retry_many rejects atoms in an item error | internal: the protocol carries no atoms, so a client cannot send one |
+| 252 | fail_many rejects atoms in the batch error | internal: the protocol carries no atoms, so a client cannot send one |
+| 274 | cancel rejects atoms in the reason | internal: the protocol carries no atoms, so a client cannot send one |
+| 289 | instance cancel rejects atoms in the reason | internal: the protocol carries no atoms, so a client cannot send one |
+| 304 | cancel_many rejects atoms in an item reason | internal: the protocol carries no atoms, so a client cannot send one |
+| 318 | batch, signal, value and cancel paths accept string keys with true, false and nil | ported (`audit::plain_values::booleans_and_nil_pass_batches_signals_values_and_cancels`) |
 
 ## `flow_test/sections/flow_fail_many_atomically_fails_one_partition_batch.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | flow_fail_many atomically fails one-partition batch | open |
-| 52 | flow_fail_many rolls back when any item fails guard | open |
-| 96 | flow_retry_many spans shards and rolls back failing shard group | open |
-| 144 | flow_retry_many terminal exhaustion updates colocated parent child group | open |
-| 198 | flow_fail_many spans shards and rolls back failing shard group | open |
-| 245 | flow_cancel_many atomically cancels one-partition queued batch | open |
-| 279 | flow_cancel_many rolls back when any item fails guard | open |
-| 310 | terminal many independent keeps successful items when one item fails | open |
-| 468 | terminal many independent does not pre-read records for cross-shard planning | open |
-| 518 | terminal local-only mixed complete_many skips cross-shard pre-read | open |
-| 573 | flow_cancel_many spans shards and rolls back failing shard group | open |
-| 612 | flow_transition enforces expected state and running lease guard | open |
-| 661 | flow_transition rejects terminal states so terminal hooks stay centralized | open |
-| 708 | flow_transition rolls back index changes when derived keys are invalid | open |
-| 746 | flow_fail and flow_cancel write terminal states and remove due work | open |
-| 817 | flow_history returns transition events | open |
+| 8 | flow_fail_many atomically fails one-partition batch | ported (`audit::terminal_batches::a_failure_batch_fails_a_partition_together_or_not_at_all`) |
+| 52 | flow_fail_many rolls back when any item fails guard | fixed (same test; G26: its stale item sorts first) |
+| 96 | flow_retry_many spans shards and rolls back failing shard group | fixed (`audit::terminal_batches::a_mixed_batch_decides_each_partition_together`; G27: all-or-none per partition, Elixir's unit is the shard) |
+| 144 | flow_retry_many terminal exhaustion updates colocated parent child group | ported (`audit::transition_guards::a_batch_retry_that_exhausts_settles_the_parent_group`) |
+| 198 | flow_fail_many spans shards and rolls back failing shard group | fixed (same mixed test; G27) |
+| 245 | flow_cancel_many atomically cancels one-partition queued batch | ported (`audit::terminal_batches::a_cancel_batch_cancels_a_partition_together_or_not_at_all`) |
+| 279 | flow_cancel_many rolls back when any item fails guard | ported (same test) |
+| 310 | terminal many independent keeps successful items when one item fails | ported (`audit::terminal_batches::independent_terminal_batches_keep_their_successes`) |
+| 468 | terminal many independent does not pre-read records for cross-shard planning | internal: Elixir's pre-read hook (the independent replies are ported in the test above) |
+| 518 | terminal local-only mixed complete_many skips cross-shard pre-read | ported (`audit::terminal_batches::a_mixed_batch_that_succeeds_finishes_every_partition`; its pre-read hook is Elixir's) |
+| 573 | flow_cancel_many spans shards and rolls back failing shard group | fixed (same mixed test; G27) |
+| 612 | flow_transition enforces expected state and running lease guard | ported (`audit::transition_guards::a_transition_checks_the_state_it_leaves_and_a_running_lease`) |
+| 661 | flow_transition rejects terminal states so terminal hooks stay centralized | ported (`audit::transition_guards::a_transition_never_enters_a_terminal_state`) |
+| 708 | flow_transition rolls back index changes when derived keys are invalid | ported (`audit::transition_guards::a_transition_refuses_a_state_over_64_bytes_and_changes_nothing`; its uncapped internal transition is Elixir's) |
+| 746 | flow_fail and flow_cancel write terminal states and remove due work | ported (`audit::transition_guards::fail_and_cancel_finish_a_flow_and_drop_its_due_work`) |
+| 817 | flow_history returns transition events | ported (`audit::partition_scopes::a_partition_scopes_claims_reads_completions_and_history`; its ordered-index and stream tables are Elixir's) |
 
 ## `flow_test/sections/flow_claim_due_drains_higher_priorities_before_lower_priorities_default.exs`
 

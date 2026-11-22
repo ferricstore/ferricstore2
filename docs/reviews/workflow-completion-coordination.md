@@ -66542,3 +66542,60 @@ per claim, then the rest by weight, so small claims take turns and a
 skewed pair yields one each. A shard chosen for a priority whose Flows are
 not yet due answers nothing, and the claim's later rounds ask the others,
 as before.
+
+The SDK queue benchmark (400k Flows, 4 clients, 3 alternating runs)
+compared 5df0ff3 with 17ed491 (G25): 260-291k against 272-291k Flows/s
+and 8.4-8.6 against 8.4-8.5 ms CPU per 1k Flows, within noise.
+
+### Flow test audit: plain values and terminal batches (22 Nov)
+
+`flow_user_value_atoms_test.exs`: its two accepting tests ported
+(`audit::plain_values`); its atom refusals are Elixir's, as the protocol
+carries no atoms. `flow_test/sections/flow_fail_many_atomically_fails_one_
+partition_batch.exs` ported (`audit::terminal_batches`,
+`audit::transition_guards`). Three gaps closed in the shard's batch path,
+now `state/batch.rs`:
+
+- G26. RED: a `FAIL_MANY` whose stale item came first answered
+  `ERR flow store unavailable`: the failed unit answered only the items up
+  to the failure, and the gather turned the rest into that error. Every
+  item of a failed unit now answers the failure.
+- G27. RED: a mixed `RETRY_MANY` (items naming partitions) answered
+  `[error, ok, ok]` where the stale item's partition sibling should have
+  stayed put. Decision: the all-or-none unit of a batch that names no
+  partition is the partition, in mutation and create batches alike
+  (Elixir's is the shard, whose membership a client cannot know; the
+  create path used the shard here too, and its G2 port now expects the
+  other partition on that shard to be created).
+- G28. RED: a `COMPLETE_MANY` refused on its second child left the
+  parent's group showing the first child `completed` while it ran (the
+  queued child event settled after the rollback and was logged). The
+  unit's child events and credit releases are dropped with it; a governed
+  test shows the credit kept (`flow_governed_claim::a_refused_batch_keeps_
+  its_flows_credit`). Closing parents and freed lanes stay queued: both
+  are checked again when acted on and find the restored Flows.
+
+New artifacts (solo design review): `supervision::shard::state::batch`
+(moved out of `state/mutate.rs`, which kept the single mutation): `Unit`
+(`Item`, `Partition`, `Batch`; `Unit::of`), `units` (grouping by
+partition through the shard's `Map`, linear in the items), `Marks`
+(private), `mutate_batch`/`mutate_unit`, `BatchItems`/`BatchReplies`.
+`Request::{CreateBatch, FlowBatch}` carry a `Unit` instead of `atomic`.
+The module owns only shard-local batch decisions and depends on the
+state's own store, queues and cold loader; no new crate or dependency.
+Cost: an independent or one-partition batch is one group as before; a
+mixed batch now saves each Flow before changing it, as one-partition
+batches always did.
+
+Mutation checks: skipping the drop, failing only the earlier items,
+deciding mixed batches per item or per shard, and keeping child events or
+credit releases each fail a test.
+
+`flow_test/sections/flow_create_stores_debug_lineage_metadata_indexes_it.
+exs` ported (`audit::lineage`): lineage queries as the SDK's `FLOW.QUERY`
+text found every case without change. G29 closed. RED: `CREATE_MANY` with
+`return: full` answered `OK` and created the Flow. `many::ok_on_success`
+now reads the mode for every batch command (`items`, `ok_on_success`, any
+case) and refuses the rest with Elixir's text; ignoring the mode in either
+parser or refusing `ITEMS` fails the test. Its `before_id` cursors, cold
+scan limits and native index members are Elixir's.

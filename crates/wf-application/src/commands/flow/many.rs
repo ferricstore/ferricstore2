@@ -5,8 +5,9 @@
 //! shared options, then the item's id, partition, lease token and fence. A
 //! batch in one named partition that is not independent is all or nothing,
 //! as in Elixir: it replies `OK` or the first item's error and changes
-//! nothing. An independent batch, or one whose items name their own
-//! partitions (`MIXED`), decides each item alone.
+//! nothing. One whose items name their own partitions (`MIXED`) is all or
+//! nothing per partition and replies per item (audit gap G27; Elixir's unit
+//! is the shard); an independent batch decides each item alone.
 
 use super::FlowError;
 use super::mutate::{self, Mutation};
@@ -92,6 +93,20 @@ fn item_entries(single: &str, item: &Term) -> Result<Vec<(Vec<u8>, Term)>, FlowE
     }
 }
 
+/// A batch's `return` mode (audit gap G29): `items` (the default) or
+/// `ok_on_success`, which replies a single `OK` when every item succeeds.
+///
+/// # Errors
+/// Any other mode, as Elixir refuses it.
+pub fn ok_on_success(mode: Option<&Term>) -> Result<bool, FlowError> {
+    match mode {
+        None | Some(Term::Nil) => Ok(false),
+        Some(Term::Bin(mode)) if mode.eq_ignore_ascii_case(b"items") => Ok(false),
+        Some(Term::Bin(mode)) if mode.eq_ignore_ascii_case(b"ok_on_success") => Ok(true),
+        Some(_) => Err(rejected("ERR flow return must be items or ok_on_success")),
+    }
+}
+
 /// Reads one batch command.
 ///
 /// # Errors
@@ -116,7 +131,7 @@ pub fn parse(name: &str, args: &Term) -> Result<ManyMutation, FlowError> {
         Some(Term::Bool(value)) => *value,
         Some(_) => return Err(FlowError::flow("independent", "must be a boolean")),
     };
-    let ok_on_success = matches!(get("return"), Some(Term::Bin(mode)) if mode.eq_ignore_ascii_case(b"ok_on_success"));
+    let ok_on_success = ok_on_success(get("return"))?;
     let partition_key = match get("partition_key") {
         None | Some(Term::Nil) => None,
         Some(Term::Bin(key)) if !key.is_empty() => Some(key.clone()),

@@ -5,6 +5,7 @@
 //! booleans and nil go through every path and read back as sent.
 
 use wf_application::commands::flow::Term;
+use wf_node::composition::QueueNode;
 
 use super::{claimed, field, get, int, map, ok, sorted, text};
 use crate::{TestResult, directory, open};
@@ -66,7 +67,14 @@ fn booleans_and_nil_pass_batches_signals_values_and_cancels() -> TestResult {
         &node,
         "FLOW.VALUE.PUT",
         &[
-            ("value", map(&[("ok", Term::Bool(true)), ("no", Term::Bool(false)), ("none", Term::Nil)])),
+            (
+                "value",
+                map(&[
+                    ("ok", Term::Bool(true)),
+                    ("no", Term::Bool(false)),
+                    ("none", Term::Nil),
+                ]),
+            ),
             ("partition_key", text(P)),
         ],
     )?;
@@ -84,7 +92,10 @@ fn booleans_and_nil_pass_batches_signals_values_and_cancels() -> TestResult {
             (
                 "items",
                 Term::List(vec![
-                    item("signalled", map(&[("paid", Term::Bool(true)), ("note", Term::Nil)])),
+                    item(
+                        "signalled",
+                        map(&[("paid", Term::Bool(true)), ("note", Term::Nil)]),
+                    ),
                     item("cancelled", map(&[("refunded", Term::Bool(false))])),
                 ]),
             ),
@@ -99,13 +110,51 @@ fn booleans_and_nil_pass_batches_signals_values_and_cancels() -> TestResult {
             ("signal", text("ready")),
             ("if_state", text("waiting")),
             ("transition_to", text("queued")),
-            ("values", map(&[("event", map(&[("paid", Term::Bool(true)), ("note", Term::Nil)]))])),
+            (
+                "values",
+                map(&[(
+                    "event",
+                    map(&[("paid", Term::Bool(true)), ("note", Term::Nil)]),
+                )]),
+            ),
             ("run_at_ms", int(1_000)),
             ("now_ms", int(1_100)),
         ],
     )?;
-    let records = claimed(
+    complete_plainly(&node)?;
+    assert_eq!(
+        field(&get(&node, "signalled", &in_p())?, "state"),
+        text("completed")
+    );
+    ok(
         &node,
+        "FLOW.CANCEL",
+        &[
+            ("id", text("cancelled")),
+            ("partition_key", text(P)),
+            ("fencing_token", int(0)),
+            (
+                "reason",
+                map(&[
+                    ("by", text("operator")),
+                    ("forced", Term::Bool(false)),
+                    ("note", Term::Nil),
+                ]),
+            ),
+            ("now_ms", int(1_103)),
+        ],
+    )?;
+    assert_eq!(
+        field(&get(&node, "cancelled", &in_p())?, "state"),
+        text("cancelled")
+    );
+    Ok(())
+}
+
+/// Claims the signalled Flow and completes it with a plain result.
+fn complete_plainly(node: &QueueNode) -> TestResult {
+    let records = claimed(
+        node,
         &[
             ("type", text("plain-accept")),
             ("states", Term::List(vec![text("queued")])),
@@ -119,7 +168,7 @@ fn booleans_and_nil_pass_batches_signals_values_and_cancels() -> TestResult {
         return Err("one claim".into());
     };
     ok(
-        &node,
+        node,
         "FLOW.COMPLETE_MANY",
         &[
             ("partition_key", text(P)),
@@ -129,24 +178,14 @@ fn booleans_and_nil_pass_batches_signals_values_and_cancels() -> TestResult {
                     ("id", field(lease, "id")),
                     ("lease_token", field(lease, "lease_token")),
                     ("fencing_token", field(lease, "fencing_token")),
-                    ("result", map(&[("ok", Term::Bool(true)), ("note", Term::Nil)])),
+                    (
+                        "result",
+                        map(&[("ok", Term::Bool(true)), ("note", Term::Nil)]),
+                    ),
                 ])]),
             ),
             ("now_ms", int(1_102)),
         ],
     )?;
-    assert_eq!(field(&get(&node, "signalled", &in_p())?, "state"), text("completed"));
-    ok(
-        &node,
-        "FLOW.CANCEL",
-        &[
-            ("id", text("cancelled")),
-            ("partition_key", text(P)),
-            ("fencing_token", int(0)),
-            ("reason", map(&[("by", text("operator")), ("forced", Term::Bool(false)), ("note", Term::Nil)])),
-            ("now_ms", int(1_103)),
-        ],
-    )?;
-    assert_eq!(field(&get(&node, "cancelled", &in_p())?, "state"), text("cancelled"));
     Ok(())
 }

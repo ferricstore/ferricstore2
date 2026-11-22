@@ -84,7 +84,7 @@ pub fn parse(args: &Term) -> Result<CreateMany, FlowError> {
         Some(Term::Bool(value)) => *value,
         Some(_) => return Err(FlowError::flow("independent", "must be a boolean")),
     };
-    let ok_on_success = matches!(get("return"), Some(Term::Bin(mode)) if mode.eq_ignore_ascii_case(b"ok_on_success"));
+    let ok_on_success = super::many::ok_on_success(get("return"))?;
     let partition_key = match get("partition_key") {
         None | Some(Term::Nil) => None,
         Some(Term::Bin(key)) if !key.is_empty() => Some(key.clone()),

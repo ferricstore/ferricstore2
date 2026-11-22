@@ -1,13 +1,14 @@
 //! `FLOW.CREATE_MANY` beyond the queue fast path on one shard (audit gap
 //! G2): each item is created as `FLOW.CREATE` would; in an all-or-nothing
-//! group, a failing item puts back every Flow the group created and fails
-//! every item of the group with its error.
+//! unit (G27), a failing item takes back every Flow the unit created and
+//! fails every item of the unit with its error.
 
 use wf_application::commands::flow::Term;
 use wf_application::commands::flow::create::CreateFlow;
 use wf_application::commands::queue::{Partition, ServiceError};
 
 use super::super::command::Logged;
+use super::batch::{Unit, units};
 use super::{BatchReplies, Key, ShardState, flow_key};
 
 /// One shard's items of a batch, with their request positions.
@@ -17,8 +18,27 @@ pub(crate) type CreateItems = Vec<(usize, CreateFlow, Partition)>;
 type Created = (Result<Term, ServiceError>, Option<(Key, Logged)>);
 
 impl ShardState {
-    /// Creates one shard's items; `atomic` makes them all or nothing.
+    /// Creates one shard's items, decided in `unit`s.
     pub(crate) fn create_batch(
+        &mut self,
+        wall: u64,
+        items: CreateItems,
+        unit: Unit,
+    ) -> (BatchReplies, Vec<Logged>) {
+        let mut replies = Vec::with_capacity(items.len());
+        let mut logged = Vec::new();
+        let atomic = unit != Unit::Item;
+        for group in units(items, unit, |(_, _, partition)| partition) {
+            let (decided, changes) = self.create_unit(wall, group, atomic);
+            replies.extend(decided);
+            logged.extend(changes);
+        }
+        (replies, logged)
+    }
+
+    /// Creates one unit; `atomic` takes back what it created when an item
+    /// fails.
+    fn create_unit(
         &mut self,
         wall: u64,
         items: CreateItems,

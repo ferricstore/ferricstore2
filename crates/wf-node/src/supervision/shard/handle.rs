@@ -246,21 +246,13 @@ pub(super) fn handle(
             let values = state.read_values(now, refs, max_bytes);
             Box::new(move |durable| done(durable.map(|()| values)))
         }
-        Request::CreateBatch {
-            items,
-            atomic,
-            done,
-        } => {
-            let (replies, changes) = state.create_batch(now, items, atomic);
+        Request::CreateBatch { items, unit, done } => {
+            let (replies, changes) = state.create_batch(now, items, unit);
             logged.extend(changes);
             Box::new(move |durable| done(durable.map(|()| replies)))
         }
-        Request::FlowBatch {
-            items,
-            atomic,
-            done,
-        } => {
-            let (replies, changes) = state.mutate_batch(now, items, atomic);
+        Request::FlowBatch { items, unit, done } => {
+            let (replies, changes) = state.mutate_batch(now, items, unit);
             logged.extend(changes);
             Box::new(move |durable| done(durable.map(|()| replies)))
         }
