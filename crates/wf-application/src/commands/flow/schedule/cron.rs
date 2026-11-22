@@ -6,14 +6,19 @@
 //! one (DST gap) none.
 
 use jiff::civil::{Date, DateTime};
-use jiff::tz::{AmbiguousOffset, TimeZone};
-use jiff::{Timestamp, ToSpan};
+use jiff::tz::{AmbiguousOffset, Offset, TimeZone};
+use jiff::{SignedDuration, Timestamp, ToSpan};
 
 const MINUTE_MS: i64 = 60_000;
 const NO_MATCH: &str = "ERR flow schedule cron has no matching time in search window";
 /// Elixir's calendar-range refusal.
 pub const CALENDAR_RANGE: &str = "ERR flow schedule timestamp is outside supported calendar range";
 const INVALID_ZONE: &str = "ERR flow schedule timezone is invalid or unavailable";
+/// The calendar's last millisecond, 9999-12-31T23:59:59.999Z, Elixir's
+/// bound; later than `Timestamp::MAX`, so instants are counted on the civil
+/// calendar.
+const CALENDAR_MAX_MS: i64 = 253_402_300_799_999;
+const EPOCH: DateTime = DateTime::constant(1970, 1, 1, 0, 0, 0, 0);
 /// Eight years of minutes, Elixir's search window.
 pub const SEARCH_MINUTES: i64 = 8 * 366 * 24 * 60;
 
@@ -198,7 +203,14 @@ impl Cron {
     }
 }
 
-/// The instants a wall-clock time names in `zone`.
+/// Milliseconds since the epoch of `civil` at `offset`.
+fn epoch_ms(civil: DateTime, offset: Offset) -> Option<i64> {
+    let local = i64::try_from(civil.duration_since(EPOCH).as_millis()).ok()?;
+    local.checked_sub(i64::from(offset.seconds()).checked_mul(1_000)?)
+}
+
+/// The instants a wall-clock time names in `zone`, up to the calendar's
+/// end.
 fn instants(zone: &TimeZone, civil: DateTime) -> Vec<i64> {
     let offsets = match zone.to_ambiguous_timestamp(civil).offset() {
         AmbiguousOffset::Unambiguous { offset } => vec![offset],
@@ -207,9 +219,22 @@ fn instants(zone: &TimeZone, civil: DateTime) -> Vec<i64> {
     };
     offsets
         .into_iter()
-        .filter_map(|offset| offset.to_timestamp(civil).ok())
-        .map(Timestamp::as_millisecond)
+        .filter_map(|offset| epoch_ms(civil, offset))
+        .filter(|ms| *ms <= CALENDAR_MAX_MS)
         .collect()
+}
+
+/// The date in `zone` of the instant `at_ms`, which may lie past
+/// `Timestamp::MAX` up to the calendar's end.
+fn local_date(at_ms: i64, zone: &TimeZone) -> Option<Date> {
+    if at_ms > CALENDAR_MAX_MS {
+        return None;
+    }
+    // Past `Timestamp::MAX`, the zone's offset there.
+    let nearest = Timestamp::from_millisecond(at_ms).unwrap_or(Timestamp::MAX);
+    let offset = i64::from(zone.to_offset(nearest).seconds()).checked_mul(1_000)?;
+    let local = SignedDuration::from_millis(at_ms.checked_add(offset)?);
+    EPOCH.checked_add(local).ok().map(DateTime::date)
 }
 
 /// The first instant after `after_ms` the expression matches in `zone`,
@@ -224,9 +249,8 @@ pub fn next_run_at_ms(expression: &str, after_ms: i64, zone_name: &str) -> Resul
         return Err("ERR flow schedule cron day cannot occur in the selected months".to_owned());
     }
     let zone = zone(zone_name)?;
-    let start = Timestamp::from_millisecond(after_ms).map_err(|_| CALENDAR_RANGE.to_owned())?;
     let upper = after_ms.saturating_add(SEARCH_MINUTES.saturating_add(1).saturating_mul(MINUTE_MS));
-    let first = start.to_zoned(zone.clone()).date();
+    let first = local_date(after_ms, &zone).ok_or_else(|| CALENDAR_RANGE.to_owned())?;
     let days = SEARCH_MINUTES / (24 * 60) + 2;
     for offset in 0..=days {
         let Ok(date) = first.checked_add(offset.days()) else {

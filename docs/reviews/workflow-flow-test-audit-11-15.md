@@ -53,6 +53,31 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
   is reserved for internal use" (a batch whole); creates and single
   mutations were already refused, and the schedule's history stays
   readable.
+- G46 (closed): an overwrite was refused while any lease was on the
+  schedule, even one its fire had long lost, with its own text. As
+  Elixir's, a lease blocks an overwrite only while the node's clock is
+  before its deadline (a caller's `now_ms` cannot expire it), with "ERR
+  flow schedule is currently leased".
+- G47 (closed): a `queue_after_previous` schedule backing off behind a
+  running target waited out its backoff (up to 30 s) after the target
+  finished. As Elixir's `notify_target_terminal`/`wake_queued`, a
+  scheduled target that turns terminal now wakes its schedule once the
+  round is durable: the schedule's shard pulls the queued occurrence to
+  its clock if the schedule is active and still waits on that target, and
+  the next poll fires it.
+- G48 (closed): schedules wrote no lifecycle events. As Elixir's, the
+  schedule's own history now carries `schedule_created`,
+  `schedule_fired`, `schedule_skipped_overlap`, `schedule_failed_overlap`,
+  `schedule_failed_planning` and `schedule_deleted` signals.
+- G49 (closed): a manual fire leased the schedule on the caller's clock,
+  so near the exact-integer limit the lease deadline passed it and the
+  fire failed with a misleading "definition too large". Manual fires
+  lease on the node's clock, as Elixir's state machine does; automatic
+  fires keep their command time.
+- G50 (closed): cron planning converted through `jiff::Timestamp`, whose
+  range ends at 9999-12-30T22:00Z, so the calendar's last day refused
+  with "outside supported calendar range". Instants are now counted on
+  the civil calendar up to 9999-12-31T23:59:59.999Z, Elixir's bound.
 
 ## `flow/governance_argument_errors_test.exs`
 
@@ -1372,48 +1397,48 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 | 925 | schedule rejects reserved target ids and prefixes | ported (`audit::schedule_api::a_target_is_a_map_that_can_create_a_flow`; `schedule::tests::targets_and_end_conditions_follow_the_kind`) |
 | 946 | schedule rejects target definitions that cannot create a flow | ported (`audit::schedule_api::a_target_is_a_map_that_can_create_a_flow`) |
 | 968 | schedule time inputs are bounded and cron conversion never raises | ported (`audit::schedule_api::time_inputs_stay_within_exact_and_calendar_bounds`) |
-| 1013 | cron fire at the calendar ceiling completes after emitting exactly one target | open |
-| 1062 | duplicate target id must belong to the schedule before it is treated as idempotent | open |
-| 1094 | predictable scheduler correlation cannot forge target ownership | open |
-| 1140 | scheduler-owned target is accepted after a crash before schedule completion | open |
-| 1196 | duplicate schedule create returns already exists unless overwrite is explicit | open |
-| 1223 | schedule overwrite atomically replaces active definition | open |
-| 1346 | schedule overwrite rejects a currently leased schedule | open |
-| 1389 | schedule overwrite cannot expire a live lease with caller time | open |
-| 1432 | schedule overwrite can reactivate a completed one-shot schedule | open |
-| 1478 | schedule target can use payload_ref and value_refs | open |
-| 1524 | schedule list filters schedules by kind timezone target type and due range | open |
-| 1569 | schedule list applies reverse ordering before count | open |
-| 1609 | schedule list keeps terminal schedules last when reverse ordering | open |
-| 1661 | schedule list pages past more candidates than one catalog page | open |
-| 1701 | schedule list preserves global ordering across catalog pages and shards | open |
-| 1737 | schedule list finds a filtered match after earlier catalog pages | open |
-| 1763 | exact catalog and async projections handle long schedule state keys | open |
-| 1800 | schedule due ranges exclude terminal schedules without a next run | open |
-| 1829 | schedule list fails closed when its exact catalog is unavailable | open |
-| 1841 | schedule exact catalog tracks retention without a second membership index | open |
-| 1896 | recurring schedule completes after max_fires | open |
-| 1933 | recurring schedule completes when next fire would pass end_at_ms | open |
-| 1968 | recurring schedule completes when its next timestamp exceeds the exact limit | open |
-| 1999 | one-shot and delay schedules reject recurring end conditions | open |
-| 2018 | manual schedule fire targets one schedule immediately | open |
-| 2043 | pause and resume controls schedule firing | open |
+| 1013 | cron fire at the calendar ceiling completes after emitting exactly one target | fixed (`audit::schedule_lifecycle::the_last_cron_fire_the_calendar_allows_completes_the_schedule`, `schedule::cron_tests::the_calendar_s_last_minute_still_plans`; G50) |
+| 1062 | duplicate target id must belong to the schedule before it is treated as idempotent | covered (`flow_schedule::schedules_pause_resume_delete_and_overwrite`, its owned-target case) |
+| 1094 | predictable scheduler correlation cannot forge target ownership | ported (`audit::schedule_lifecycle::the_scheduler_correlation_does_not_forge_ownership`) |
+| 1140 | scheduler-owned target is accepted after a crash before schedule completion | internal: building the owner attributes needs the schedule's ownership secret, which only the scheduler reads; a retried fire accepts its own target through `target::owned` (`composition::schedule::fire::create_target`) |
+| 1196 | duplicate schedule create returns already exists unless overwrite is explicit | covered (`flow_schedule::schedules_pause_resume_delete_and_overwrite`) |
+| 1223 | schedule overwrite atomically replaces active definition | ported (`audit::schedule_lifecycle::an_overwrite_replaces_the_whole_definition_at_once`) |
+| 1346 | schedule overwrite rejects a currently leased schedule | fixed (`audit::schedule_lifecycle::an_overwrite_waits_for_a_live_lease_on_the_node_clock`; G46) |
+| 1389 | schedule overwrite cannot expire a live lease with caller time | fixed (`audit::schedule_lifecycle::an_overwrite_waits_for_a_live_lease_on_the_node_clock`; G46) |
+| 1432 | schedule overwrite can reactivate a completed one-shot schedule | covered (`flow_schedule::schedules_pause_resume_delete_and_overwrite`) |
+| 1478 | schedule target can use payload_ref and value_refs | ported (`audit::schedule_lifecycle::a_target_can_take_its_payload_and_values_by_reference`) |
+| 1524 | schedule list filters schedules by kind timezone target type and due range | covered (`flow_schedule::listing_filters_schedules_and_orders_them_by_due_time`) |
+| 1569 | schedule list applies reverse ordering before count | covered (`flow_schedule::listing_filters_schedules_and_orders_them_by_due_time`) |
+| 1609 | schedule list keeps terminal schedules last when reverse ordering | ported (`audit::schedule_lifecycle::listings_keep_finished_schedules_out_of_due_ranges_and_last_in_reverse`) |
+| 1661 | schedule list pages past more candidates than one catalog page | internal: Elixir's catalog page size; the node lists every shard's schedules in one pass |
+| 1701 | schedule list preserves global ordering across catalog pages and shards | covered: order across shards (`flow_schedule::listing_filters_schedules_and_orders_them_by_due_time` on 4 shards); catalog pages are Elixir's |
+| 1737 | schedule list finds a filtered match after earlier catalog pages | internal: Elixir's catalog pages; the filter is covered (`flow_schedule::listing_filters_schedules_and_orders_them_by_due_time`) |
+| 1763 | exact catalog and async projections handle long schedule state keys | internal: `Flow.create_internal/3` and the async history projector |
+| 1800 | schedule due ranges exclude terminal schedules without a next run | ported (`audit::schedule_lifecycle::listings_keep_finished_schedules_out_of_due_ranges_and_last_in_reverse`) |
+| 1829 | schedule list fails closed when its exact catalog is unavailable | internal: an instance context with a missing shard |
+| 1841 | schedule exact catalog tracks retention without a second membership index | ported (`audit::schedule_lifecycle::retention_removes_a_deleted_schedule_from_listings`) |
+| 1896 | recurring schedule completes after max_fires | covered (`flow_schedule::schedules_fire_their_targets_until_they_end`) |
+| 1933 | recurring schedule completes when next fire would pass end_at_ms | covered (`flow_schedule::schedules_fire_their_targets_until_they_end`) |
+| 1968 | recurring schedule completes when its next timestamp exceeds the exact limit | ported (`audit::schedule_overlaps::exact_integer_bounds_end_a_schedule_cleanly`) |
+| 1999 | one-shot and delay schedules reject recurring end conditions | covered (`schedule::tests::targets_and_end_conditions_follow_the_kind`) |
+| 2018 | manual schedule fire targets one schedule immediately | ported (`audit::schedule_overlaps::a_manual_skip_past_the_end_bound_completes`) |
+| 2043 | pause and resume controls schedule firing | covered (`flow_schedule::schedules_pause_resume_delete_and_overwrite`) |
 | 2075 | operator schedule mutations reject stale expected state and version | fixed (`audit::schedule_api::operator_changes_keep_to_their_expected_state_and_version`, `audit::schedule_api::a_guarded_overwrite_needs_the_schedule_as_expected`; G43) |
-| 2123 | schedule lifecycle writes explicit signal history events | open |
-| 2154 | overlap policy skip advances recurring schedule without creating a new target | open |
-| 2185 | strict overlap state reads use the replicated state-only path | open |
-| 2209 | strict overlap state reads include hibernated targets | open |
-| 2240 | overlap policy allow does not depend on reading the previous target | open |
-| 2297 | overlap policy queue_after_previous preserves queued due occurrence | open |
-| 2345 | repeated unchanged overlap backs off while preserving the queued occurrence | open |
-| 2394 | target completion wakes a backed-off queued schedule without changing its occurrence | open |
-| 2478 | queued overlap terminates cleanly when its retry timestamp would overflow | open |
-| 2517 | manual queued overlap terminates cleanly when its retry timestamp would overflow | open |
-| 2554 | manual overlap skip completes when the next occurrence passes the end bound | open |
-| 2587 | manual overlap skip terminates cleanly at the exact timestamp limit | open |
-| 2624 | overlap policy fail_schedule marks recurring schedule failed | open |
-| 2656 | manual fail_schedule overlap persists the same terminal details | open |
-| 2692 | schedule delete cancels future schedule | open |
+| 2123 | schedule lifecycle writes explicit signal history events | fixed (`audit::schedule_overlaps::a_schedule_records_its_lifecycle_as_signals`; G48) |
+| 2154 | overlap policy skip advances recurring schedule without creating a new target | covered (`flow_schedule::overlap_policies_hold_back_a_schedule_while_its_target_runs`) |
+| 2185 | strict overlap state reads use the replicated state-only path | internal: `Router.flow_consistent_state/3`; the node reads the previous target with FLOW.GET on its shard |
+| 2209 | strict overlap state reads include hibernated targets | internal: Elixir's hibernation; the node's FLOW.GET reads a cold Flow from disk |
+| 2240 | overlap policy allow does not depend on reading the previous target | internal: a corrupted raw row; the node reads no previous target for `allow` (`composition::schedule::fire::fire_one`) |
+| 2297 | overlap policy queue_after_previous preserves queued due occurrence | covered (`flow_schedule::overlap_policies_hold_back_a_schedule_while_its_target_runs`) |
+| 2345 | repeated unchanged overlap backs off while preserving the queued occurrence | covered (`schedule::tests::a_repeated_overlap_backs_off_on_the_same_occurrence`) |
+| 2394 | target completion wakes a backed-off queued schedule without changing its occurrence | fixed (`audit::schedule_overlaps::a_finished_target_wakes_its_backed_off_queued_schedule`; G47) |
+| 2478 | queued overlap terminates cleanly when its retry timestamp would overflow | ported (`audit::schedule_overlaps::exact_integer_bounds_end_a_schedule_cleanly`) |
+| 2517 | manual queued overlap terminates cleanly when its retry timestamp would overflow | fixed (`audit::schedule_overlaps::exact_integer_bounds_end_a_schedule_cleanly`; G49: the manual lease passed the exact-integer bound) |
+| 2554 | manual overlap skip completes when the next occurrence passes the end bound | ported (`audit::schedule_overlaps::a_manual_skip_past_the_end_bound_completes`) |
+| 2587 | manual overlap skip terminates cleanly at the exact timestamp limit | fixed (`audit::schedule_overlaps::exact_integer_bounds_end_a_schedule_cleanly`; G49) |
+| 2624 | overlap policy fail_schedule marks recurring schedule failed | ported (`audit::schedule_overlaps::fail_schedule_keeps_the_overlap_that_failed_it`) |
+| 2656 | manual fail_schedule overlap persists the same terminal details | ported (`audit::schedule_overlaps::fail_schedule_keeps_the_overlap_that_failed_it`) |
+| 2692 | schedule delete cancels future schedule | fixed (`audit::schedule_overlaps::a_schedule_records_its_lifecycle_as_signals`; G48) |
 | 2725 | invalid cron is rejected during schedule creation | ported (`schedule::cron_tests::malformed_expressions_are_refused_with_their_reason`) |
 | 2734 | recurrence planning failures do not create orphan targets | internal: a stored definition corrupted in place; its reason text is ported (`schedule::cron_tests::malformed_expressions_are_refused_with_their_reason`) |
 | 2799 | recurrence planning failures terminate an overlap skip | internal: a stored definition corrupted in place during an overlap skip |
@@ -1425,14 +1450,14 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 | 2939 | cron schedule supports aliases, ranges, and steps | ported (`schedule::cron_tests::aliases_ranges_steps_and_leap_days_plan_their_runs`) |
 | 2988 | cron schedule supports weekday aliases | ported (`schedule::cron_tests::aliases_ranges_steps_and_leap_days_plan_their_runs`) |
 | 3004 | cron schedule matches wall-clock time in configured timezone | ported (`schedule::cron_tests::zones_and_daylight_saving_folds_plan_wall_clock_times`) |
-| 3027 | a schedule fire that fails transiently is released for the next poll | open |
+| 3027 | a schedule fire that fails transiently is released for the next poll | internal: Elixir's fault-injection hook; on a failure that is not a refusal the node hands the schedule back at once (`composition::schedule::fire::fire_one`) |
 | 3073 | cron schedule handles repeated DST wall-clock minute as distinct due times | ported (`schedule::cron_tests::zones_and_daylight_saving_folds_plan_wall_clock_times`) |
 | 3100 | cron chooses the earliest instant across multiple DST fallback wall minutes | ported (`schedule::cron_tests::zones_and_daylight_saving_folds_plan_wall_clock_times`) |
-| 3113 | due schedule is not missed after hibernation removes its hot due key | open |
+| 3113 | due schedule is not missed after hibernation removes its hot due key | internal: Elixir's LMDB writer and Raft acceptor race |
 | 3194 | cron schedule rejects invalid timezone | ported (`schedule::cron_tests::malformed_expressions_are_refused_with_their_reason`) |
-| 3207 | cron schedule fires on matching UTC minutes and reschedules to next match | open |
-| 3263 | runtime bookkeeping cannot make an accepted schedule unreadable | open |
-| 3317 | schedule creation reserves hydration capacity for bounded runtime state | open |
+| 3207 | cron schedule fires on matching UTC minutes and reschedules to next match | ported (`audit::schedule_lifecycle::a_cron_fires_on_matching_minutes_and_moves_to_the_next`) |
+| 3263 | runtime bookkeeping cannot make an accepted schedule unreadable | covered by bounds: a schedule's record holds up to 512 MiB and its target's inline values 8 KiB (G44), with ids at most 256 bytes, so runtime bookkeeping cannot outgrow it |
+| 3317 | schedule creation reserves hydration capacity for bounded runtime state | internal: Elixir's configurable definition and hydration limits (`Schedule.Limits`) |
 
 ## `flow/scheduler_test.exs`
 

@@ -56,6 +56,9 @@ pub(crate) enum ScheduleOp {
     },
     /// Cancel.
     Delete { key: Key, expect: Expect, now: u64 },
+    /// Wake the queued occurrence `target`'s finish frees, by the node's
+    /// clock.
+    Wake { key: Key, target: Vec<u8> },
 }
 
 /// A schedule request's answer.
@@ -81,7 +84,8 @@ impl ShardState {
         let mut claimed = Vec::new();
         let mut logged = Vec::new();
         for key in self.due_schedules(now, limit) {
-            let claim = self.schedule_claim(&key, (now, worker, lease_ms), &Expect::default());
+            let claim =
+                self.schedule_claim(&key, (now, now), (worker, lease_ms), &Expect::default());
             if let Ok((one, change)) = claim {
                 claimed.push(one);
                 logged.push(change);
@@ -109,7 +113,12 @@ impl ShardState {
                 overwrite,
                 guard,
                 now,
-            } => one(self.schedule_create(&key, *definition, (overwrite, guard.as_ref()), now)),
+            } => one(self.schedule_create(
+                &key,
+                *definition,
+                (overwrite, guard.as_ref()),
+                (now, wall),
+            )),
             ScheduleOp::Read { key } => (
                 Ok(ScheduleReply::One(self.schedule(&key).map(Box::new))),
                 Vec::new(),
@@ -121,7 +130,7 @@ impl ShardState {
                 worker,
                 lease_ms,
                 expect,
-            } => match self.schedule_claim(&key, (now, &worker, lease_ms), &expect) {
+            } => match self.schedule_claim(&key, (now, wall), (&worker, lease_ms), &expect) {
                 Ok((claimed, logged)) => (Ok(ScheduleReply::Claimed(vec![claimed])), vec![logged]),
                 Err(error) => (Err(error), Vec::new()),
             },
@@ -147,6 +156,12 @@ impl ShardState {
                 expect,
                 now,
             } => one(self.schedule_pause(&key, (pause, &expect), now)),
+            ScheduleOp::Wake { key, target } => match self.schedule_wake(&key, &target, wall) {
+                Some((stored, logged)) => {
+                    (Ok(ScheduleReply::One(Some(Box::new(stored)))), vec![logged])
+                }
+                None => (Ok(ScheduleReply::One(None)), Vec::new()),
+            },
             ScheduleOp::Delete { key, expect, now } => {
                 match self.schedule_delete(&key, &expect, (now, wall)) {
                     Ok(logged) => (Ok(ScheduleReply::Done), vec![logged]),

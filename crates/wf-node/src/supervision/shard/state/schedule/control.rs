@@ -1,5 +1,6 @@
 //! Operator changes to a schedule: pause, resume and delete, each held to
-//! the caller's `expected_state`/`expected_version` guards.
+//! the caller's `expected_state`/`expected_version` guards; and the wake a
+//! finished target gives its queued schedule.
 
 use wf_application::commands::flow::schedule::guard::Expect;
 use wf_application::commands::queue::ServiceError;
@@ -11,6 +12,37 @@ use super::super::{Key, ShardState};
 use super::{Stored, data_of, not_found, rejected, terminal};
 
 impl ShardState {
+    /// Pulls an active schedule's queued occurrence to `now` once the
+    /// target it waits on has finished, as Elixir's `wake_queued/4`; any
+    /// other schedule, or one already due, is left as it is.
+    pub(crate) fn schedule_wake(
+        &mut self,
+        key: &Key,
+        target: &[u8],
+        now: u64,
+    ) -> Option<(Stored, Logged)> {
+        let stored = self.stored(key)?;
+        let queued = &stored.definition;
+        let waiting = stored.state.as_slice() == b"active"
+            && queued.last_target_id.as_deref() == Some(target)
+            && queued.overlap_queued_due_at_ms.is_some()
+            && queued.next_run_at_ms.is_some_and(|next| next > now);
+        if !waiting {
+            return None;
+        }
+        let entry = self.hot(key)?;
+        let mut data = data_of(&entry.record);
+        let mut definition = stored.definition;
+        definition.next_run_at_ms = Some(now);
+        data.next_run_at = Some(TimestampMillis::new(now));
+        data.payload = Some(definition.encode());
+        let meta = self.meta_of(key);
+        let logged = self
+            .rewrite(key, data, meta, (EventKind::Transitioned, now))
+            .ok()?;
+        Some((self.stored(key)?, logged))
+    }
+
     /// Pauses an active schedule, or resumes a paused one at its next run.
     pub(crate) fn schedule_pause(
         &mut self,

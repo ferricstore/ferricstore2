@@ -56,6 +56,7 @@ impl Started {
                 by_priority: Arc::new([AtomicU64::new(0), AtomicU64::new(0), AtomicU64::new(0)]),
                 waiters: waiters.clone(),
                 release: credit::releaser(Arc::clone(&release_router)),
+                wake: super::schedule::waker(Arc::clone(&release_router)),
                 backlog: Arc::new(AtomicUsize::new(0)),
             },
         )?;
@@ -104,6 +105,7 @@ fn start_shards(
             by_priority: Arc::clone(&by_priority),
             waiters: shared.waiters.clone(),
             release: Arc::clone(&shared.release),
+            wake: Arc::clone(&shared.wake),
             backlog: Arc::clone(&backlog),
         };
         threads.push(

@@ -178,12 +178,17 @@ pub(crate) struct Links {
     pub(crate) waiters: Waiters,
     /// Delivers the credits of Flows that left `running` (ADR-014 step 15).
     pub(crate) release: Releases,
+    /// Wakes the queued schedules of targets that finished (audit G47).
+    pub(crate) wake: Wakes,
     /// Items sent to this shard and not yet taken (ADR-017).
     pub(crate) backlog: Arc<AtomicUsize>,
 }
 
 /// Delivers limit credits for release.
 pub(crate) type Releases = Arc<dyn Fn(Vec<Credit>) + Send + Sync>;
+
+/// Delivers finished targets' schedules to wake.
+pub(crate) type Wakes = Arc<dyn Fn(Vec<state::schedule::Wake>) + Send + Sync>;
 
 /// Committed time: the wall clock, never earlier than the previous round.
 fn committed_now(previous: u64) -> u64 {
@@ -232,6 +237,14 @@ fn release_once_durable(release: Releases, credits: Vec<Credit>) -> Finish {
     Box::new(move |durable: Result<(), ServiceError>| {
         if durable.is_ok() {
             release(credits);
+        }
+    })
+}
+
+fn wake_once_durable(wake: Wakes, wakes: Vec<state::schedule::Wake>) -> Finish {
+    Box::new(move |durable: Result<(), ServiceError>| {
+        if durable.is_ok() {
+            wake(wakes);
         }
     })
 }
@@ -288,6 +301,11 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         let credits = state.take_credit_releases();
         if !credits.is_empty() && serving {
             finishes.push(release_once_durable(Arc::clone(&links.release), credits));
+        }
+        // Queued schedules whose targets finished wake once durable.
+        let wakes = state.take_schedule_wakes();
+        if !wakes.is_empty() && serving {
+            finishes.push(wake_once_durable(Arc::clone(&links.wake), wakes));
         }
         let pending = if failed {
             None

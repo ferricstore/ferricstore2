@@ -4,7 +4,7 @@
 //! targets' shards in between, as `Schedule.fire_one/3` does.
 
 use crate::supervision::shard::state::{Key, flow_key};
-use std::sync::mpsc;
+use std::sync::{Arc, OnceLock, Weak, mpsc};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use wf_application::commands::flow::FlowCommand;
@@ -16,8 +16,8 @@ use wf_application::commands::flow::schedule::{
 use wf_application::commands::flow::term::{Term, map};
 use wf_application::commands::queue::{Partition, ServiceError};
 
-use crate::supervision::shard::Request;
 use crate::supervision::shard::state::schedule::{ScheduleOp, ScheduleReply, Stored};
+use crate::supervision::shard::{Request, Wakes};
 
 use super::router::Router;
 
@@ -70,7 +70,8 @@ fn op(
         | ScheduleOp::Claim { key, .. }
         | ScheduleOp::Apply { key, .. }
         | ScheduleOp::Pause { key, .. }
-        | ScheduleOp::Delete { key, .. } => router.route(&key.0),
+        | ScheduleOp::Delete { key, .. }
+        | ScheduleOp::Wake { key, .. } => router.route(&key.0),
         ScheduleOp::List | ScheduleOp::ClaimDue { .. } => 0,
     });
     ask(router, index, |done| Request::Schedule { op, done })
@@ -93,6 +94,24 @@ fn flow_call(router: &Router, command: FlowCommand) -> Result<Term, ServiceError
         partition,
         done,
     })
+}
+
+/// Records a lifecycle event in schedule `id`'s own history, as Elixir's
+/// `emit_schedule_event/5` signals it: best effort, after the change.
+fn signal(router: &Router, id: &[u8], event: &str, now: u64) {
+    let Partition::Named(partition) = schedules::partition(id) else {
+        return;
+    };
+    let options = map(vec![
+        ("id", Term::Bin(flow_id(id))),
+        ("partition_key", Term::Bin(partition)),
+        ("signal", Term::text(event)),
+        ("now_ms", Term::int(now)),
+    ]);
+    if let Ok(command) = wf_application::commands::flow::parse("FLOW.SIGNAL", &options) {
+        // The change itself succeeded; a lost event only thins the history.
+        let _signaled = flow_call(router, command);
+    }
 }
 
 fn view(stored: &Stored) -> Term {
@@ -183,6 +202,7 @@ pub(super) fn run(router: &Router, command: Command) -> Result<Term, ServiceErro
                 now,
             };
             let stored = one(op(router, created, None)?).ok_or(ServiceError::Unavailable)?;
+            signal(router, &request.id, "schedule_created", now);
             Ok(unread(&stored.definition, b"active"))
         }
         Command::Get(target) => {
@@ -206,6 +226,7 @@ pub(super) fn run(router: &Router, command: Command) -> Result<Term, ServiceErro
                 },
                 None,
             )?;
+            signal(router, &target.id, "schedule_deleted", now);
             Ok(Term::text("OK"))
         }
         Command::Pause(target) => pause(router, &target, true, wall),
@@ -284,6 +305,28 @@ fn pause(
     )?;
     let stored = one(reply).ok_or(ServiceError::Unavailable)?;
     Ok(unread(&stored.definition, &stored.state))
+}
+
+/// Wakes the queued schedules of targets that finished (audit G47): each
+/// goes to its schedule's shard, which decides with its own clock; the
+/// next poll fires it.
+pub(super) fn waker(router: Arc<OnceLock<Weak<Router>>>) -> Wakes {
+    Arc::new(move |wakes| {
+        let Some(router) = router.get().and_then(Weak::upgrade) else {
+            return;
+        };
+        for (schedule, target) in wakes {
+            let key = key_of(&schedule);
+            let index = router.route(&key.0);
+            router.send(
+                index,
+                Request::Schedule {
+                    op: ScheduleOp::Wake { key, target },
+                    done: Box::new(|_woken| {}),
+                },
+            );
+        }
+    })
 }
 
 /// The background poll: fires due schedules at wall time; whether it did.

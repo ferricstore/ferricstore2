@@ -66907,3 +66907,55 @@ pause or delete, the composition's guard hand-off, the inline bound,
 the values bound, or the list-target text each fail a test (13 of 13);
 removing the reserved-id check, or its GET, batch, rewind or spawn arm,
 each fail one (5 of 5).
+
+### Flow test audit: schedule lifecycle and overlaps; G46-G50 (22 Nov)
+
+`flow/schedule_test.exs`, the rest: `audit::schedule_lifecycle` (the
+calendar's last cron fire, ownership a caller's correlation cannot
+forge, atomic overwrite, overwrite and live leases, targets by
+reference, listing order and due ranges, retention) and
+`audit::schedule_overlaps` (exact-integer and end bounds while
+overlapping, fail_schedule details, lifecycle signals, the
+target-finished wake).
+
+G46 closed. RED: an overwrite of a leased schedule answered "leased by a
+fire in progress", Elixir's text is "currently leased", and a lease the
+node's clock had passed still blocked it. The create op now refuses only
+a lease whose deadline is after its clock.
+
+G47 closed. RED: completing the target a `queue_after_previous` schedule
+waited on left its next run at the backoff time. Like credit releases,
+the shard notes a terminal write of a Flow carrying the schedule
+attribute (live, not replay), and once the round is durable a waker
+sends `ScheduleOp::Wake` to the schedule's shard through the router's
+weak handle; the op pulls the queued occurrence to the shard's clock
+only for an active schedule whose last target is that Flow and whose
+next run is later. The schedule thread is not involved, so shutdown's
+order (schedule thread joined before shards) is unchanged.
+
+G48 closed. RED: the schedule's history had no signals. Create, delete
+and each fire outcome now signal the schedule's own Flow after the
+change, best effort, as Elixir's `emit_schedule_event/5`.
+
+G49 closed, found by the manual overflow ports. RED: a manual fire at
+`now_ms` near 2^53 failed "definition too large": its 30 s lease
+deadline passed the exact-integer bound and the record rewrite refused
+it. Manual claims now lease from the node's clock (`schedule_claim`
+takes a lease base).
+
+G50 closed, found by the calendar-ceiling port. RED: "59 23 31 DEC *"
+from 9999-12-31T23:58Z was refused as outside the calendar. Cron
+instants are counted as civil time minus the zone offset, the start
+date from the offset at the nearest representable instant, and instants
+past 9999-12-31T23:59:59.999Z are dropped.
+
+Mutation checks: blocking on any lease or on caller time (G46), manual
+leases on caller time (G49), no Timestamp fallback, no calendar filter or
+Timestamp conversion (G50), and dropping the created, deleted, fired,
+skipped or failed-overlap signal (G48) each fail a test (11 of 11), as
+do dropping the wake's note, its delivery or its pull (G47, 3 of 3). Two
+lines have no test by design: the failed-planning signal (a planning
+failure needs a stored definition corrupted in place, which no client
+can write), and the `live` check that keeps replay from queueing wakes
+(without it a restart replays every finished scheduled target into a
+burst of wake ops, each harmless because the op re-checks the schedule).

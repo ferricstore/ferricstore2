@@ -12,7 +12,7 @@ use wf_application::commands::queue::ServiceError;
 use crate::supervision::shard::state::schedule::{Claimed, ScheduleOp, Stored};
 
 use super::super::router::Router;
-use super::{flow_call, one, op};
+use super::{flow_call, one, op, signal};
 
 fn target_record(
     router: &Router,
@@ -130,6 +130,12 @@ pub(super) fn fire_one(
                 },
                 now,
             )?;
+            signal(
+                router,
+                &claimed.stored.definition.id,
+                "schedule_failed_planning",
+                now,
+            );
             return Err(ServiceError::rejected(reason));
         }
     };
@@ -152,23 +158,32 @@ pub(super) fn fire_one(
                 }
                 return Err(error);
             }
-            Ok(Outcome::Fired(
-                target_id,
-                coalesced,
-                apply(router, claimed, then, now)?,
-            ))
+            let stored = apply(router, claimed, then, now)?;
+            signal(router, &stored.definition.id, "schedule_fired", now);
+            Ok(Outcome::Fired(target_id, coalesced, stored))
         }
         Plan::Hold {
             reason,
             then,
             coalesced,
-        } => Ok(Outcome::Skipped(
-            reason,
-            coalesced,
-            apply(router, claimed, then, now)?,
-        )),
+        } => {
+            let stored = apply(router, claimed, then, now)?;
+            signal(
+                router,
+                &stored.definition.id,
+                "schedule_skipped_overlap",
+                now,
+            );
+            Ok(Outcome::Skipped(reason, coalesced, stored))
+        }
         Plan::Fail { reason, then } => {
-            apply(router, claimed, then, now)?;
+            let stored = apply(router, claimed, then, now)?;
+            signal(
+                router,
+                &stored.definition.id,
+                "schedule_failed_overlap",
+                now,
+            );
             Err(ServiceError::rejected(reason))
         }
     }

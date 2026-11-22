@@ -106,6 +106,8 @@ pub(crate) struct ShardState {
     governance: BTreeMap<(Kind, Vec<u8>), Vec<u8>>,
     /// Credits of Flows that left `running`, to release (ADR-014 step 15).
     credit_releases: Vec<wf_application::commands::flow::effect::Credit>,
+    /// Schedules whose targets finished this round, to wake (audit G47).
+    schedule_wakes: Vec<schedule::Wake>,
     /// Named partitions by hash tag, to find a Flow from a value reference;
     /// rebuilt on a miss when Flows were added since (`tags_at`).
     tags: Map<String, Partition>,
@@ -170,6 +172,7 @@ impl ShardState {
             held: value::Held::default(),
             governance: BTreeMap::new(),
             credit_releases: Vec::new(),
+            schedule_wakes: Vec::new(),
             tags: Map::default(),
             tags_at: 0,
             live: false,
@@ -198,6 +201,7 @@ impl ShardState {
         self.child_events.clear();
         self.closing.clear();
         self.credit_releases.clear();
+        self.schedule_wakes.clear();
     }
 
     /// Records in the due index, claimable now or later.

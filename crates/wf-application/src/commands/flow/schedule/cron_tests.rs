@@ -102,3 +102,26 @@ fn zones_and_daylight_saving_folds_plan_wall_clock_times() -> Result<(), String>
     assert_eq!(int(fallback)?, at("2024-11-03T05:31:00Z")?);
     Ok(())
 }
+
+#[test]
+fn the_calendar_s_last_minute_still_plans() -> Result<(), String> {
+    // Elixir: "cron fire at the calendar ceiling completes after emitting
+    // exactly one target": 9999-12-31T23:59Z plans, and nothing after it.
+    let ceiling: i64 = 253_402_300_740_000;
+    let first = first("59 23 31 DEC *", ceiling - 60_000, "Etc/UTC")?;
+    assert_eq!(i64::try_from(first).map_err(|e| e.to_string())?, ceiling);
+    assert_eq!(
+        next_run_at_ms("59 23 31 DEC *", ceiling, "Etc/UTC").err(),
+        Some(super::cron::CALENDAR_RANGE.to_owned())
+    );
+    assert_eq!(
+        next_run_at_ms("* * * * *", ceiling + 59_999, "Etc/UTC").err(),
+        Some(super::cron::CALENDAR_RANGE.to_owned())
+    );
+    // New York's last 23:59 is past the calendar's end in UTC.
+    assert_eq!(
+        next_run_at_ms("59 23 31 DEC *", ceiling - 86_400_000, "America/New_York").err(),
+        Some(super::cron::CALENDAR_RANGE.to_owned())
+    );
+    Ok(())
+}

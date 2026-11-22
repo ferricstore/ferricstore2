@@ -9,7 +9,9 @@ use wf_application::commands::flow::record::FlowMeta;
 use wf_application::commands::flow::schedule::definition::Definition;
 use wf_application::commands::flow::schedule::guard::Expect;
 use wf_application::commands::flow::schedule::plan::Apply;
+use wf_application::commands::flow::schedule::target::SCHEDULE_ATTRIBUTE;
 use wf_application::commands::flow::schedule::{HISTORY_MAX_EVENTS, SCHEDULE_TYPE};
+use wf_application::commands::flow::term::Term;
 use wf_application::commands::flow::value_codec;
 use wf_application::commands::queue::ServiceError;
 use wf_domain::history::EventKind;
@@ -38,6 +40,9 @@ pub(crate) struct Stored {
     pub(crate) attempts: u64,
     pub(crate) definition: Definition,
 }
+
+/// A finished target's schedule to wake: the schedule id and the target's.
+pub(crate) type Wake = (Vec<u8>, Vec<u8>);
 
 /// A schedule claimed for one fire, with its lease.
 #[derive(Clone, Debug)]
@@ -98,6 +103,25 @@ impl ShardState {
         })
     }
 
+    /// Notes a scheduled target that just finished, so its queued schedule
+    /// wakes once the round is durable, as Elixir's
+    /// `Scheduler.notify_target_terminal/3`; replay wakes nothing.
+    pub(super) fn note_scheduled(&mut self, key: &Key, meta: Option<&FlowMeta>) {
+        if !self.live {
+            return;
+        }
+        if let Some(Term::Bin(schedule)) =
+            meta.and_then(|meta| meta.attributes.get(SCHEDULE_ATTRIBUTE))
+        {
+            self.schedule_wakes.push((schedule.clone(), key.1.clone()));
+        }
+    }
+
+    /// The wakes to deliver once this round is durable.
+    pub(crate) fn take_schedule_wakes(&mut self) -> Vec<Wake> {
+        std::mem::take(&mut self.schedule_wakes)
+    }
+
     /// The schedule under `key`.
     pub(crate) fn schedule(&self, key: &Key) -> Option<Stored> {
         self.stored(key)
@@ -151,14 +175,16 @@ impl ShardState {
             })
     }
 
-    /// Creates the schedule, or with `overwrite` replaces an unleased one;
-    /// a `guard` replaces only the schedule the caller read.
+    /// Creates the schedule, or with `overwrite` replaces one no live fire
+    /// holds, a lease live by the node's clock `wall` (a caller's time
+    /// cannot expire it); a `guard` replaces only the schedule the caller
+    /// read.
     pub(crate) fn schedule_create(
         &mut self,
         key: &Key,
         mut definition: Definition,
         (overwrite, guard): (bool, Option<&Expect>),
-        now: u64,
+        (now, wall): (u64, u64),
     ) -> Result<(Stored, Logged), ServiceError> {
         if let Some(guard) = guard {
             let stored = self.stored(key).ok_or_else(not_found)?;
@@ -168,10 +194,13 @@ impl ShardState {
         let next = definition.next_run_at_ms.map(TimestampMillis::new);
         let data = match self.hot(key) {
             Some(_) if !overwrite => return Err(rejected("ERR flow already exists")),
-            Some(entry) if entry.record.lease().is_some() => {
-                return Err(rejected(
-                    "ERR flow schedule is leased by a fire in progress",
-                ));
+            Some(entry)
+                if entry
+                    .record
+                    .lease()
+                    .is_some_and(|lease| lease.deadline.get() > wall) =>
+            {
+                return Err(rejected("ERR flow schedule is currently leased"));
             }
             Some(entry) => {
                 let mut data = data_of(&entry.record);
@@ -217,12 +246,15 @@ impl ShardState {
         Ok((stored, logged))
     }
 
-    /// Leases the schedule under `key` for a fire: an active one, or (when
-    /// `due` and its lease ran out) one a crashed fire still holds.
+    /// Leases the schedule under `key` for a fire from `lease_at`: an
+    /// active one, or one whose lease ran out by then (a crashed fire's).
+    /// Automatic fires lease on their command time, manual ones on the
+    /// node's clock, as Elixir's.
     pub(crate) fn schedule_claim(
         &mut self,
         key: &Key,
-        (now, worker, lease_ms): (u64, &[u8], u64),
+        (now, lease_at): (u64, u64),
+        (worker, lease_ms): (&[u8], u64),
         expect: &Expect,
     ) -> Result<(Claimed, Logged), ServiceError> {
         let stored = self.stored(key).ok_or_else(not_found)?;
@@ -231,7 +263,7 @@ impl ShardState {
         let expired = entry
             .record
             .lease()
-            .is_some_and(|lease| lease.deadline.get() <= now);
+            .is_some_and(|lease| lease.deadline.get() <= lease_at);
         if stored.state.as_slice() != b"active" && !expired {
             return Err(rejected("ERR flow schedule is not active"));
         }
@@ -242,7 +274,7 @@ impl ShardState {
         data.lease = Some(Lease {
             worker: worker.to_vec(),
             token: LeaseToken::new(token.clone()).map_err(ServiceError::Domain)?,
-            deadline: TimestampMillis::new(now.saturating_add(lease_ms)),
+            deadline: TimestampMillis::new(lease_at.saturating_add(lease_ms)),
         });
         data.state = b"running".to_vec();
         data.run_state = Some(b"active".to_vec());
