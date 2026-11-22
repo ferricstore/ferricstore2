@@ -17,6 +17,8 @@ use super::term::Term;
 
 /// The longest new child group id.
 const MAX_GROUP_ID_BYTES: usize = 128;
+/// Most children one spawn creates.
+const MAX_CHILDREN: usize = 100_000;
 
 /// A spawn request.
 #[derive(Clone, Debug, PartialEq)]
@@ -202,6 +204,40 @@ fn empty_group(opts: &Opts<'_>) -> Result<ChildGroup, FlowError> {
     })
 }
 
+/// The children to spawn: a non-empty list, capped as batches are (audit
+/// gaps G15, G38).
+fn children_list<'a>(opts: &Opts<'a>) -> Result<&'a Vec<Term>, FlowError> {
+    let items = match opts.get("children") {
+        Some(Term::List(items)) if !items.is_empty() => items,
+        _ => {
+            return Err(FlowError::rejected(
+                "ERR flow children must be a non-empty list".to_owned(),
+            ));
+        }
+    };
+    if items.len() > MAX_CHILDREN {
+        return Err(FlowError::rejected(format!(
+            "ERR flow batch item count exceeds maximum {MAX_CHILDREN}"
+        )));
+    }
+    Ok(items)
+}
+
+/// The group's id: bounded as Elixir bounds a new one (audit gap G33), and
+/// not reserved.
+fn group_id(opts: &Opts<'_>) -> Result<Vec<u8>, FlowError> {
+    let group_id = opts.required_binary("group_id")?;
+    if group_id.len() > MAX_GROUP_ID_BYTES {
+        return Err(FlowError::flow("group_id", "is longer than 128 bytes"));
+    }
+    if group_id.starts_with(b"__") {
+        return Err(FlowError::rejected(
+            "ERR flow group_id is reserved".to_owned(),
+        ));
+    }
+    Ok(group_id)
+}
+
 /// Reads `FLOW.SPAWN_CHILDREN`.
 ///
 /// # Errors
@@ -234,26 +270,10 @@ pub fn parse(args: &Term) -> Result<SpawnChildren, FlowError> {
         Some(Term::Bin(id)) if !id.is_empty() => id.clone(),
         _ => return Err(FlowError::flow("id", "must be a non-empty string")),
     };
-    let items = match opts.get("children") {
-        Some(Term::List(items)) if !items.is_empty() => items,
-        _ => {
-            return Err(FlowError::rejected(
-                "ERR flow children must be a non-empty list".to_owned(),
-            ));
-        }
-    };
+    let items = children_list(&opts)?;
     let partition_key = create::partition_key(&opts)?
         .ok_or_else(|| FlowError::flow("partition_key", "is required"))?;
-    let group_id = opts.required_binary("group_id")?;
-    // A new group's id is bounded as Elixir bounds it (audit gap G33).
-    if group_id.len() > MAX_GROUP_ID_BYTES {
-        return Err(FlowError::flow("group_id", "is longer than 128 bytes"));
-    }
-    if group_id.starts_with(b"__") {
-        return Err(FlowError::rejected(
-            "ERR flow group_id is reserved".to_owned(),
-        ));
-    }
+    let group_id = group_id(&opts)?;
     let group = empty_group(&opts)?;
     let from_state = opts.binary_or_nil("from_state")?;
     // An empty wait state is a missing one, as in Elixir (audit gap G19).

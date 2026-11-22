@@ -181,6 +181,11 @@ Gaps found so far:
   kind and name, versions older than the one current at the oldest kept
   event go, at each write (Elixir releases a value once no history event
   names it).
+- G38 (closed): `RUN_STEPS_MANY` and `SPAWN_CHILDREN` took any number of
+  items (and step batches any number of items times steps), so one
+  request could admit unbounded work. Both are capped as batches are, at
+  100000 items (G15), and a step batch's items times steps at 100000,
+  with Elixir's texts.
 - P1 (open, performance): a batch's shared payload is logged in each
   Flow's after-image; Elixir logs it once per command. Clients see the
   same results; the log carries the payload once per Flow.
@@ -574,8 +579,8 @@ Gaps found so far:
 | 668 | flow_claim_due partition_keys tries later shards when an earlier stale candidate claims nothing | internal: Elixir's stale native index member and claim cursor table |
 | 755 | flow_create_many idempotent retry returns existing records without duplicate writes | fixed (G2) |
 | 794 | flow_create_many idempotency conflict rolls back same shard group | fixed (G2) |
-| 824 | flow_spawn_children wait none creates full child flows and advances parent | open |
-| 864 | flow_spawn_children wait all advances parent only after direct children finish | open |
+| 824 | flow_spawn_children wait none creates full child flows and advances parent | ported (`audit::spawn_waits::a_group_waiting_for_none_advances_its_parent_at_once`) |
+| 864 | flow_spawn_children wait all advances parent only after direct children finish | ported (`audit::spawn_waits::a_group_waiting_for_all_advances_after_every_child`; its lane sequences are Elixir's) |
 
 ## `flow_test/sections/flow_claim_due_automatically_reclaims_expired_leases_ratio.exs`
 
@@ -947,12 +952,12 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 33 | complete retry after committed response loss is a no-op success | open |
-| 53 | fail retry after committed response loss is a no-op success | open |
-| 70 | transition retry after committed response loss is a no-op success | open |
-| 96 | retry retry after committed response loss is guarded by latest history event | open |
-| 135 | retry retry without explicit run_at is a no-op while scheduled in original state | open |
-| 159 | same fencing token does not turn a different terminal effect into success | open |
+| 33 | complete retry after committed response loss is a no-op success | ported (`audit::fencing_retries::a_resent_completion_failure_or_transition_is_a_no_op`) |
+| 53 | fail retry after committed response loss is a no-op success | ported (same test) |
+| 70 | transition retry after committed response loss is a no-op success | ported (same test) |
+| 96 | retry retry after committed response loss is guarded by latest history event | ported (`audit::fencing_retries::a_resent_retry_is_a_no_op_until_the_flow_moves_on`) |
+| 135 | retry retry without explicit run_at is a no-op while scheduled in original state | ported (same test) |
+| 159 | same fencing token does not turn a different terminal effect into success | ported (`audit::fencing_retries::the_same_fence_does_not_turn_another_terminal_effect_into_success`) |
 
 ## `flow_test/sections/flushdb_clears_flow_lmdb_terminal_projections.exs`
 
@@ -968,11 +973,11 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 10 | stats counts active workflows beyond list count cap | open |
-| 34 | stats counts indexed attribute candidates beyond list count cap | open |
-| 54 | attribute stats ignore expired terminal projection rows | open |
-| 77 | attribute stats fail closed when exact scan would exceed limit | open |
-| 96 | info and stats stop counting a Flow that retention cleaned up | open |
+| 10 | stats counts active workflows beyond list count cap | ported (`flow_info::info_and_stats_count_states_partitions_and_leases`: stats count past any list cap; its configured cap is Elixir's) |
+| 34 | stats counts indexed attribute candidates beyond list count cap | ported (`audit::attribute_queries::queries_and_stats_filter_by_attributes`) |
+| 54 | attribute stats ignore expired terminal projection rows | ported (`flow_info::discovery_counts_policy_indexed_values_of_live_flows`, its expired terminal Flows) |
+| 77 | attribute stats fail closed when exact scan would exceed limit | internal: Elixir's stats scan limit; the node counts exactly |
+| 96 | info and stats stop counting a Flow that retention cleaned up | ported (`flow_info::info_and_stats_count_states_partitions_and_leases`, its retention cleanup) |
 
 ## `flow/metadata_extension_test.exs`
 
@@ -998,86 +1003,86 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | validate_children requires a non-empty list | open |
-| 14 | validate_no_parent_child_id rejects parent id as child id | open |
-| 21 | optional_policy normalizes binary values and rejects unsupported values | open |
-| 38 | exhaust_to_opts accepts explicit map or success/failure options | open |
-| 49 | exhaust_to_opts rejects missing or empty states | open |
+| 7 | validate_children requires a non-empty list | ported (`audit::spawn_limits::a_spawn_checks_its_children_policies_and_exhaust_states`) |
+| 14 | validate_no_parent_child_id rejects parent id as child id | ported (`audit::spawn_limits::a_spawn_checks_its_children_policies_and_exhaust_states`) |
+| 21 | optional_policy normalizes binary values and rejects unsupported values | ported (`audit::spawn_limits::a_spawn_checks_its_children_policies_and_exhaust_states`) |
+| 38 | exhaust_to_opts accepts explicit map or success/failure options | ported (`audit::spawn_limits::a_spawn_checks_its_children_policies_and_exhaust_states`) |
+| 49 | exhaust_to_opts rejects missing or empty states | ported (`audit::spawn_limits::a_spawn_checks_its_children_policies_and_exhaust_states`) |
 
 ## `flow_run_steps_many_validation_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | run_steps_many rejects batches above the configured Flow item limit | open |
-| 19 | run_steps_many bounds the item-by-step work admitted to one Raft apply | open |
-| 30 | spawn_children rejects child batches above the configured Flow item limit | open |
-| 44 | pipeline claim_due rejects inexact timestamps before routing | open |
+| 8 | run_steps_many rejects batches above the configured Flow item limit | fixed (`audit::spawn_limits::step_and_child_batches_stay_within_the_batch_cap`; G38: capped at 100000 as batches are, G15; Elixir's default is 1000) |
+| 19 | run_steps_many bounds the item-by-step work admitted to one Raft apply | fixed (same test; G38) |
+| 30 | spawn_children rejects child batches above the configured Flow item limit | fixed (same test; G38) |
+| 44 | pipeline claim_due rejects inexact timestamps before routing | covered: `audit::claim_api::claim_times_and_sizes_stay_within_their_ceilings` refuses a `now_ms` above the exact ceiling; a pipelined claim reads the same options |
 
 ## `flow/rewind_target_level_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 24 | a rewind applies to an event this node's projector has not reached yet | open |
-| 44 | apply refuses an event past the history cap that this node still holds | open |
-| 75 | apply refuses a target entry that does not decode | open |
-| 97 | a rewind restores a cold event of a partitioned Flow | open |
+| 24 | a rewind applies to an event this node's projector has not reached yet | internal: Elixir's projector feature level (a rewind reads its target directly: `flow_rewind::a_rewind_restores_an_event_and_remembers_it`) |
+| 44 | apply refuses an event past the history cap that this node still holds | ported (`audit::history_limits::a_rewind_to_an_event_trimmed_from_history_is_refused`; its held-entry reader is Elixir's) |
+| 75 | apply refuses a target entry that does not decode | internal: Elixir's target entry decoding |
+| 97 | a rewind restores a cold event of a partitioned Flow | ported (`audit::history_limits::a_rewind_restores_an_earlier_state_and_its_counts`; a live Flow's history has no cold tier in the node) |
 
 ## `flow/options_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | binary options validate required and optional strings | open |
-| 26 | integer and boolean options preserve Flow error messages | open |
-| 45 | integer options reject values above Flow's exact integer ceiling | open |
-| 64 | ref size and put helpers preserve existing semantics | open |
+| 7 | binary options validate required and optional strings | covered: the node's `Opts` readers keep these texts (`opts.rs` mirrors `Flow.Options`), as the ports exercise them (`audit::input_limits` worker checks) |
+| 26 | integer and boolean options preserve Flow error messages | covered (same readers) |
+| 45 | integer options reject values above Flow's exact integer ceiling | ported (`audit::create_rules::integer_options_take_the_exact_ceiling_and_refuse_beyond_it`) |
+| 64 | ref size and put helpers preserve existing semantics | internal: Elixir's Options helpers; the node's `payload_ref` is one of its own short references, refused above 256 bytes (G16) |
 
 ## `flow_facade_correctness_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | get fails closed when the persisted Flow record is corrupt | open |
-| 26 | lease governance renewal preserves storage unavailability | open |
-| 34 | get rejects payload hydration above the configured ceiling | open |
+| 8 | get fails closed when the persisted Flow record is corrupt | internal: Elixir's corrupt-record fixture written under its storage key |
+| 26 | lease governance renewal preserves storage unavailability | internal: asserts Elixir source text, not behaviour |
+| 34 | get rejects payload hydration above the configured ceiling | ported (`audit::metadata_shapes::a_read_keeps_hydration_within_its_ceiling`) |
 
 ## `flow/retry_policy_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | flow policies reject malformed per-state policy values | open |
-| 18 | flow policies omit absent fields from their canonical snapshot | open |
-| 27 | each state retains its independently configured execution mode | open |
+| 6 | flow policies reject malformed per-state policy values | ported (`audit::metadata_shapes::a_state_policy_is_a_map_and_keeps_its_own_mode`) |
+| 18 | flow policies omit absent fields from their canonical snapshot | ported (`audit::metadata_shapes::a_state_policy_is_a_map_and_keeps_its_own_mode`) |
+| 27 | each state retains its independently configured execution mode | ported (`audit::metadata_shapes::a_state_policy_is_a_map_and_keeps_its_own_mode`) |
 
 ## `flow/record_read_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | filter_index_records applies field filter sort reverse and count | open |
-| 20 | filtered candidate scans resume after an underfilled heuristic window | open |
-| 52 | filtered candidate scans fail explicitly when the bounded window is not exhaustive | open |
+| 7 | filter_index_records applies field filter sort reverse and count | internal: Elixir's record-read scan windows and candidate limit (the node counts exactly) |
+| 20 | filtered candidate scans resume after an underfilled heuristic window | internal: Elixir's record-read scan windows and candidate limit (the node counts exactly) |
+| 52 | filtered candidate scans fail explicitly when the bounded window is not exhaustive | internal: Elixir's record-read scan windows and candidate limit (the node counts exactly) |
 
 ## `flow/partition_key_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | encodes components with byte lengths | open |
-| 11 | delimiter bytes cannot make different component lists collide | open |
-| 16 | uses byte sizes for arbitrary binary components | open |
+| 6 | encodes components with byte lengths | internal: a client-side helper for composite partition names; the node takes the bytes it makes |
+| 11 | delimiter bytes cannot make different component lists collide | internal: a client-side helper for composite partition names; the node takes the bytes it makes |
+| 16 | uses byte sizes for arbitrary binary components | internal: a client-side helper for composite partition names; the node takes the bytes it makes |
 
 ## `flow/metadata_validation_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | attributes identify canonical persisted metadata without rebuilding it | open |
-| 36 | state metadata identifies canonical scalar-only persisted metadata | open |
-| 56 | normalization rejects names that cannot be addressed by FQL | open |
+| 6 | attributes identify canonical persisted metadata without rebuilding it | ported (`audit::metadata_shapes::attribute_lists_and_names_are_normalized_or_refused`; its persisted-shape predicates are Elixir's) |
+| 36 | state metadata identifies canonical scalar-only persisted metadata | ported (`audit::metadata_shapes::attribute_lists_and_names_are_normalized_or_refused`; its persisted-shape predicates are Elixir's) |
+| 56 | normalization rejects names that cannot be addressed by FQL | ported (`audit::metadata_shapes::attribute_lists_and_names_are_normalized_or_refused`; its persisted-shape predicates are Elixir's) |
 
 ## `flow/idempotent_create_after_progress_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 31 | a retry after a worker claimed the Flow answers it | open |
-| 38 | a retry after the Flow completed answers it | open |
-| 52 | a different request for a claimed Flow still conflicts | open |
+| 31 | a retry after a worker claimed the Flow answers it | ported (`audit::create_retries::an_idempotent_create_resent_after_progress_answers_the_flow`) |
+| 38 | a retry after the Flow completed answers it | ported (`audit::create_retries::an_idempotent_create_resent_after_progress_answers_the_flow`) |
+| 52 | a different request for a claimed Flow still conflicts | ported (`audit::create_retries::an_idempotent_create_resent_after_progress_answers_the_flow`) |
 
 ## `flow/history_values_test.exs`
 
@@ -1091,9 +1096,9 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | public create rejects running without reserving the identity or disrupting writes | open |
-| 18 | public atomic batch rejects a running item without writing earlier valid items | open |
-| 33 | the supported atomic start and claim still creates a leased running execution | open |
+| 6 | public create rejects running without reserving the identity or disrupting writes | ported (`audit::create_retries::a_create_refused_for_running_reserves_nothing`; its batch case is in `audit::create_rules`, its start-and-claim in `audit::steps_contract`) |
+| 18 | public atomic batch rejects a running item without writing earlier valid items | ported (`audit::create_retries::a_create_refused_for_running_reserves_nothing`; its batch case is in `audit::create_rules`, its start-and-claim in `audit::steps_contract`) |
+| 33 | the supported atomic start and claim still creates a leased running execution | ported (`audit::create_retries::a_create_refused_for_running_reserves_nothing`; its batch case is in `audit::create_rules`, its start-and-claim in `audit::steps_contract`) |
 
 ## `flow_batch_state_write_error_test.exs`
 

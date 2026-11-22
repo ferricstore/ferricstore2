@@ -66749,3 +66749,30 @@ failure markers are Elixir's. Two gaps closed:
 
 Mutation checks: never omitting, dropping the size, no ceiling, no prune
 and an exclusive floor each fail a test.
+
+### Flow test audit: fences, spawns, step batches, stats, options (22 Nov)
+
+Ported without node changes: `flow/fencing_retry_test.exs` (resent
+commands are no-ops; `audit::fencing_retries`), `flow/child_policy_test.
+exs` (`audit::spawn_limits`), and the exact-integer ceilings of
+`flow/options_test.exs` (`audit::create_rules`). `flow_stats_test.exs`
+and `flow/rewind_target_level_test.exs` map to existing node tests
+(`flow_info`, `audit::attribute_queries`, `audit::history_limits`); their
+scan limits, projector levels and entry decoding are Elixir's.
+
+G38 closed. RED: `RUN_STEPS_MANY` with 100001 items answered `OK` (and
+ran them). Step batches and spawns take at most 100000 items, the cap G15
+set for batches (Elixir's largest setting; its default is 1000), and a
+step batch at most 100000 items times steps, as Elixir's
+`validate_run_steps_many_work` bounds one apply. Loosening any of the
+three caps fails the test.
+
+Also ported without node changes: the two spawn tests at the end of the
+lineage section (`audit::spawn_waits`), `flow/create_running_validation_
+test.exs` and `flow/idempotent_create_after_progress_test.exs`
+(`audit::create_retries`), and the wire-visible cases of
+`flow/metadata_validation_test.exs`, `flow/retry_policy_test.exs` and
+`flow_facade_correctness_test.exs` (`audit::metadata_shapes`).
+`flow/partition_key_test.exs` and `flow/record_read_test.exs` are a
+client-side helper and Elixir's scan windows. G38's spawn change moved the
+child list and group id reads out of `children::parse` (over 100 lines).

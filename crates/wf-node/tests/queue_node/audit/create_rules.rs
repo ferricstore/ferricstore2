@@ -211,3 +211,38 @@ fn a_create_ignores_known_options_it_does_not_read_but_not_return() -> TestResul
     );
     Ok(())
 }
+
+#[test]
+fn integer_options_take_the_exact_ceiling_and_refuse_beyond_it() -> TestResult {
+    // Elixir: "integer options reject values above Flow's exact integer
+    // ceiling", as a transition's fence and a history read's `to_ms`.
+    let node = open(&directory("audit-create-integer-ceiling")?, 4)?;
+    create(&node, "flow-1", &[("state", text("queued"))])??;
+    let moved = run(
+        &node,
+        "FLOW.TRANSITION",
+        &[
+            ("id", text("flow-1")),
+            ("from_state", text("queued")),
+            ("to_state", text("ready")),
+            ("fencing_token", int(MAX_EXACT.saturating_add(1))),
+        ],
+    )?;
+    assert_eq!(
+        refusal(moved)?,
+        format!("ERR flow fencing_token exceeds maximum {MAX_EXACT}")
+    );
+    let read = |to: i64| {
+        run(
+            &node,
+            "FLOW.HISTORY",
+            &[("id", text("flow-1")), ("to_ms", int(to))],
+        )
+    };
+    read(MAX_EXACT)??;
+    assert_eq!(
+        refusal(read(MAX_EXACT.saturating_add(1))?)?,
+        format!("ERR flow to_ms exceeds maximum {MAX_EXACT}")
+    );
+    Ok(())
+}

@@ -11,6 +11,8 @@ use super::create::{self, CreateFlow};
 use super::opts::Opts;
 use super::term::Term;
 
+/// Most items one step batch takes, and most items times steps.
+const MAX_BATCH_ITEMS: usize = 100_000;
 const DEFAULT_LEASE_MS: u64 = 30_000;
 
 /// A Flow created claimed.
@@ -198,6 +200,18 @@ pub fn parse_run_steps(args: &Term) -> Result<RunSteps, FlowError> {
             ));
         }
     };
+    // Bounded as Elixir bounds one apply's work (audit gap G38), at its
+    // largest batch setting (G15).
+    if items.len() > MAX_BATCH_ITEMS {
+        return Err(FlowError::rejected(format!(
+            "ERR flow batch item count exceeds maximum {MAX_BATCH_ITEMS}"
+        )));
+    }
+    if items.len() > MAX_BATCH_ITEMS.checked_div(states.len()).unwrap_or(0) {
+        return Err(FlowError::rejected(format!(
+            "ERR flow run step operation count exceeds maximum {MAX_BATCH_ITEMS}"
+        )));
+    }
     Ok(RunSteps {
         flow_type,
         states,
