@@ -2,7 +2,7 @@
 //! schedules, and the `FIRE_DUE` summary.
 
 use super::super::FlowError;
-use super::super::opts::Opts;
+use super::super::opts::{MAX_EXACT, Opts};
 use super::super::term::{Term, map};
 use super::definition::Kind;
 use super::integer;
@@ -242,9 +242,11 @@ pub enum Fired {
     },
 }
 
-/// `Summary.fire_results/2`.
+/// `Summary.fire_results/2`: the outcomes of the claimed schedules, their
+/// coalesced periods held to the exact-integer limit, and a claim that
+/// failed after some were claimed.
 #[must_use]
-pub fn summary(outcomes: &[Fired]) -> Term {
+pub fn summary(outcomes: &[Fired], claim_error: Option<&str>) -> Term {
     let (mut fired, mut skipped, mut coalesced) = (0_u64, 0_u64, 0_u64);
     let mut last_target = None;
     let mut last_skip = None;
@@ -256,7 +258,7 @@ pub fn summary(outcomes: &[Fired]) -> Term {
                 coalesced: count,
             } => {
                 fired = fired.saturating_add(1);
-                coalesced = coalesced.saturating_add(*count);
+                coalesced = coalesced.saturating_add(*count).min(MAX_EXACT);
                 last_target = Some(target_id.clone());
             }
             Fired::Skipped {
@@ -264,7 +266,7 @@ pub fn summary(outcomes: &[Fired]) -> Term {
                 coalesced: count,
             } => {
                 skipped = skipped.saturating_add(1);
-                coalesced = coalesced.saturating_add(*count);
+                coalesced = coalesced.saturating_add(*count).min(MAX_EXACT);
                 last_skip = Some(reason.clone());
             }
             Fired::Failed { id, reason } => {
@@ -284,6 +286,7 @@ pub fn summary(outcomes: &[Fired]) -> Term {
     ];
     entries.extend(last_target.map(|id| ("last_target_id", Term::Bin(id))));
     entries.extend(last_skip.map(|reason| ("last_skip_reason", Term::text(&reason))));
+    entries.extend(claim_error.map(|reason| ("claim_error", Term::text(reason))));
     entries.sort_by_key(|(key, _)| *key);
     map(entries)
 }

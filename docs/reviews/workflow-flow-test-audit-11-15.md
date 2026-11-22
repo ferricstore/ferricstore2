@@ -78,6 +78,14 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
   range ends at 9999-12-30T22:00Z, so the calendar's last day refused
   with "outside supported calendar range". Instants are now counted on
   the civil calendar up to 9999-12-31T23:59:59.999Z, Elixir's bound.
+- G51 (closed): `FLOW.SCHEDULE.FIRE_DUE` ignored a shard whose claim
+  failed and answered as if it had nothing due. As Elixir's dispatcher, a
+  failed claim ends the claiming: before anything was claimed it fails
+  the command, after it the summary reports it as `claim_error` beside
+  the outcomes.
+- G52 (closed): the summary's `coalesced` total could pass 2^53 (two
+  schedules each far behind reported 2·(2^53−2)). It is held to the
+  exact-integer limit, as Elixir's `Summary`.
 
 ## `flow/governance_argument_errors_test.exs`
 
@@ -1310,54 +1318,54 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | interval schedules expose the bounded catch-up policy | open |
-| 27 | an overdue interval coalesces every missed occurrence into one fire | open |
-| 84 | catch-up planning remains constant-work near the exact-integer limit | open |
-| 100 | an interval less than one period late keeps its original cadence | open |
-| 128 | catch-up counts only occurrences within an interval schedule end bound | open |
-| 160 | catch-up remains independent from overlap skipping | open |
-| 197 | a queued overlap fires once and coalesces intervals missed while waiting | open |
-| 262 | resuming an overdue interval coalesces the paused periods into one fire | open |
-| 308 | an overlap skip completes when catch-up passes the interval end bound | open |
-| 348 | an overlap skip completes safely at the exact timestamp limit | open |
-| 401 | an elapsed end bound takes precedence over recovery timestamp overflow | open |
-| 416 | max_fires keeps precedence when the end bound is reached by the same fire | open |
-| 445 | a batch catch-up total stays within the public exact-integer contract | open |
-| 479 | catchup_policy accepts only fire_once on interval schedules | open |
+| 6 | interval schedules expose the bounded catch-up policy | ported (`audit::schedule_catchups::only_intervals_take_the_fire_once_catch_up_policy`) |
+| 27 | an overdue interval coalesces every missed occurrence into one fire | ported (`audit::schedule_catchups::an_overdue_interval_fires_once_for_every_missed_period`) |
+| 84 | catch-up planning remains constant-work near the exact-integer limit | ported (`schedule::tests::catch_up_is_constant_work_and_an_elapsed_end_wins`) |
+| 100 | an interval less than one period late keeps its original cadence | ported (`audit::schedule_catchups::an_overdue_interval_fires_once_for_every_missed_period`) |
+| 128 | catch-up counts only occurrences within an interval schedule end bound | ported (`audit::schedule_catchups::catch_up_counts_only_periods_within_the_end_bound`) |
+| 160 | catch-up remains independent from overlap skipping | ported (`audit::schedule_catchups::catch_up_runs_alongside_overlap_skips`) |
+| 197 | a queued overlap fires once and coalesces intervals missed while waiting | ported (`audit::schedule_catchups::a_queued_or_paused_interval_catches_up_in_one_fire`) |
+| 262 | resuming an overdue interval coalesces the paused periods into one fire | ported (`audit::schedule_catchups::a_queued_or_paused_interval_catches_up_in_one_fire`) |
+| 308 | an overlap skip completes when catch-up passes the interval end bound | ported (`audit::schedule_catchups::catch_up_counts_only_periods_within_the_end_bound`) |
+| 348 | an overlap skip completes safely at the exact timestamp limit | ported (`audit::schedule_catchups::catch_up_runs_alongside_overlap_skips`; its internal retention-deadline read is Elixir's) |
+| 401 | an elapsed end bound takes precedence over recovery timestamp overflow | ported (`schedule::tests::catch_up_is_constant_work_and_an_elapsed_end_wins`) |
+| 416 | max_fires keeps precedence when the end bound is reached by the same fire | ported (`audit::schedule_catchups::catch_up_counts_only_periods_within_the_end_bound`) |
+| 445 | a batch catch-up total stays within the public exact-integer contract | fixed (`audit::schedule_catchups::a_batch_catch_up_total_stays_an_exact_integer`, `schedule::tests::a_later_claim_failure_is_reported_beside_the_outcomes`; G52) |
+| 479 | catchup_policy accepts only fire_once on interval schedules | ported (`audit::schedule_catchups::only_intervals_take_the_fire_once_catch_up_policy`) |
 
 ## `flow/schedule_dispatcher_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | claims bounded waves only after the previous wave finishes | open |
-| 57 | single-record waves avoid task creation | open |
-| 66 | returns completed work when a later claim fails | open |
+| 6 | claims bounded waves only after the previous wave finishes | internal: Elixir's dispatcher waves and task concurrency; the node claims per shard and fires in due order |
+| 57 | single-record waves avoid task creation | internal: Elixir's task creation |
+| 66 | returns completed work when a later claim fails | covered (G51: the summary keeps completed outcomes beside a later claim failure, `schedule::tests::a_later_claim_failure_is_reported_beside_the_outcomes`) |
 
 ## `flow/schedule_recovery_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 18 | schedule record and due index survive application restart | open |
-| 70 | overdue interval catch-up remains bounded after application restart | open |
-| 143 | queued overlap keeps its retry deadline and backoff across restart | open |
-| 199 | claimed schedule is reclaimable after shard leader restart | open |
+| 18 | schedule record and due index survive application restart | ported (`audit::schedule_recovery::schedules_their_catch_up_and_backoff_survive_a_restart`) |
+| 70 | overdue interval catch-up remains bounded after application restart | ported (`audit::schedule_recovery::schedules_their_catch_up_and_backoff_survive_a_restart`) |
+| 143 | queued overlap keeps its retry deadline and backoff across restart | ported (`audit::schedule_recovery::schedules_their_catch_up_and_backoff_survive_a_restart`) |
+| 199 | claimed schedule is reclaimable after shard leader restart | ported (`audit::schedule_recovery::a_lease_a_lost_fire_left_is_reclaimed_after_a_restart`) |
 
 ## `flow/schedule_retention_members_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 62 | a recurring schedule keeps a bounded number of retention cleanup members | open |
-| 82 | a new schedule's Flow keeps a short history | open |
-| 90 | a schedule created with a long history takes the short one on its next fire | open |
-| 105 | a long-history schedule held back by overlap keeps a bounded number of retention cleanup members | open |
-| 138 | a long-history schedule held back by overlap (#{policy}) takes the short history | open |
+| 62 | a recurring schedule keeps a bounded number of retention cleanup members | ported (`audit::schedule_recovery::a_schedule_s_history_stays_bounded`; its keydir members are Elixir's) |
+| 82 | a new schedule's Flow keeps a short history | ported (`audit::schedule_recovery::a_schedule_s_history_stays_bounded`) |
+| 90 | a schedule created with a long history takes the short one on its next fire | internal: changing Elixir's history setting at run time; the node's schedules always keep 100 events |
+| 105 | a long-history schedule held back by overlap keeps a bounded number of retention cleanup members | ported (`audit::schedule_recovery::a_schedule_s_history_stays_bounded`) |
+| 138 | a long-history schedule held back by overlap (#{policy}) takes the short history | internal: changing Elixir's history setting at run time; the node's schedules always keep 100 events |
 
 ## `flow/schedule_summary_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | reports a later claim failure separately from claimed schedule outcomes | open |
-| 23 | omits claim_error from the normal response | open |
+| 6 | reports a later claim failure separately from claimed schedule outcomes | fixed (`schedule::tests::a_later_claim_failure_is_reported_beside_the_outcomes`; G51) |
+| 23 | omits claim_error from the normal response | ported (`schedule::tests::a_later_claim_failure_is_reported_beside_the_outcomes`) |
 
 ## `flow/schedule_test.exs`
 
@@ -1463,14 +1471,14 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 9 | a target's terminal wakes its queued schedule from the shard leader only | open |
-| 32 | configuration validates the batch limit and is a stable snapshot | open |
-| 60 | configuration defaults the runner on but fails closed for invalid boolean values | open |
-| 75 | configuration caps the scheduler batch at the claim command maximum | open |
-| 94 | a claimed batch drains immediately even when every schedule was skipped | open |
-| 111 | a scheduler waiting on an empty store wakes for a newly-created future schedule | open |
-| 160 | orphaned cold schedules and unrelated cold work do not append empty claims | open |
-| 236 | a committed target completion wakes a queued schedule before its fallback retry | open |
+| 9 | a target's terminal wakes its queued schedule from the shard leader only | internal: Elixir's GenServer cast and leader check; the node's shards deliver wakes only while they serve (`supervision::shard::run`, G47) |
+| 32 | configuration validates the batch limit and is a stable snapshot | internal: Elixir's scheduler settings (application env) |
+| 60 | configuration defaults the runner on but fails closed for invalid boolean values | internal: Elixir's scheduler settings (application env) |
+| 75 | configuration caps the scheduler batch at the claim command maximum | internal: Elixir's scheduler settings (application env) |
+| 94 | a claimed batch drains immediately even when every schedule was skipped | internal: the scheduler's own loop; the node's poll counts a skip as activity and polls again (`composition::schedule::fire_due`, `supervision::scheduler`) |
+| 111 | a scheduler waiting on an empty store wakes for a newly-created future schedule | ported (`audit::schedule_recovery::the_poll_fires_a_future_schedule_and_a_woken_queue`; an idle poll claims nothing and logs nothing) |
+| 160 | orphaned cold schedules and unrelated cold work do not append empty claims | internal: Elixir's cold LMDB due keys |
+| 236 | a committed target completion wakes a queued schedule before its fallback retry | fixed (`audit::schedule_recovery::the_poll_fires_a_future_schedule_and_a_woken_queue`; G47) |
 
 ## `flow_governance_approval_catalog_repair_test.exs`
 

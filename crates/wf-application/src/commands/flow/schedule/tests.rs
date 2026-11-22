@@ -1,6 +1,7 @@
 //! Business cases of Elixir's `schedule_test.exs` that need no node:
 //! creation rules and the queued-overlap backoff.
 
+use super::super::opts::MAX_EXACT;
 use super::super::term::Term;
 use super::create::definition;
 use super::definition::Definition;
@@ -239,5 +240,90 @@ fn a_repeated_overlap_backs_off_on_the_same_occurrence() -> Result<(), String> {
             .map(|(next, at)| next - at),
         Some(30_000)
     );
+    Ok(())
+}
+
+#[test]
+fn a_later_claim_failure_is_reported_beside_the_outcomes() {
+    // Elixir's `schedule_summary_test.exs`: "reports a later claim failure
+    // separately from claimed schedule outcomes" and "omits claim_error from
+    // the normal response".
+    use super::list::{Fired, summary};
+    let outcomes = [
+        Fired::Fired {
+            target_id: b"daily:1000:1".to_vec(),
+            coalesced: 2,
+        },
+        Fired::Failed {
+            id: b"broken".to_vec(),
+            reason: "ERR target creation failed".to_owned(),
+        },
+    ];
+    let reported = summary(&outcomes, Some("ERR claim unavailable"));
+    let field = |term: &Term, key: &str| term.get(key.as_bytes()).cloned();
+    assert_eq!(field(&reported, "claimed"), Some(Term::Int(2)));
+    assert_eq!(field(&reported, "fired"), Some(Term::Int(1)));
+    assert_eq!(field(&reported, "skipped"), Some(Term::Int(0)));
+    assert_eq!(field(&reported, "coalesced"), Some(Term::Int(2)));
+    assert_eq!(
+        field(&reported, "errors"),
+        Some(Term::List(vec![Term::List(vec![
+            Term::text("broken"),
+            Term::text("ERR target creation failed")
+        ])]))
+    );
+    assert_eq!(
+        field(&reported, "claim_error"),
+        Some(Term::text("ERR claim unavailable"))
+    );
+    assert_eq!(
+        field(&reported, "last_target_id"),
+        Some(Term::text("daily:1000:1"))
+    );
+    assert_eq!(field(&summary(&[], None), "claim_error"), None);
+    // `schedule_catchup_test.exs`: "a batch catch-up total stays within the
+    // public exact-integer contract".
+    let late = |id: &str| Fired::Fired {
+        target_id: id.as_bytes().to_vec(),
+        coalesced: MAX_EXACT - 1,
+    };
+    assert_eq!(
+        field(&summary(&[late("a"), late("b")], None), "coalesced"),
+        Some(Term::int(MAX_EXACT))
+    );
+    let held = Fired::Skipped {
+        reason: "previous target still active: a".to_owned(),
+        coalesced: MAX_EXACT - 1,
+    };
+    assert_eq!(
+        field(&summary(&[late("a"), held], None), "coalesced"),
+        Some(Term::int(MAX_EXACT))
+    );
+}
+
+#[test]
+fn catch_up_is_constant_work_and_an_elapsed_end_wins() -> Result<(), String> {
+    // Elixir's `schedule_catchup_test.exs`: "catch-up planning remains
+    // constant-work near the exact-integer limit" and "an elapsed end bound
+    // takes precedence over recovery timestamp overflow".
+    use super::plan::{Next, next};
+    let mut every_one = create(vec![
+        ("every_ms", Term::Int(1)),
+        ("start_at_ms", Term::Int(0)),
+        ("now_ms", Term::Int(0)),
+        ("target", target(vec![("id_prefix", Term::text("t"))])),
+    ])?;
+    let recovery = MAX_EXACT - 1;
+    assert!(matches!(
+        next(&every_one, 0, Some(recovery))?,
+        Next::At(MAX_EXACT, coalesced) if coalesced == recovery
+    ));
+    every_one.every_ms = Some(5);
+    let due = recovery - 20;
+    every_one.end_at_ms = Some(due + 10);
+    assert!(matches!(
+        next(&every_one, due, Some(recovery))?,
+        Next::EndAt(2)
+    ));
     Ok(())
 }

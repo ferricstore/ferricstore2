@@ -131,14 +131,20 @@ fn unread(definition: &Definition, state: &[u8]) -> Term {
 }
 
 /// Fires due schedules on every shard, at most `limit`; the summary and
-/// whether anything fired or skipped.
+/// whether anything fired or skipped. A claim that fails ends the claiming,
+/// as Elixir's dispatcher does: before anything was claimed it fails the
+/// command, after it the summary reports it as `claim_error`.
+///
+/// # Errors
+/// The first shard's claim failure when nothing was claimed.
 pub(super) fn fire_due(
     router: &Router,
     now: u64,
     limit: u64,
     (worker, lease_ms): (&[u8], u64),
-) -> (Term, bool) {
+) -> Result<(Term, bool), ServiceError> {
     let mut claimed = Vec::new();
+    let mut claim_error = None;
     let mut left = usize::try_from(limit).unwrap_or(usize::MAX);
     for index in 0..router.shards.len() {
         if left == 0 {
@@ -150,9 +156,17 @@ pub(super) fn fire_due(
             worker: worker.to_vec(),
             lease_ms,
         };
-        if let Ok(ScheduleReply::Claimed(more)) = op(router, claim, Some(index)) {
-            left = left.saturating_sub(more.len());
-            claimed.extend(more);
+        match op(router, claim, Some(index)) {
+            Ok(ScheduleReply::Claimed(more)) => {
+                left = left.saturating_sub(more.len());
+                claimed.extend(more);
+            }
+            Ok(_) => {}
+            Err(error) if claimed.is_empty() => return Err(error),
+            Err(error) => {
+                claim_error = Some(error.to_string());
+                break;
+            }
         }
     }
     // Fire in due order across the shards, as Elixir's claims return them.
@@ -182,7 +196,7 @@ pub(super) fn fire_due(
     let active = outcomes
         .iter()
         .any(|outcome| !matches!(outcome, Fired::Failed { .. }));
-    (list::summary(&outcomes), active)
+    Ok((list::summary(&outcomes, claim_error.as_deref()), active))
 }
 
 /// Runs one schedule command.
@@ -260,13 +274,13 @@ pub(super) fn run(router: &Router, command: Command) -> Result<Term, ServiceErro
         }
         Command::FireDue(request) => {
             let now = request.now_ms.unwrap_or(wall);
-            Ok(fire_due(
+            fire_due(
                 router,
                 now,
                 request.limit,
                 (&request.worker, request.lease_ms),
             )
-            .0)
+            .map(|(summary, _)| summary)
         }
         Command::List(listing) => {
             let mut views = Vec::new();
@@ -331,5 +345,6 @@ pub(super) fn waker(router: Arc<OnceLock<Weak<Router>>>) -> Wakes {
 
 /// The background poll: fires due schedules at wall time; whether it did.
 pub(super) fn poll(router: &Router) -> bool {
-    fire_due(router, wall_ms(), DEFAULT_LIMIT, (WORKER, DEFAULT_LEASE_MS)).1
+    fire_due(router, wall_ms(), DEFAULT_LIMIT, (WORKER, DEFAULT_LEASE_MS))
+        .is_ok_and(|(_, active)| active)
 }

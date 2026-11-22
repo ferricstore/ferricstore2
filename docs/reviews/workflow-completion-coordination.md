@@ -66959,3 +66959,30 @@ failure needs a stored definition corrupted in place, which no client
 can write), and the `live` check that keeps replay from queueing wakes
 (without it a restart replays every finished scheduled target into a
 burst of wake ops, each harmless because the op re-checks the schedule).
+
+### Flow test audit: schedule catch-up, recovery and summary; G51-G52 (22 Nov)
+
+`flow/schedule_catchup_test.exs` as `audit::schedule_catchups` (fire-once
+policy, overdue, paused and queued catch-up, end bounds, overlap skips,
+the exact-integer total) and `schedule::tests` (`next` near 2^53 and an
+elapsed end bound); `flow/schedule_recovery_test.exs`, the client side of
+`flow/scheduler_test.exs` and `flow/schedule_retention_members_test.exs`
+as `audit::schedule_recovery` (restart keeps schedules, catch-up and
+backoff; a lost fire's lease is reclaimed after a restart; the poll fires
+a future schedule and, with G47, a woken queue before its 10 s retry; a
+schedule's history stays within 100 events however often it fires or
+overlaps); `flow/schedule_summary_test.exs` in `schedule::tests`. The
+dispatcher's waves, the scheduler's settings and leader checks, and the
+keydir members are Elixir's.
+
+G51 closed. RED: `list::summary` had no `claim_error`, and FIRE_DUE
+skipped a shard whose claim failed. The summary takes the claim error;
+`fire_due` stops claiming at the first failure, fails the command when
+nothing was claimed yet and reports it otherwise. The composition branch
+has no node test: no client action makes one shard's claim fail.
+
+G52 closed. RED: two schedules 2^53−2 periods behind summed 2^54−4
+coalesced. Each outcome's count is added saturating and held to 2^53−1.
+
+Mutation checks: dropping the cap on fired or skipped outcomes, or the
+`claim_error` entry, each fail a test (4 of 4).
