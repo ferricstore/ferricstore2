@@ -86,6 +86,24 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 - G52 (closed): the summary's `coalesced` total could pass 2^53 (two
   schedules each far behind reported 2·(2^53−2)). It is held to the
   exact-integer limit, as Elixir's `Summary`.
+- G53 (closed): `FLOW.APPROVAL.LIST` answered an empty list for a
+  `flow_id` or `scope` filter longer than a key can be, while
+  `FLOW.BUDGET.LIST` (and Elixir, for both) refuse it with "ERR key too
+  large (max 65535 bytes)". The approval listing now checks its filters
+  as the approval request checks its dimensions.
+
+## Recorded decisions
+
+- Type-level governance (`FLOW.POLICY.SET` `governance` and `version` at
+  the top level) is Elixir's in-process API only: its wire refuses both
+  as unknown options, and an effect's governance resolves from the
+  type's policy and the state `running`, which takes no state policy. So
+  over the wire Elixir applies only the default effect rule (an
+  idempotency key is required), as the node does; its policy-driven
+  effect rules (allowed and denied effect types, required approvals,
+  effect-driven circuits with latency, failure-rate and half-open
+  tracking, telemetry) are not ported. Building them would add wire
+  options Elixir lacks and cross-shard circuit state.
 
 ## `flow/governance_argument_errors_test.exs`
 
@@ -1549,93 +1567,93 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 30 | budget reservation retries are idempotent and cannot reuse a reservation id | open |
-| 56 | budget active reservations are bounded without breaking idempotent retries | open |
-| 107 | budget validation rejects undercounted current-window reservations | open |
-| 116 | budget validation rejects impossible released reservation payloads | open |
-| 133 | budget validation rejects oversized scopes and aggregate records | open |
-| 163 | policy string-list deduplication preserves first-seen order | open |
-| 172 | policy resolution ignores unsupported effect-specific policy maps | open |
-| 186 | policy string lists stop at the governance collection bound | open |
-| 193 | policy circuit error classes have a bounded persisted width | open |
-| 208 | policy rule maps stop at the governance collection bound | open |
-| 215 | policy rule names stop at the durable dimension bound | open |
-| 222 | normalized governance policies have a fixed aggregate byte budget | open |
-| 229 | policy rules reject integers outside the exact durable range | open |
-| 245 | ignored half-open failures release their probe without closing the circuit | open |
-| 269 | circuit records reject oversized error-class collections | open |
-| 275 | circuit records reject oversized scope dimensions | open |
-| 279 | circuit records bound configured and observed error-class widths | open |
-| 297 | circuit records reject impossible half-open probe counters | open |
-| 314 | release outbox can persist its terminal acknowledged metadata | open |
-| 328 | release outbox rejects structurally invalid metadata before acknowledgement | open |
-| 340 | release outbox bounds unreconciled durable intents | open |
-| 350 | limit catalog outbox rejects structurally invalid metadata before acknowledgement | open |
-| 355 | limit catalog outbox terminal acknowledgement retries remain idempotent | open |
-| 366 | release outbox cursors reject sequences outside the durable integer range | open |
-| 373 | approval records reject terminal decisions at or after their expiry | open |
-| 392 | governance models reject integers outside the exact durable range | open |
-| 410 | limit owner decoding rejects malformed detached reservations before normalization | open |
-| 418 | limit owner decoding enforces capacity, epoch, and reclaim invariants | open |
-| 433 | limit owner records reject oversized scope dimensions | open |
-| 438 | credit reclaim selection is deterministic across large shard maps | open |
-| 470 | limit cleanup checkpoints reject page numbers outside the durable page bound | open |
-| 493 | cache-session public helpers reject malformed sessions and options without raising | open |
-| 511 | governance entrypoints reject non-keyword option lists without touching storage | open |
-| 573 | scope parsing rejects malformed exported arguments without raising | open |
-| 583 | maintenance and ledger boundaries reject invalid finite inputs | open |
-| 593 | telemetry uses a bounded stable code for arbitrary error terms | open |
-| 615 | credit leases reject generation overflow before creating an invalid owner | open |
-| 627 | credit lease top-ups never shorten an existing deadline | open |
-| 649 | credit lease initial grants set an exact deadline | open |
-| 658 | credit lease spends reject timestamps older than the previous spend | open |
-| 679 | budget transitions reject timestamps that move durable state backward | open |
-| 695 | budget validation rejects impossible reservation timestamps | open |
-| 720 | circuit validation rejects backward event history | open |
+| 30 | budget reservation retries are idempotent and cannot reuse a reservation id | ported (`audit::governance_bounds::a_reservation_id_retries_but_is_never_reused`) |
+| 56 | budget active reservations are bounded without breaking idempotent retries | ported (`governance::tests::a_budget_holds_at_most_4096_active_reservations`) |
+| 107 | budget validation rejects undercounted current-window reservations | internal: Elixir's model checks on hand-built structs |
+| 116 | budget validation rejects impossible released reservation payloads | internal: Elixir's model checks on hand-built structs |
+| 133 | budget validation rejects oversized scopes and aggregate records | internal: Elixir's model checks on hand-built structs |
+| 163 | policy string-list deduplication preserves first-seen order | internal: Elixir's model checks on hand-built structs; the wire's state governance is covered by `flow_policy_governance::state_governance_is_normalized_merged_and_kept` |
+| 172 | policy resolution ignores unsupported effect-specific policy maps | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 186 | policy string lists stop at the governance collection bound | internal: Elixir's model checks on hand-built structs |
+| 193 | policy circuit error classes have a bounded persisted width | internal: Elixir's model checks on hand-built structs |
+| 208 | policy rule maps stop at the governance collection bound | internal: Elixir's model checks on hand-built structs |
+| 215 | policy rule names stop at the durable dimension bound | internal: Elixir's model checks on hand-built structs |
+| 222 | normalized governance policies have a fixed aggregate byte budget | internal: Elixir's model checks on hand-built structs |
+| 229 | policy rules reject integers outside the exact durable range | internal: Elixir's model checks on hand-built structs |
+| 245 | ignored half-open failures release their probe without closing the circuit | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 269 | circuit records reject oversized error-class collections | internal: Elixir's model checks on hand-built structs (`governance::tests::stored_circuits_round_trip_and_refuse_damage`; error-class bound covered by `flow_circuit::impossible_rules_are_refused_before_anything_is_stored`) |
+| 275 | circuit records reject oversized scope dimensions | internal: Elixir's model checks on hand-built structs (`governance::tests::stored_circuits_round_trip_and_refuse_damage`) |
+| 279 | circuit records bound configured and observed error-class widths | internal: Elixir's model checks on hand-built structs (`governance::tests::stored_circuits_round_trip_and_refuse_damage`) |
+| 297 | circuit records reject impossible half-open probe counters | internal: Elixir's model checks on hand-built structs (`governance::tests::stored_circuits_round_trip_and_refuse_damage`) |
+| 314 | release outbox can persist its terminal acknowledged metadata | internal: Elixir's release outbox |
+| 328 | release outbox rejects structurally invalid metadata before acknowledgement | internal: Elixir's release outbox |
+| 340 | release outbox bounds unreconciled durable intents | internal: Elixir's release outbox |
+| 350 | limit catalog outbox rejects structurally invalid metadata before acknowledgement | internal: Elixir's limit catalog outbox |
+| 355 | limit catalog outbox terminal acknowledgement retries remain idempotent | internal: Elixir's limit catalog outbox |
+| 366 | release outbox cursors reject sequences outside the durable integer range | internal: Elixir's release outbox |
+| 373 | approval records reject terminal decisions at or after their expiry | ported (`audit::governance_bounds::approval_deadlines_expire_once_and_times_never_run_backward`) |
+| 392 | governance models reject integers outside the exact durable range | internal: Elixir's model checks on hand-built structs; through the wire covered by `audit::governance_bounds::approval_text_and_stored_integers_stay_bounded` |
+| 410 | limit owner decoding rejects malformed detached reservations before normalization | internal: Elixir's model checks on hand-built structs (`governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 418 | limit owner decoding enforces capacity, epoch, and reclaim invariants | internal: Elixir's model checks on hand-built structs (`governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 433 | limit owner records reject oversized scope dimensions | internal: Elixir's model checks on hand-built structs (`governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 438 | credit reclaim selection is deterministic across large shard maps | internal: Elixir's credit reclaim selection over shard maps |
+| 470 | limit cleanup checkpoints reject page numbers outside the durable page bound | internal: Elixir's limit cleanup checkpoints |
+| 493 | cache-session public helpers reject malformed sessions and options without raising | internal: Elixir's cache sessions |
+| 511 | governance entrypoints reject non-keyword option lists without touching storage | internal: Elixir's keyword-list option shape; a wire payload is a map |
+| 573 | scope parsing rejects malformed exported arguments without raising | internal: Elixir's exported scope parser |
+| 583 | maintenance and ledger boundaries reject invalid finite inputs | internal: Elixir's maintenance entry points |
+| 593 | telemetry uses a bounded stable code for arbitrary error terms | internal: Elixir's telemetry |
+| 615 | credit leases reject generation overflow before creating an invalid owner | internal: a lease generation at 2^53, which no client sequence reaches |
+| 627 | credit lease top-ups never shorten an existing deadline | ported (`audit::governance_bounds::circuit_and_lease_times_keep_their_order`) |
+| 649 | credit lease initial grants set an exact deadline | ported (`audit::governance_bounds::circuit_and_lease_times_keep_their_order`) |
+| 658 | credit lease spends reject timestamps older than the previous spend | ported (`audit::governance_bounds::circuit_and_lease_times_keep_their_order`) |
+| 679 | budget transitions reject timestamps that move durable state backward | ported (`audit::governance_bounds::budget_times_and_totals_never_run_backward_or_past_2_pow_53`) |
+| 695 | budget validation rejects impossible reservation timestamps | internal: Elixir's model checks on hand-built structs |
+| 720 | circuit validation rejects backward event history | covered through the wire (`audit::governance_bounds::circuit_and_lease_times_keep_their_order`) |
 
 ## `flow_governance_exhaustive_store_review_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 19 | limit-cache flush releases each bounded batch before detaching the next one | open |
-| 53 | atomic governance records reject oversized encoded values before registration | open |
-| 70 | approval requests reject oversized aggregate records before catalog registration | open |
-| 90 | expired pending cache pages use the configured exact-release contract | open |
-| 144 | one cache spend bounds expired pending-page cleanup work | open |
-| 195 | cache recovery derives progress from durable metadata instead of trusting a forged cursor | open |
-| 240 | circuit mutations preserve configured values when options omit them | open |
-| 264 | circuit mutations reject oversized error-class collections before storage | open |
-| 287 | circuit mutations fingerprint oversized observed error classes | open |
-| 308 | effect reservation retries consult the existing decision before changed policy | open |
-| 346 | effect decoding rejects aggregate records above the durable byte budget | open |
-| 381 | an effect reservation that loses the NX race releases its half-open probe | open |
-| 451 | invalid terminal effect metadata is rejected without changing status | open |
-| 482 | corrupt circuit state returns an error instead of crashing effect reservation | open |
-| 507 | repeated terminal effect updates do not duplicate ledger events | open |
-| 542 | ledger append uses the CAS index as its only authoritative record | open |
-| 567 | effect reservation is not acknowledged until its ledger event is durable | open |
-| 610 | terminal effect retry completes a ledger side effect that previously failed | open |
-| 668 | terminal effect retry completes a circuit side effect that previously failed | open |
-| 725 | ledger codec rejects a status that does not match its event kind | open |
-| 751 | ledger indexes retain newest events within a fixed byte budget | open |
-| 785 | governance lists surface corrupt cataloged records | open |
-| 802 | exact approval lists preserve and surface corrupt cataloged records | open |
-| 824 | approval decisions atomically expire requests at their deadline | open |
-| 851 | approval requests reject an absolute deadline that is not in the future | open |
-| 865 | approval decisions reject time regression without corrupting the record | open |
-| 884 | budget commits reject unsafe usage terms without corrupting the record | open |
-| 916 | oversized governance storage keys are rejected before catalog publication | open |
-| 963 | governance stores reject integers outside the exact durable range | open |
-| 994 | budget commits reject aggregate usage outside the exact durable range | open |
-| 1023 | limit reconciliation rejects time outside the exact durable range | open |
-| 1033 | circuit mutations reject timestamps older than durable state | open |
-| 1053 | circuit list preserves option validation errors | open |
-| 1061 | approval rejects oversized secondary catalog dimensions before storage | open |
-| 1088 | exact governance lists reject oversized derived keys | open |
-| 1101 | budget rejects oversized reservation identifiers before catalog publication | open |
-| 1118 | approval metadata is bounded before record publication | open |
-| 1155 | cache session heads reject oversized durable identities | open |
-| 1178 | effect transitions reject timestamps older than the durable effect | open |
+| 19 | limit-cache flush releases each bounded batch before detaching the next one | internal: Elixir's limit cache |
+| 53 | atomic governance records reject oversized encoded values before registration | internal: Elixir's atomic record registration |
+| 70 | approval requests reject oversized aggregate records before catalog registration | covered by bounds (`audit::governance_bounds::approval_text_and_stored_integers_stay_bounded`) |
+| 90 | expired pending cache pages use the configured exact-release contract | internal: Elixir's cache pages |
+| 144 | one cache spend bounds expired pending-page cleanup work | internal: Elixir's cache pages |
+| 195 | cache recovery derives progress from durable metadata instead of trusting a forged cursor | internal: Elixir's cache recovery |
+| 240 | circuit mutations preserve configured values when options omit them | covered (`flow_circuit::manual_opens_and_closes_keep_the_rule`) |
+| 264 | circuit mutations reject oversized error-class collections before storage | covered (`flow_circuit::impossible_rules_are_refused_before_anything_is_stored`) |
+| 287 | circuit mutations fingerprint oversized observed error classes | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 308 | effect reservation retries consult the existing decision before changed policy | covered (`flow_effect::reservations_replay_for_their_digest_and_conflict_for_another`) |
+| 346 | effect decoding rejects aggregate records above the durable byte budget | internal: Elixir's effect codec (`effect::tests::stored_records_round_trip_and_refuse_damage`) |
+| 381 | an effect reservation that loses the NX race releases its half-open probe | internal: type-level governance is Elixir's in-process API (see Recorded decisions); its NX race is Elixir's storage |
+| 451 | invalid terminal effect metadata is rejected without changing status | covered (`flow_effect::refused_options_and_older_times_leave_the_effect_unchanged`) |
+| 482 | corrupt circuit state returns an error instead of crashing effect reservation | internal: a corrupted circuit record |
+| 507 | repeated terminal effect updates do not duplicate ledger events | covered (`flow_effect::terminal_moves_are_recorded_once_and_listed_by_window`) |
+| 542 | ledger append uses the CAS index as its only authoritative record | internal: Elixir's CAS ledger index |
+| 567 | effect reservation is not acknowledged until its ledger event is durable | internal: Elixir's fault injection; the node replies once the round, ledger included, is durable |
+| 610 | terminal effect retry completes a ledger side effect that previously failed | internal: Elixir's fault injection |
+| 668 | terminal effect retry completes a circuit side effect that previously failed | internal: Elixir's fault injection |
+| 725 | ledger codec rejects a status that does not match its event kind | internal: Elixir's ledger codec (`effect::tests::stored_records_round_trip_and_refuse_damage`) |
+| 751 | ledger indexes retain newest events within a fixed byte budget | covered (`effect::tests::the_ledger_keeps_the_newest_events_within_its_byte_budget`) |
+| 785 | governance lists surface corrupt cataloged records | internal: corrupted catalog records |
+| 802 | exact approval lists preserve and surface corrupt cataloged records | internal: corrupted catalog records |
+| 824 | approval decisions atomically expire requests at their deadline | ported (`audit::governance_bounds::approval_deadlines_expire_once_and_times_never_run_backward`) |
+| 851 | approval requests reject an absolute deadline that is not in the future | ported (`audit::governance_bounds::approval_deadlines_expire_once_and_times_never_run_backward`) |
+| 865 | approval decisions reject time regression without corrupting the record | ported (`audit::governance_bounds::approval_deadlines_expire_once_and_times_never_run_backward`) |
+| 884 | budget commits reject unsafe usage terms without corrupting the record | covered (`flow_budget::refused_commits_leave_the_record_as_it_was`, `budget::request::tests::usage_is_bounded_as_elixir_walks_it`) |
+| 916 | oversized governance storage keys are rejected before catalog publication | ported (`audit::governance_bounds::oversized_governance_keys_are_refused_before_anything_is_stored`) |
+| 963 | governance stores reject integers outside the exact durable range | ported (`audit::governance_bounds::approval_text_and_stored_integers_stay_bounded`) |
+| 994 | budget commits reject aggregate usage outside the exact durable range | ported (`audit::governance_bounds::budget_times_and_totals_never_run_backward_or_past_2_pow_53`) |
+| 1023 | limit reconciliation rejects time outside the exact durable range | internal: Elixir's limit reconciler |
+| 1033 | circuit mutations reject timestamps older than durable state | ported (`audit::governance_bounds::circuit_and_lease_times_keep_their_order`) |
+| 1053 | circuit list preserves option validation errors | internal: `flow_circuit_list/1` has no wire command |
+| 1061 | approval rejects oversized secondary catalog dimensions before storage | ported (`audit::governance_bounds::oversized_governance_keys_are_refused_before_anything_is_stored`) |
+| 1088 | exact governance lists reject oversized derived keys | fixed (`audit::governance_bounds::oversized_governance_keys_are_refused_before_anything_is_stored`; G53) |
+| 1101 | budget rejects oversized reservation identifiers before catalog publication | ported (`audit::governance_bounds::a_reservation_id_retries_but_is_never_reused`) |
+| 1118 | approval metadata is bounded before record publication | ported (`audit::governance_bounds::approval_text_and_stored_integers_stay_bounded`) |
+| 1155 | cache session heads reject oversized durable identities | internal: Elixir's cache session heads |
+| 1178 | effect transitions reject timestamps older than the durable effect | covered (`flow_effect::refused_options_and_older_times_leave_the_effect_unchanged`) |
 
 ## `flow_governance_limit_cleaner_correctness_test.exs`
 
@@ -1772,50 +1790,50 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | approval records reject trailing external-term bytes | open |
-| 25 | budget records reject compressed external terms | open |
-| 51 | circuit records reject trailing external-term bytes | open |
-| 70 | approval records reject structurally invalid structs | open |
-| 87 | budget records reject structurally invalid structs without raising | open |
-| 104 | circuit records reject structurally invalid structs | open |
-| 121 | effect records reject trailing external-term bytes | open |
-| 145 | effect records reject structurally invalid maps | open |
-| 157 | ledger indexes reject non-canonical external terms | open |
-| 181 | ledger indexes reject structurally invalid events without raising | open |
-| 195 | flow policy stores governance rules and exposes them | open |
-| 220 | flow policy version is returned and carried by governance decisions | open |
-| 252 | governance ledger defaults to the flow id auto partition | open |
-| 261 | effect get defaults to the flow id auto partition | open |
-| 297 | effect reserve is idempotent for same digest and conflicts for different digest | open |
-| 344 | effect confirm updates the durable effect record | open |
-| 393 | policy denial returns structured governance error | open |
-| 427 | approval policy returns structured approval-required denial | open |
-| 457 | approval requests are durable and accept one terminal decision | open |
-| 499 | approval request validates optional metadata | open |
-| 551 | approval decisions validate optional persisted metadata before mutation | open |
-| 571 | approval list filters pending requests and governance overview summarizes records | open |
-| 622 | governance overview and list APIs honor partition scope filters | open |
-| 688 | open circuit blocks governed effect reserve until closed | open |
-| 733 | circuit list filters by scope and status for dashboard use | open |
-| 755 | effect failures open governed circuit and later success resets it | open |
-| 900 | default circuit policy does not write circuit state on clean successful effect | open |
-| 940 | latency circuit does not write circuit state for fast clean success | open |
-| 982 | latency circuit opens when the first recorded effect is a slow success | open |
-| 1027 | failure-rate circuit records first clean successes for exact rate math | open |
-| 1074 | manual circuit open rejects impossible tracking windows | open |
-| 1088 | advanced circuit policy opens on latency and filtered failure rate | open |
-| 1210 | half-open circuit allows configured probe budget before closing | open |
-| 1296 | budget reserve enforces fixed window and resets after window | open |
-| 1322 | budget commit and release settle reservations with actual usage | open |
-| 1364 | governance telemetry emits stable budget and approval metadata | open |
-| 1496 | budget supports repeated same-scope reserve and commit operations | open |
-| 1535 | limit leases grant, spend, release, and reclaim durable credits | open |
-| 1593 | expired in-use limit leases are reclaimed to avoid pinned capacity | open |
-| 1613 | claim_due can spend leased running-limit credits and terminal release frees them | open |
-| 1674 | governed claim uses pre-spent local limit credits across batches | open |
-| 1721 | terminal release returns its named pre-spent credit durably | open |
-| 1783 | empty governed claim skips limit spend when no due work exists | open |
-| 1841 | effect reserve requires the current flow lease and fencing token | open |
-| 1856 | ledger list treats its exact durable index as the source of truth | open |
-| 1882 | terminal retention removes effect and ledger governance records | open |
-| 1942 | terminal retention serializes with racing effect and ledger owner writes | open |
+| 6 | approval records reject trailing external-term bytes | internal: Elixir's external term format; the node stores its own encoding (`governance::tests::stored_approvals_round_trip_and_refuse_damage`) |
+| 25 | budget records reject compressed external terms | internal: Elixir's external term format; the node stores its own encoding |
+| 51 | circuit records reject trailing external-term bytes | internal: Elixir's external term format; the node stores its own encoding (`governance::tests::stored_circuits_round_trip_and_refuse_damage`) |
+| 70 | approval records reject structurally invalid structs | internal: Elixir's external term format; the node stores its own encoding (`governance::tests::stored_approvals_round_trip_and_refuse_damage`) |
+| 87 | budget records reject structurally invalid structs without raising | internal: Elixir's external term format; the node stores its own encoding |
+| 104 | circuit records reject structurally invalid structs | internal: Elixir's external term format; the node stores its own encoding (`governance::tests::stored_circuits_round_trip_and_refuse_damage`) |
+| 121 | effect records reject trailing external-term bytes | internal: Elixir's external term format; the node stores its own encoding (`effect::tests::stored_records_round_trip_and_refuse_damage`) |
+| 145 | effect records reject structurally invalid maps | internal: Elixir's external term format; the node stores its own encoding (`effect::tests::stored_records_round_trip_and_refuse_damage`) |
+| 157 | ledger indexes reject non-canonical external terms | internal: Elixir's external term format; the node stores its own encoding (`effect::tests::the_ledger_orders_by_time_and_keeps_an_id_once`) |
+| 181 | ledger indexes reject structurally invalid events without raising | internal: Elixir's external term format; the node stores its own encoding (`effect::tests::the_ledger_keeps_the_newest_events_within_its_byte_budget`) |
+| 195 | flow policy stores governance rules and exposes them | covered for state governance (`flow_policy_governance::state_governance_is_normalized_merged_and_kept`); its type-level rules are type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 220 | flow policy version is returned and carried by governance decisions | internal: type-level governance is Elixir's in-process API (see Recorded decisions); the policy hash a decision carries is covered (`flow_effect::policy_hash::the_hash_names_the_types_policy_and_follows_its_changes`) |
+| 252 | governance ledger defaults to the flow id auto partition | covered (`flow_effect::lease::reads_default_to_the_flow_ids_auto_partition`) |
+| 261 | effect get defaults to the flow id auto partition | covered (`flow_effect::lease::reads_default_to_the_flow_ids_auto_partition`) |
+| 297 | effect reserve is idempotent for same digest and conflicts for different digest | covered (`flow_effect::reservations_replay_for_their_digest_and_conflict_for_another`) |
+| 344 | effect confirm updates the durable effect record | covered (`flow_effect::terminal_moves_are_recorded_once_and_listed_by_window`) |
+| 393 | policy denial returns structured governance error | internal: type-level governance is Elixir's in-process API (see Recorded decisions); the structured denial and its ledger event are covered (`flow_effect::refusals_are_structured_and_each_recorded`) |
+| 427 | approval policy returns structured approval-required denial | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 457 | approval requests are durable and accept one terminal decision | covered (`flow_approval::a_request_takes_one_terminal_decision_and_survives_restarts`) |
+| 499 | approval request validates optional metadata | covered (`flow_approval::options_are_checked_before_anything_changes`) |
+| 551 | approval decisions validate optional persisted metadata before mutation | covered (`flow_approval::options_are_checked_before_anything_changes`) |
+| 571 | approval list filters pending requests and governance overview summarizes records | covered (`flow_approval::listings_filter_and_order_across_shards`, `flow_overview::the_overview_summarizes_every_kind_across_shards`) |
+| 622 | governance overview and list APIs honor partition scope filters | covered (`flow_overview::partition_scopes_filter_the_overview`) |
+| 688 | open circuit blocks governed effect reserve until closed | internal: type-level governance is Elixir's in-process API (see Recorded decisions): an effect consults a circuit only when its policy names one |
+| 733 | circuit list filters by scope and status for dashboard use | internal: `flow_circuit_list/1` has no wire command; the overview lists circuits (`flow_overview::the_overview_summarizes_every_kind_across_shards`) |
+| 755 | effect failures open governed circuit and later success resets it | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 900 | default circuit policy does not write circuit state on clean successful effect | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 940 | latency circuit does not write circuit state for fast clean success | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 982 | latency circuit opens when the first recorded effect is a slow success | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 1027 | failure-rate circuit records first clean successes for exact rate math | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 1074 | manual circuit open rejects impossible tracking windows | covered (`flow_circuit::impossible_rules_are_refused_before_anything_is_stored`) |
+| 1088 | advanced circuit policy opens on latency and filtered failure rate | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 1210 | half-open circuit allows configured probe budget before closing | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 1296 | budget reserve enforces fixed window and resets after window | covered (`flow_budget::a_fixed_window_refuses_past_its_limit_and_resets`) |
+| 1322 | budget commit and release settle reservations with actual usage | covered (`flow_budget::reservations_settle_with_what_was_used`) |
+| 1364 | governance telemetry emits stable budget and approval metadata | internal: Elixir's telemetry events |
+| 1496 | budget supports repeated same-scope reserve and commit operations | covered (`flow_budget::many_settle_in_one_scope_keeping_the_newest`) |
+| 1535 | limit leases grant, spend, release, and reclaim durable credits | covered (`flow_limit::leases_spends_and_releases_move_credits`) |
+| 1593 | expired in-use limit leases are reclaimed to avoid pinned capacity | covered (`flow_limit::expired_leases_in_use_are_reclaimed`) |
+| 1613 | claim_due can spend leased running-limit credits and terminal release frees them | covered (`flow_governed_claim::credits_govern_claims_and_terminal_moves_free_them`) |
+| 1674 | governed claim uses pre-spent local limit credits across batches | covered (`flow_governed_claim::claims_take_credits_spent_ahead_and_releases_return_each`) |
+| 1721 | terminal release returns its named pre-spent credit durably | covered (`flow_governed_claim::claims_take_credits_spent_ahead_and_releases_return_each`) |
+| 1783 | empty governed claim skips limit spend when no due work exists | covered (`flow_governed_claim::an_empty_claim_spends_nothing`) |
+| 1841 | effect reserve requires the current flow lease and fencing token | covered (`flow_effect::lease::the_current_lease_and_fence_are_required`) |
+| 1856 | ledger list treats its exact durable index as the source of truth | internal: deleting the ledger index key in place |
+| 1882 | terminal retention removes effect and ledger governance records | covered (`flow_effect::lease::retention_removes_effects_and_ledger_with_the_flow`) |
+| 1942 | terminal retention serializes with racing effect and ledger owner writes | internal: Elixir's retention plan hook; the node's shard applies retention and owner writes one at a time |

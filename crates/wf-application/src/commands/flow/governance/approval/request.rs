@@ -301,6 +301,13 @@ pub fn parse_list(args: &Term) -> Result<List, FlowError> {
             ));
         }
     };
+    // Elixir refuses a filter no stored dimension could hold (audit G53).
+    if let Some(flow_id) = &flow_id {
+        key_size(flow_id.len())?;
+    }
+    for scope in scopes.iter().flatten() {
+        key_size(scope.len())?;
+    }
     Ok(List {
         limit,
         status,

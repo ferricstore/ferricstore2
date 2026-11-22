@@ -66986,3 +66986,31 @@ coalesced. Each outcome's count is added saturating and held to 2^53−1.
 
 Mutation checks: dropping the cap on fired or skipped outcomes, or the
 `claim_error` entry, each fail a test (4 of 4).
+
+### Flow test audit: governance file and hardening reviews; G53 (22 Nov)
+
+`flow_governance_test.exs`: its record codecs are Elixir's term format;
+its effect, ledger, approval, budget, limit, governed-claim, overview and
+retention cases map onto the node's existing governance tests. Recorded
+decision: type-level governance (`FLOW.POLICY.SET` `governance` and
+`version`) is Elixir's in-process API only (its wire refuses both as
+unknown options, and an effect resolves governance from the type and the
+state `running`, which takes no state policy), so over the wire Elixir
+applies only the default effect rule, as the node does; policy-driven
+effect rules (allowed and denied types, required approvals, effect-driven
+circuits, telemetry) are not ported.
+
+`flow_governance_exhaustive_review_test.exs` and
+`flow_governance_exhaustive_store_review_test.exs`: their client-visible
+rules ported as `audit::governance_bounds` (reservation ids, budget,
+approval, circuit and lease times, approval deadlines and expiry, lease
+deadlines, exact-integer and size bounds, refusals that keep the record)
+and `governance::tests::a_budget_holds_at_most_4096_active_reservations`
+(on the model, as Elixir: 4,096 reservations through the node rewrite
+the budget record each time and take ~40 s). Every rule already held but
+one.
+
+G53 closed. RED: `FLOW.APPROVAL.LIST` with a 65,536-byte `flow_id`
+answered `[]`; Elixir and the node's budget listing refuse it. The
+approval listing checks its `flow_id` and scope filters with `key_size`.
+Removing either check fails the test (2 of 2).

@@ -161,3 +161,54 @@ fn stored_limits_round_trip_and_refuse_damage() -> Result<(), &'static str> {
     assert_eq!(super::limit::Owner::decode(&trailing), None);
     Ok(())
 }
+
+#[test]
+fn a_budget_holds_at_most_4096_active_reservations() -> Result<(), &'static str> {
+    // Elixir's `flow_governance_exhaustive_review_test.exs`: "budget active
+    // reservations are bounded without breaking idempotent retries".
+    use super::budget::{Budget, Command as BudgetCommand, Reservation, Status as Held};
+    let reservations = (1..=4_096_u64)
+        .map(|index| {
+            let id = format!("reservation-{index}").into_bytes();
+            let held = Reservation {
+                id: id.clone(),
+                amount: 1,
+                actual_amount: None,
+                status: Held::Reserved,
+                usage: None,
+                overage_amount: 0,
+                reserved_at_ms: 0,
+                settled_at_ms: None,
+                window_start_ms: 0,
+            };
+            (id, held)
+        })
+        .collect();
+    let budget = Budget {
+        scope: b"scope".to_vec(),
+        limit: 4_097,
+        window_ms: 1_000,
+        window_start_ms: 0,
+        used: 4_096,
+        reservations,
+        settled: Vec::new(),
+        generated: 0,
+    };
+    let stored = budget.encode().ok_or("the budget does not encode")?;
+    let reserve = |id: &str| BudgetCommand::Reserve {
+        scope: b"scope".to_vec(),
+        amount: 1,
+        now_ms: Some(1),
+        reservation_id: Some(id.as_bytes().to_vec()),
+        shape: (None, None),
+    };
+    let (retried, _) = reserve("reservation-1").decide(Some(&stored), 1);
+    let retried = retried.map_err(|_| "a retry was refused")?;
+    assert_eq!(retried.get(b"used"), Some(&Term::Int(4_096)));
+    let (overflow, _) = reserve("overflow").decide(Some(&stored), 1);
+    assert_eq!(
+        overflow.err().map(|error| error.to_string()),
+        Some("ERR flow budget has too many active reservations".to_owned())
+    );
+    Ok(())
+}
