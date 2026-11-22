@@ -31,6 +31,25 @@ pub(crate) struct Taken {
 pub(crate) struct Peeked {
     pub(crate) available: usize,
     pub(crate) wait_ms: Option<u64>,
+    /// The highest priority among the due Flows it could claim, and how
+    /// many of them have it (audit gap G30).
+    pub(crate) top: Option<(u8, usize)>,
+}
+
+/// A Flow a claim may take: its key, state, fence and priority.
+type Candidate = (Key, Vec<u8>, u64, u8);
+
+/// The highest priority among `found` (sorted highest first) and how many
+/// share it.
+fn top_of(found: &[Candidate]) -> Option<(u8, usize)> {
+    let best = found.first()?.3;
+    Some((
+        best,
+        found
+            .iter()
+            .take_while(|candidate| candidate.3 == best)
+            .count(),
+    ))
 }
 
 /// Entries scanned for a partition match before the earliest due time of
@@ -128,11 +147,13 @@ impl ShardState {
         let now = request.now_ms.unwrap_or(now);
         let mut available = 0_usize;
         let mut next: Option<u64> = None;
+        let mut top = None;
         for mode in modes(request) {
-            available = available.saturating_add(
-                self.candidates(now, request, *mode, limit, partitions)
-                    .len(),
-            );
+            let found = self.candidates(now, request, *mode, limit, partitions);
+            if *mode == Mode::Due {
+                top = top_of(&found);
+            }
+            available = available.saturating_add(found.len());
             let earliest = self
                 .matching(request, *mode)
                 .filter_map(|(_, due)| next_due(due, now, request, partitions))
@@ -145,6 +166,7 @@ impl ShardState {
         Peeked {
             available: available.min(limit),
             wait_ms: next.map(|at| at.saturating_sub(now)),
+            top,
         }
     }
 
@@ -205,7 +227,9 @@ impl ShardState {
         taken: &mut Taken,
     ) -> usize {
         let mut timed_out = 0_usize;
-        for (key, expected_state, fence) in self.candidates(now, request, mode, limit, partitions) {
+        for (key, expected_state, fence, _) in
+            self.candidates(now, request, mode, limit, partitions)
+        {
             if self.overdue(&key, now) {
                 let change = self.time_out_one(now, now, &key);
                 timed_out = timed_out.saturating_add(usize::from(change.is_some()));
@@ -274,7 +298,7 @@ impl ShardState {
         mode: Mode,
         limit: usize,
         partitions: Option<&[Partition]>,
-    ) -> Vec<(Key, Vec<u8>, u64)> {
+    ) -> Vec<Candidate> {
         let mut found: Vec<(Reverse<u8>, (u64, u64), &Key)> = Vec::new();
         for (queue, due) in self.matching(request, mode) {
             if mode == Mode::Due
@@ -298,9 +322,14 @@ impl ShardState {
         found.truncate(limit);
         found
             .into_iter()
-            .filter_map(|(_, _, key)| {
+            .filter_map(|(Reverse(priority), _, key)| {
                 let record = &self.hot(key)?.record;
-                Some((key.clone(), record.state().to_vec(), record.fence().get()))
+                Some((
+                    key.clone(),
+                    record.state().to_vec(),
+                    record.fence().get(),
+                    priority,
+                ))
             })
             .collect()
     }

@@ -111,6 +111,30 @@ impl Router {
         }
     }
 
+    /// The first round's shards among `holders`: those with due-indexed
+    /// Flows, weighted by them, so ready work comes before expired leases
+    /// (Elixir's limit-one preference); `holders` itself for a claim of
+    /// expired leases only, one naming partitions, or when no shard has
+    /// due-indexed Flows.
+    pub(crate) fn due_first(
+        &self,
+        request: &ClaimFlows,
+        partitions: bool,
+        holders: Vec<(usize, u64)>,
+    ) -> Vec<(usize, u64)> {
+        if partitions || request.running_only() {
+            return holders;
+        }
+        let ready: Vec<(usize, u64)> = holders
+            .iter()
+            .filter_map(|(index, _)| {
+                let count = self.shards.get(*index)?.ready.load(Ordering::Relaxed);
+                (count > 0).then_some((*index, count))
+            })
+            .collect();
+        if ready.is_empty() { holders } else { ready }
+    }
+
     /// Whether a lease on some shard has expired by `now`, as of the
     /// shards' last rounds.
     pub(crate) fn any_expired(&self, now: u64) -> bool {
@@ -119,37 +143,28 @@ impl Router {
             .any(|shard| shard.expiry.load(Ordering::Relaxed) <= now)
     }
 
-    /// The shards holding due-indexed Flows of the highest priority any
-    /// shard holds, weighted by how many.
-    fn top_priority_weights(&self) -> Option<Vec<(usize, u64)>> {
-        (0..3).rev().find_map(|priority: usize| {
-            let weights: Vec<(usize, u64)> = self
-                .shards
-                .iter()
-                .enumerate()
-                .filter_map(|(index, shard)| {
-                    let count = shard.by_priority.get(priority)?.load(Ordering::Relaxed);
-                    (count > 0).then_some((index, count))
+    /// Whether due-indexed Flows of more than one priority are held, as of
+    /// the shards' last rounds (of any type). A claim without a priority
+    /// filter then peeks first, so it takes the highest priority its own
+    /// Flows have (audit gaps G25, G30).
+    pub(crate) fn mixed_priorities(&self) -> bool {
+        (0..3)
+            .filter(|priority: &usize| {
+                self.shards.iter().any(|shard| {
+                    shard
+                        .by_priority
+                        .get(*priority)
+                        .is_some_and(|count| count.load(Ordering::Relaxed) > 0)
                 })
-                .collect();
-            (!weights.is_empty()).then_some(weights)
-        })
+            })
+            .count()
+            > 1
     }
 
     /// Per shard, the indexed Flows the claim may take: due-indexed Flows,
     /// plus leased ones when it reclaims. Shards with none are left out.
     fn weights(&self, request: &ClaimFlows) -> Vec<(usize, u64)> {
         let running = request.running_only();
-        // Higher priorities first across shards, as Elixir drains them
-        // (audit gap G25): weight shards by the highest priority any holds.
-        // Expired leases are reclaimed in separate passes (G24); due work
-        // goes to the shards holding the highest priority.
-        if !running
-            && request.priority.is_none()
-            && let Some(weights) = self.top_priority_weights()
-        {
-            return weights;
-        }
         self.shards
             .iter()
             .enumerate()

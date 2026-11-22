@@ -4,8 +4,11 @@
 //! returns fewer Flows than the limit, the shards that may still have some
 //! (not asked yet, or filled their share) count what they could claim now; the
 //! rest of the limit is split by those counts and claimed, for at most
-//! [`MAX_ROUNDS`] claim rounds. A blocking claim that found nothing parks in
-//! the waiter thread and starts a new attempt when woken.
+//! [`MAX_ROUNDS`] claim rounds. A claim without a priority filter, while
+//! Flows of more than one priority are held, counts first and each round
+//! goes to the shards whose Flows reach the highest priority, for as many
+//! as they hold at it (audit gap G30). A blocking claim that found nothing
+//! parks in the waiter thread and starts a new attempt when woken.
 
 use std::sync::{Arc, Mutex, PoisonError, Weak};
 use std::time::{Duration, Instant};
@@ -106,6 +109,12 @@ fn attempt(router: &Router, mut run: Box<ClaimRun>) {
     if holders.is_empty() {
         return settle(router, run);
     }
+    // With priorities to choose between, the shards say what they hold
+    // first, so the claim takes its type's highest priority (audit G30).
+    if run.request.priority.is_none() && prefers_due(&run.request) && router.mixed_priorities() {
+        return peek(router, run);
+    }
+    let holders = router.due_first(&run.request, run.partitions.is_some(), holders);
     let turn = router
         .claim_turn
         .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
@@ -254,11 +263,16 @@ fn peeked_round(mut run: Box<ClaimRun>, parts: &[(usize, usize, Peeked)]) {
             *exhausted = true;
         }
     }
-    let counts: Vec<(usize, u64)> = parts
-        .iter()
-        .filter(|(_, _, peeked)| peeked.available > 0)
-        .filter_map(|(index, _, peeked)| Some((*index, u64::try_from(peeked.available).ok()?)))
-        .collect();
+    let top = prefers_due(&run.request)
+        .then(|| top_counts(parts))
+        .flatten();
+    let counts: Vec<(usize, u64)> = top.unwrap_or_else(|| {
+        parts
+            .iter()
+            .filter(|(_, _, peeked)| peeked.available > 0)
+            .filter_map(|(index, _, peeked)| Some((*index, u64::try_from(peeked.available).ok()?)))
+            .collect()
+    });
     let Some(router) = run.router.upgrade() else {
         return fail(*run, ServiceError::Unavailable);
     };
@@ -287,6 +301,34 @@ fn peeked_round(mut run: Box<ClaimRun>, parts: &[(usize, usize, Peeked)]) {
         .filter(|(_, share)| *share > 0)
         .collect();
     claim_round(&router, run, shares);
+}
+
+/// Whether a claim takes due Flows, highest priority first, before
+/// expired leases: any claim but one of expired leases only.
+fn prefers_due(request: &ClaimFlows) -> bool {
+    !request.running_only()
+}
+
+/// The shards whose claimable due Flows reach the highest priority any
+/// has, with how many each holds at it (audit gap G30); `None` when no
+/// shard has due Flows, and expired leases are shared by count.
+fn top_counts(parts: &[(usize, usize, Peeked)]) -> Option<Vec<(usize, u64)>> {
+    let best = parts
+        .iter()
+        .filter_map(|(_, _, peeked)| peeked.top)
+        .map(|(priority, _)| priority)
+        .max()?;
+    Some(
+        parts
+            .iter()
+            .filter_map(|(index, _, peeked)| match peeked.top {
+                Some((priority, count)) if priority == best => {
+                    Some((*index, u64::try_from(count).ok()?))
+                }
+                _ => None,
+            })
+            .collect(),
+    )
 }
 
 /// Replies, or parks a blocking claim that found nothing.

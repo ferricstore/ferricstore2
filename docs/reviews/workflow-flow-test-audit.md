@@ -133,6 +133,16 @@ Gaps found so far:
 - G29 (closed): a batch's `return` option other than `ok_on_success` was
   ignored, so `return: full` created the Flows; every batch command now
   takes `items` or `ok_on_success` and refuses the rest, as Elixir does.
+- G30 (closed): G25 steered a claim to the shards holding the highest
+  priority of any type, so a claim for one type went to a shard holding
+  another type's priority-2 Flow and answered nothing, or took that
+  shard's priority-0 Flow over a priority-1 one elsewhere. While ready
+  Flows of more than one priority are held, a claim without a priority
+  filter now asks the shards first; each answers the highest priority
+  among its claimable Flows of the claim's type and how many have it, and
+  each round goes to the shards at the highest, for that many. Otherwise
+  the first round goes to shards with ready Flows (ready work before
+  expired leases), as G25 did.
 - P1 (open, performance): a batch's shared payload is logged in each
   Flow's after-image; Elixir logs it once per command. Clients see the
   same results; the log carries the payload once per Flow.
@@ -691,19 +701,19 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | flow_claim_due drains higher priorities before lower priorities by default | open |
-| 47 | flow_claim_due priority option targets one priority band | open |
-| 88 | flow_complete enforces lease token guard and writes terminal state | open |
-| 128 | terminal flows reject normal transition and cancel | open |
-| 163 | flow_retry clears lease and reschedules flow | open |
-| 211 | flow_claim_due promotes hibernated cold due flow | open |
-| 485 | blocking claim_due schedules wake from cold due rows | open |
-| 555 | hibernation schedules due wake for existing claim waiter | open |
-| 588 | flow_retry returns to claimed run_state with computed backoff | open |
-| 661 | flow_retry exhausts to configured active state | open |
-| 706 | flow_retry terminal exhaustion keeps stable audit metadata | open |
-| 748 | flow_retry terminal exhaustion updates colocated parent child group | open |
-| 795 | flow_retry rejects invalid retry policy | open |
+| 8 | flow_claim_due drains higher priorities before lower priorities by default | fixed (`audit::priority_retries::claims_take_higher_priorities_first_or_one_named_band`; G30, a G25 regression) |
+| 47 | flow_claim_due priority option targets one priority band | ported (same test) |
+| 88 | flow_complete enforces lease token guard and writes terminal state | ported (`audit::priority_retries::a_completion_checks_its_lease_and_finishes_the_flow`) |
+| 128 | terminal flows reject normal transition and cancel | ported (`audit::priority_retries::a_finished_flow_refuses_transitions_and_cancels`) |
+| 163 | flow_retry clears lease and reschedules flow | ported (`audit::priority_retries::a_retry_clears_the_lease_and_reschedules`) |
+| 211 | flow_claim_due promotes hibernated cold due flow | ported (`audit::priority_retries::a_flow_due_far_ahead_is_claimed_when_due` and `...::flows_due_far_ahead_in_auto_buckets_are_claimed_by_their_keys`; its LMDB parking is Elixir's) |
+| 485 | blocking claim_due schedules wake from cold due rows | internal: Elixir's cold due rows and claim waiter schedule (a blocking claim woken when a Flow falls due: `blocking::a_blocking_claim_wakes_when_a_scheduled_flow_falls_due`) |
+| 555 | hibernation schedules due wake for existing claim waiter | internal: Elixir's hibernation waiter schedule (same node test) |
+| 588 | flow_retry returns to claimed run_state with computed backoff | ported (`audit::priority_retries::a_retry_policy_backs_off_into_the_claimed_state`) |
+| 661 | flow_retry exhausts to configured active state | ported (`audit::priority_retries::a_retry_that_exhausts_moves_to_its_active_or_terminal_state`) |
+| 706 | flow_retry terminal exhaustion keeps stable audit metadata | ported (same test) |
+| 748 | flow_retry terminal exhaustion updates colocated parent child group | ported (`audit::priority_retries::a_retry_that_exhausts_settles_the_parent_group`) |
+| 795 | flow_retry rejects invalid retry policy | ported (`audit::priority_retries::a_retry_refuses_an_invalid_policy`) |
 
 ## `flow_state_meta_test.exs`
 

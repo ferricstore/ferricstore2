@@ -32,6 +32,8 @@ mod payload_refs;
 mod plain_values;
 mod policy_commands;
 mod policy_lifecycle;
+mod priority_retries;
+mod priority_shards;
 mod reclaim_batches;
 mod records_and_claims;
 mod shared_values;

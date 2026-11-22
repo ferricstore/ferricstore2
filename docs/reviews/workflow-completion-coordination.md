@@ -66599,3 +66599,37 @@ now reads the mode for every batch command (`items`, `ok_on_success`, any
 case) and refuses the rest with Elixir's text; ignoring the mode in either
 parser or refusing `ITEMS` fails the test. Its `before_id` cursors, cold
 scan limits and native index members are Elixir's.
+
+### Flow test audit: priorities and retries; G25 regression (22 Nov)
+
+`flow_test/sections/flow_claim_due_drains_higher_priorities_before_lower_
+priorities_default.exs` ported (`audit::priority_retries`). G30 closed, a
+regression from G25. RED: the second limit-1 claim of type `priority`
+answered nothing while `priority-low` was due (another type's priority-2
+Flow steered it to a shard with none of its own); a node test with a
+priority-0 Flow of type `a` beside type `b`'s priority-2 one took it over
+type `a`'s priority-1 Flow on another shard.
+
+Decision: the published per-priority counts span every type, so they only
+say whether priorities differ (`Router::mixed_priorities`). Then a claim
+without a priority filter starts with the shards' peeks, which now report
+`Peeked::top` (the highest priority among the shard's claimable due Flows
+of the request, and how many have it); each round goes to the shards at
+the highest priority, capped at that many, and later rounds take the next
+priority. Without mixed priorities the claim keeps one round, sent to
+shards with ready Flows first (`Router::due_first`; Elixir's limit-one
+preference for ready work over expired leases, which G25's steering had
+also carried). `top_priority_weights` is gone. Claims come back in the
+order taken, highest priority first.
+
+New artifacts (solo design review): `Peeked::top`, `Candidate` (private
+alias, the candidate's priority added), `Router::{mixed_priorities,
+due_first}`, `claim::{prefers_due, top_counts}`; test module
+`audit::priority_shards`. No new dependency. Cost: one extra peek round
+only while ready Flows of more than one priority exist; the benchmark's
+Flows are all priority 0.
+
+Mutation checks (three runs each): no mixed check, no top counts, no
+ready-first round, a top count capped at one, and the lowest priority
+taken as the top each fail a test (the last after the order of the reply
+was asserted; sorted ids hid it).
