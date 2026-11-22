@@ -72,7 +72,9 @@ impl Command {
                     )),
                     None,
                 ),
-                Op::Spend | Op::Release => (Err(rejected("ERR flow limit not found")), None),
+                Op::Spend | Op::Release | Op::Renew => {
+                    (Err(rejected("ERR flow limit not found")), None)
+                }
             };
         };
         let previous = existing.as_ref();
@@ -127,6 +129,24 @@ impl Command {
                 let reply = owner.release(shard, &fields.ids).map(|()| owner.view());
                 stored(&owner, previous, reply)
             }
+            Op::Renew => {
+                let reply = renew(&mut owner, shard, (now, fields.ttl_ms.unwrap_or(0)));
+                stored(&owner, previous, reply)
+            }
         }
+    }
+}
+
+/// Elixir's `CreditLease.renew/3`: the shard's lease lasts at least until
+/// `now + ttl`; a lease already reclaimed is gone.
+fn renew(owner: &mut Owner, shard: u64, (now, ttl): (u64, u64)) -> Result<Term, FlowError> {
+    owner.reclaim(now);
+    let until = now.saturating_add(ttl);
+    match owner.leases.get_mut(&shard) {
+        Some(lease) => {
+            lease.expires_at_ms = lease.expires_at_ms.max(until);
+            Ok(lease.view())
+        }
+        None => Err(rejected("ERR flow limit lease expired")),
     }
 }

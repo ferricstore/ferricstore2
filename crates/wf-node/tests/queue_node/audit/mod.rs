@@ -27,6 +27,7 @@ mod create_retries;
 mod create_rules;
 mod fencing_retries;
 mod governance_bounds;
+mod governance_limits;
 mod history_filters;
 mod history_limits;
 mod history_requests;

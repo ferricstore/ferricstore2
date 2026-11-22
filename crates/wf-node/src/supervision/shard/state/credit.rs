@@ -56,7 +56,28 @@ impl CreditPool {
     }
 }
 
+/// A credit lease to renew: the credit, the extended lease's length and
+/// the command time.
+pub(crate) type Renewal = (Credit, u64, u64);
+
 impl ShardState {
+    /// Queues the renewal of a governed Flow's credit lease when its own
+    /// lease is extended, as Elixir's `maybe_renew_governance_limit/2`.
+    pub(super) fn note_renewal(&mut self, meta: &FlowMeta, (lease_ms, now): (u64, u64)) {
+        if let Some(credit) = meta
+            .governance
+            .as_deref()
+            .and_then(|governance| governance.credit.clone())
+        {
+            self.credit_renewals.push((credit, lease_ms, now));
+        }
+    }
+
+    /// The renewals to deliver once this round is durable.
+    pub(crate) fn take_credit_renewals(&mut self) -> Vec<Renewal> {
+        std::mem::take(&mut self.credit_renewals)
+    }
+
     /// Queues the credit of a Flow leaving `running`.
     pub(super) fn note_credit(
         &mut self,

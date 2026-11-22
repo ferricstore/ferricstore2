@@ -57,6 +57,7 @@ impl Started {
                 waiters: waiters.clone(),
                 release: credit::releaser(Arc::clone(&release_router)),
                 wake: super::schedule::waker(Arc::clone(&release_router)),
+                renew: credit::renewer(Arc::clone(&release_router)),
                 backlog: Arc::new(AtomicUsize::new(0)),
             },
         )?;
@@ -106,6 +107,7 @@ fn start_shards(
             waiters: shared.waiters.clone(),
             release: Arc::clone(&shared.release),
             wake: Arc::clone(&shared.wake),
+            renew: Arc::clone(&shared.renew),
             backlog: Arc::clone(&backlog),
         };
         threads.push(

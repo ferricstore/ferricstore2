@@ -34,6 +34,10 @@ pub enum Op {
     Release,
     /// `FLOW.LIMIT.GET`.
     Get,
+    /// The node's own renewal of a credit lease a governed Flow holds when
+    /// that Flow's lease is extended (Elixir's `CreditLease.renew/3`); no
+    /// wire command names it.
+    Renew,
 }
 
 /// A configuration a lease or spend may carry.
@@ -294,7 +298,8 @@ fn fields(op: Op, opts: &Opts<'_>) -> Result<Fields, FlowError> {
                 ..Fields::default()
             })
         }
-        Op::Get => Ok(Fields {
+        // No wire command names a renewal; read as a get if one ever did.
+        Op::Get | Op::Renew => Ok(Fields {
             now_ms: now_ms(opts)?,
             ..Fields::default()
         }),

@@ -67014,3 +67014,36 @@ G53 closed. RED: `FLOW.APPROVAL.LIST` with a 65,536-byte `flow_id`
 answered `[]`; Elixir and the node's budget listing refuse it. The
 approval listing checks its `flow_id` and scope filters with `key_size`.
 Removing either check fails the test (2 of 2).
+
+### Flow test audit: limit correctness; G54 (22 Nov)
+
+`flow_governance_limit_correctness_test.exs` as
+`audit::governance_limits`: a terminal caller cannot redirect its
+release, every terminal move (complete, retry, fail, cancel, batch and
+independent batch) releases its credit once, running policies set per
+state govern claims (strict, approximate, and the strictest across
+states), a public release names exact reservation ids, and a governed
+retry still wakes a waiting claim. Elixir's limit cache, reconciler and
+type-level policies are its own.
+
+G54 closed. RED: after `FLOW.EXTEND_LEASE` to 2,050 ms on a Flow whose
+100 ms credit lease began at 1,000 ms, `FLOW.LIMIT.GET` at 1,101 ms had
+no lease left. The shard notes a governed Flow's extension (live writes
+only), and once the round is durable a renewer sends `Op::Renew` to the
+limit's shard, which keeps the later of the lease's deadline and
+now + lease_ms, or answers "ERR flow limit lease expired" when the lease
+is gone. Removing the note, the delivery or the deadline update each
+fails the test (3 of 3). Recorded decision: the renewal follows the
+extension instead of gating it (see the map's G54).
+
+### Flow test audit: steps 11-15 complete (22 Nov)
+
+The remaining governance files are Elixir's storage machinery (limit
+cache sessions, limit owner storage, release outbox, catalogs and their
+repair, the limit cleaner), its model unit tests (whose rules the node's
+wire tests cover, or are type-level governance), its API argument types
+and its index-query helpers. With them the steps 11-15 map has no open
+row: 1,308 Elixir tests, 160 ported, 26 fixed by node changes (G39-G54),
+98 covered by existing node tests, the rest Elixir-internal. Two recorded
+decisions bound the port: type-level governance stays Elixir's in-process
+API, and a credit renewal follows a lease extension instead of gating it.

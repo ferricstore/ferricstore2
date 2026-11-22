@@ -7,6 +7,11 @@ row is one test; its status says where the node covers it, which gap
 fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 `workflow-flow-test-audit.md` (G39 on).
 
+Status (22 Nov): complete. 1,308 rows: 160 ported, 26 fixed by node
+changes (gaps G39-G54), 98 covered by existing node tests, the rest
+Elixir-internal (its query engine, storage, caches, catalogs, codecs,
+telemetry and in-process API). No row is open.
+
 ## Gaps
 
 - G39 (closed): `FLOW.QUERY` had no text form (`COMMAND_EXEC`); the
@@ -91,6 +96,15 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
   `FLOW.BUDGET.LIST` (and Elixir, for both) refuse it with "ERR key too
   large (max 65535 bytes)". The approval listing now checks its filters
   as the approval request checks its dimensions.
+- G54 (closed): extending a governed Flow's lease left its credit lease
+  to expire, so a long-running Flow lost the credit it held. As Elixir's
+  `maybe_renew_governance_limit/2`, an extension now renews the credit
+  lease to at least the command time plus the new lease length (an
+  internal `Op::Renew` on the limit, sent once the extension is durable,
+  as credit releases are). Recorded decision: Elixir renews first and
+  refuses the extension when the credit lease has already lapsed; the
+  node extends and the renewal finds no lease, since the shard holding
+  the Flow cannot consult the limit's shard within one step.
 
 ## Recorded decisions
 
@@ -109,17 +123,17 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | governance calls name the bad argument | open |
+| 8 | governance calls name the bad argument | internal: Elixir's API argument types; on the wire a non-binary id or scope is the native layer's refusal first (`governance::tests::the_id_is_checked_by_the_native_layer_then_the_store`) |
 
 ## `flow/index_query_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 18 | filtering is false when index query has no filters | open |
-| 22 | fetch_count only asks scan count for filtered queries | open |
-| 29 | filter_records matches index value state terminal flag and time range | open |
-| 58 | record_matches supports explicit state filter | open |
-| 74 | cursor tie-breaking filters records and RAM index entries by timestamp and id | open |
+| 18 | filtering is false when index query has no filters | internal: Elixir's index query helpers; the node evaluates FLOW.QUERY in memory (ADR-014 step 12) |
+| 22 | fetch_count only asks scan count for filtered queries | internal: Elixir's index query helpers; the node evaluates FLOW.QUERY in memory (ADR-014 step 12) |
+| 29 | filter_records matches index value state terminal flag and time range | internal: Elixir's index query helpers; the node evaluates FLOW.QUERY in memory (ADR-014 step 12) |
+| 58 | record_matches supports explicit state filter | internal: Elixir's index query helpers; the node evaluates FLOW.QUERY in memory (ADR-014 step 12) |
+| 74 | cursor tie-breaking filters records and RAM index entries by timestamp and id | internal: Elixir's index query helpers; the node evaluates FLOW.QUERY in memory (ADR-014 step 12) |
 
 ## `flow/query/admission_controller_test.exs`
 
@@ -1502,66 +1516,66 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 8 | catalog bulk unregister removes one bounded page in one write | open |
-| 29 | source repair restores membership created during a batched stale removal | open |
-| 59 | target repair restores membership that becomes valid during batched removal | open |
-| 81 | source repair restores uncertain membership when post-delete validation fails | open |
-| 109 | target repair restores uncertain membership when post-delete validation fails | open |
+| 8 | catalog bulk unregister removes one bounded page in one write | internal: Elixir's approval catalog repair |
+| 29 | source repair restores membership created during a batched stale removal | internal: Elixir's approval catalog repair |
+| 59 | target repair restores membership that becomes valid during batched removal | internal: Elixir's approval catalog repair |
+| 81 | source repair restores uncertain membership when post-delete validation fails | internal: Elixir's approval catalog repair |
+| 109 | target repair restores uncertain membership when post-delete validation fails | internal: Elixir's approval catalog repair |
 
 ## `flow_governance_cache_session_store_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 26 | session heads reject trailing external-term bytes | open |
-| 42 | session manifests reject trailing external-term bytes | open |
-| 60 | session pages reject trailing external-term bytes | open |
-| 94 | power loss before activation releases every durably proven-unused page | open |
-| 148 | restart retains the uncertain consumption window and releases later unused pages | open |
-| 194 | a newer cache session fences stale persistence and activation | open |
-| 233 | acknowledged activated pages advance a bounded recovery floor and are deleted | open |
-| 264 | acknowledge deletes its page before advancing the recovery floor | open |
-| 313 | discarded denied plans advance the recovery floor without durable holes | open |
-| 341 | acknowledging an early gap compacts a bounded run of later deleted pages | open |
-| 385 | floor compaction does not treat an unavailable page read as deletion | open |
-| 428 | discard cannot delete a page that won an activation race | open |
-| 463 | partial manifest persistence failure deletes every unspent reserved page | open |
-| 499 | discard deletes its pages before advancing the recovery floor | open |
-| 546 | discard rejects pages owned by another cache session | open |
-| 574 | completed recovery severs the historical session chain | open |
-| 609 | recovery resumes a durable metadata cleanup checkpoint after process loss | open |
-| 649 | recovery repairs a stale cursor after metadata deletion but before checkpoint clearing | open |
-| 690 | corrupt oversized manifest pages fail closed without invoking release | open |
-| 745 | recovery rejects cursors outside the durable exact-integer boundary | open |
-| 760 | opening a session fails closed when the durable generation is exhausted | open |
-| 781 | session open reuses staged metadata after head publication is interrupted | open |
-| 818 | session pages use the same reservation id byte boundary as LimitStore | open |
-| 849 | transient recovery release failure retains its cursor and retries before compaction | open |
-| 907 | transient recovery page deletion failure retains its cursor before metadata compaction | open |
-| 969 | unavailable recovery page read retains its cursor without releasing or compacting | open |
-| 1021 | session key families co-locate internally and distribute by node and instance | open |
-| 1032 | graceful flush releases activated and unopened manifest pages | open |
-| 1072 | clear without context refuses pending pages left by a partial flush failure | open |
-| 1111 | expired pending pages are exact-released after the durable lease is renewed | open |
-| 1165 | newer policy config fences and releases prefetched credits before a cache hit | open |
-| 1223 | failed policy-fence release persists retry pages instead of losing detached ids | open |
-| 1283 | large valid cache spend clamps prefetch to the store mutation maximum | open |
-| 1313 | crash after exact spend but before cache activation leaves prefetched ids recoverable | open |
-| 1356 | LimitCache process restart automatically recovers untouched manifest pages | open |
+| 26 | session heads reject trailing external-term bytes | internal: Elixir's limit cache sessions and their durable pages |
+| 42 | session manifests reject trailing external-term bytes | internal: Elixir's limit cache sessions and their durable pages |
+| 60 | session pages reject trailing external-term bytes | internal: Elixir's limit cache sessions and their durable pages |
+| 94 | power loss before activation releases every durably proven-unused page | internal: Elixir's limit cache sessions and their durable pages |
+| 148 | restart retains the uncertain consumption window and releases later unused pages | internal: Elixir's limit cache sessions and their durable pages |
+| 194 | a newer cache session fences stale persistence and activation | internal: Elixir's limit cache sessions and their durable pages |
+| 233 | acknowledged activated pages advance a bounded recovery floor and are deleted | internal: Elixir's limit cache sessions and their durable pages |
+| 264 | acknowledge deletes its page before advancing the recovery floor | internal: Elixir's limit cache sessions and their durable pages |
+| 313 | discarded denied plans advance the recovery floor without durable holes | internal: Elixir's limit cache sessions and their durable pages |
+| 341 | acknowledging an early gap compacts a bounded run of later deleted pages | internal: Elixir's limit cache sessions and their durable pages |
+| 385 | floor compaction does not treat an unavailable page read as deletion | internal: Elixir's limit cache sessions and their durable pages |
+| 428 | discard cannot delete a page that won an activation race | internal: Elixir's limit cache sessions and their durable pages |
+| 463 | partial manifest persistence failure deletes every unspent reserved page | internal: Elixir's limit cache sessions and their durable pages |
+| 499 | discard deletes its pages before advancing the recovery floor | internal: Elixir's limit cache sessions and their durable pages |
+| 546 | discard rejects pages owned by another cache session | internal: Elixir's limit cache sessions and their durable pages |
+| 574 | completed recovery severs the historical session chain | internal: Elixir's limit cache sessions and their durable pages |
+| 609 | recovery resumes a durable metadata cleanup checkpoint after process loss | internal: Elixir's limit cache sessions and their durable pages |
+| 649 | recovery repairs a stale cursor after metadata deletion but before checkpoint clearing | internal: Elixir's limit cache sessions and their durable pages |
+| 690 | corrupt oversized manifest pages fail closed without invoking release | internal: Elixir's limit cache sessions and their durable pages |
+| 745 | recovery rejects cursors outside the durable exact-integer boundary | internal: Elixir's limit cache sessions and their durable pages |
+| 760 | opening a session fails closed when the durable generation is exhausted | internal: Elixir's limit cache sessions and their durable pages |
+| 781 | session open reuses staged metadata after head publication is interrupted | internal: Elixir's limit cache sessions and their durable pages |
+| 818 | session pages use the same reservation id byte boundary as LimitStore | internal: Elixir's limit cache sessions and their durable pages |
+| 849 | transient recovery release failure retains its cursor and retries before compaction | internal: Elixir's limit cache sessions and their durable pages |
+| 907 | transient recovery page deletion failure retains its cursor before metadata compaction | internal: Elixir's limit cache sessions and their durable pages |
+| 969 | unavailable recovery page read retains its cursor without releasing or compacting | internal: Elixir's limit cache sessions and their durable pages |
+| 1021 | session key families co-locate internally and distribute by node and instance | internal: Elixir's limit cache sessions and their durable pages |
+| 1032 | graceful flush releases activated and unopened manifest pages | internal: Elixir's limit cache sessions and their durable pages |
+| 1072 | clear without context refuses pending pages left by a partial flush failure | internal: Elixir's limit cache sessions and their durable pages |
+| 1111 | expired pending pages are exact-released after the durable lease is renewed | internal: Elixir's limit cache sessions and their durable pages |
+| 1165 | newer policy config fences and releases prefetched credits before a cache hit | internal: Elixir's limit cache sessions and their durable pages |
+| 1223 | failed policy-fence release persists retry pages instead of losing detached ids | internal: Elixir's limit cache sessions and their durable pages |
+| 1283 | large valid cache spend clamps prefetch to the store mutation maximum | internal: Elixir's limit cache sessions and their durable pages |
+| 1313 | crash after exact spend but before cache activation leaves prefetched ids recoverable | internal: Elixir's limit cache sessions and their durable pages |
+| 1356 | LimitCache process restart automatically recovers untouched manifest pages | internal: Elixir's limit cache sessions and their durable pages |
 
 ## `flow_governance_catalog_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | approval catalog repair rejects non-canonical and oversized progress | open |
-| 43 | governance list paths never enumerate the full application keyspace | open |
-| 55 | governance catalog traversal is unbounded in count but bounded in memory | open |
-| 78 | catalog collection keeps global top results across pages | open |
-| 107 | exact-scope lists derive record keys without scanning catalog membership | open |
-| 174 | catalog paging anchors on the last member during concurrent insertion | open |
-| 208 | governance catalogs preserve limit, budget, circuit, and approval listing | open |
-| 259 | approval NX conflicts cannot poison attacker-supplied exact catalogs | open |
-| 312 | filtered approval lists repair missing and stale exact membership | open |
-| 353 | approval exact repair is bounded and resumes from durable progress | open |
+| 6 | approval catalog repair rejects non-canonical and oversized progress | internal: Elixir's approval catalog repair progress |
+| 43 | governance list paths never enumerate the full application keyspace | internal: Elixir's catalog traversal |
+| 55 | governance catalog traversal is unbounded in count but bounded in memory | internal: Elixir's catalog traversal |
+| 78 | catalog collection keeps global top results across pages | internal: Elixir's catalog paging |
+| 107 | exact-scope lists derive record keys without scanning catalog membership | covered for exact-scope listings (`flow_approval::listings_filter_and_order_across_shards`, `flow_overview::partition_scopes_filter_the_overview`); deleting catalog membership in place is Elixir's |
+| 174 | catalog paging anchors on the last member during concurrent insertion | internal: Elixir's catalog paging |
+| 208 | governance catalogs preserve limit, budget, circuit, and approval listing | covered (`flow_overview::the_overview_summarizes_every_kind_across_shards`, `flow_approval::listings_filter_and_order_across_shards`); circuits have no list command on the wire |
+| 259 | approval NX conflicts cannot poison attacker-supplied exact catalogs | internal: Elixir's exact approval catalogs |
+| 312 | filtered approval lists repair missing and stale exact membership | internal: Elixir's exact approval catalog repair |
+| 353 | approval exact repair is bounded and resumes from durable progress | internal: Elixir's exact approval catalog repair |
 
 ## `flow_governance_exhaustive_review_test.exs`
 
@@ -1659,132 +1673,132 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 22 | a pending scope consumes a bounded page burst before traversal advances | open |
-| 45 | an empty catalog does not issue an absent cursor delete | open |
-| 61 | a non-canonical progress cursor is reset within the tick write budget | open |
+| 22 | a pending scope consumes a bounded page burst before traversal advances | internal: Elixir's limit cleaner |
+| 45 | an empty catalog does not issue an absent cursor delete | internal: Elixir's limit cleaner |
+| 61 | a non-canonical progress cursor is reset within the tick write budget | internal: Elixir's limit cleaner |
 
 ## `flow_governance_limit_correctness_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 20 | terminal completion releases the reservation captured by claim | open |
-| 41 | terminal caller cannot redirect release to another governance scope | open |
-| 77 | duplicate terminal completion releases a reservation exactly once | open |
-| 101 | retry, fail, and cancel release their captured reservation | open |
-| 117 | Flow lease extension renews the bound governance credit lease | open |
-| 157 | limit cache table is owned by its supervised process | open |
-| 186 | limit cache rejects every untagged entry shape instead of granting credits | open |
-| 212 | strict global running policy enforces claims without caller limit options | open |
-| 252 | approximate global running policy bounds prefetched claims and recycles completion | open |
-| 309 | multi-state claims enforce the strictest resolved running policy | open |
-| 361 | batched and independent completion release only committed reservations | open |
-| 398 | bound governance reservation is not exposed in public Flow records | open |
-| 409 | durable reservation ids make replayed release unable to free another flow | open |
-| 433 | public limit release requires exact reservation ids | open |
-| 468 | record codec rejects governance metadata without a reservation id | open |
-| 487 | existing limit owner applies only monotonic capacity configurations | open |
-| 596 | running policy generations reconfigure an existing limit owner | open |
-| 680 | large valid policy versions are fingerprinted across governed claims | open |
-| 720 | reconciler releases a terminal reservation after post-commit release is skipped | open |
-| 750 | reconciler releases governance credit after automatic max-active timeout | open |
-| 788 | duplicate cache release cannot mint credits beyond the durable chunk | open |
-| 811 | cache shutdown flush returns only unused prefetched reservations | open |
-| 835 | flushdb drains cached reservations before deleting governance owners | open |
-| 877 | destructive cache drain keeps concurrent spends uncached until deletion finishes | open |
-| 928 | cache drain owner death releases the flush fence | open |
-| 961 | cache drain owner death releases entries detached before durable release | open |
-| 1010 | pending cache-page release runs outside the cache server and survives owner death | open |
-| 1101 | cache drain quarantines a page when durable release succeeds before discard fails | open |
-| 1169 | concurrent cache drains serialize by instance | open |
-| 1210 | nested cache drain rejects reentrant ownership without blocking | open |
-| 1227 | cache refills after a durable clear resets its session | open |
-| 1280 | flush never releases a cached reservation taken before atomic detach | open |
-| 1334 | failed flush release merges detached reservations with a concurrent refill | open |
-| 1379 | unknown flush release outcome fences detached reservations before reuse | open |
-| 1418 | clear refuses to erase live cached reservations without a durable flush | open |
-| 1453 | governed retry still wakes claim waiters after releasing its reservation | open |
+| 20 | terminal completion releases the reservation captured by claim | ported (`audit::governance_limits::every_terminal_move_releases_its_credit_once`; `flow_governed_claim::credits_govern_claims_and_terminal_moves_free_them`) |
+| 41 | terminal caller cannot redirect release to another governance scope | ported (`audit::governance_limits::a_terminal_caller_cannot_redirect_its_release`) |
+| 77 | duplicate terminal completion releases a reservation exactly once | ported (`audit::governance_limits::every_terminal_move_releases_its_credit_once`) |
+| 101 | retry, fail, and cancel release their captured reservation | ported (`audit::governance_limits::every_terminal_move_releases_its_credit_once`) |
+| 117 | Flow lease extension renews the bound governance credit lease | fixed (`audit::governance_limits::extending_a_flow_s_lease_renews_its_credit_lease`; G54) |
+| 157 | limit cache table is owned by its supervised process | internal: Elixir's limit cache |
+| 186 | limit cache rejects every untagged entry shape instead of granting credits | internal: Elixir's limit cache |
+| 212 | strict global running policy enforces claims without caller limit options | ported with the rule on the claimed state (`audit::governance_limits::running_policies_govern_claims_and_the_strictest_one_wins`) |
+| 252 | approximate global running policy bounds prefetched claims and recycles completion | ported with the rule on the claimed state (`audit::governance_limits::running_policies_govern_claims_and_the_strictest_one_wins`); Elixir's prefetch cache is its own |
+| 309 | multi-state claims enforce the strictest resolved running policy | ported for its state rules (`audit::governance_limits::running_policies_govern_claims_and_the_strictest_one_wins`); its type-level rule is Elixir's in-process API |
+| 361 | batched and independent completion release only committed reservations | ported (`audit::governance_limits::every_terminal_move_releases_its_credit_once`) |
+| 398 | bound governance reservation is not exposed in public Flow records | ported (`audit::governance_limits::a_terminal_caller_cannot_redirect_its_release`) |
+| 409 | durable reservation ids make replayed release unable to free another flow | covered (`audit::governance_limits::a_public_release_names_its_exact_reservations`); its internal release call is Elixir's |
+| 433 | public limit release requires exact reservation ids | ported (`audit::governance_limits::a_public_release_names_its_exact_reservations`) |
+| 468 | record codec rejects governance metadata without a reservation id | internal: Elixir's record codec |
+| 487 | existing limit owner applies only monotonic capacity configurations | covered (`flow_limit::configuration_versions_guard_limit_changes`) |
+| 596 | running policy generations reconfigure an existing limit owner | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 680 | large valid policy versions are fingerprinted across governed claims | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 720 | reconciler releases a terminal reservation after post-commit release is skipped | internal: Elixir's release reconciler; the node releases a Flow's credit once the round that ends its run is durable |
+| 750 | reconciler releases governance credit after automatic max-active timeout | internal: Elixir's release reconciler; a max-active timeout ends the run like any terminal move, so its credit is released in the same round (`supervision::shard::state::credit`) |
+| 788 | duplicate cache release cannot mint credits beyond the durable chunk | internal: Elixir's limit cache |
+| 811 | cache shutdown flush returns only unused prefetched reservations | internal: Elixir's limit cache |
+| 835 | flushdb drains cached reservations before deleting governance owners | internal: Elixir's limit cache |
+| 877 | destructive cache drain keeps concurrent spends uncached until deletion finishes | internal: Elixir's limit cache |
+| 928 | cache drain owner death releases the flush fence | internal: Elixir's limit cache |
+| 961 | cache drain owner death releases entries detached before durable release | internal: Elixir's limit cache |
+| 1010 | pending cache-page release runs outside the cache server and survives owner death | internal: Elixir's limit cache |
+| 1101 | cache drain quarantines a page when durable release succeeds before discard fails | internal: Elixir's limit cache |
+| 1169 | concurrent cache drains serialize by instance | internal: Elixir's limit cache |
+| 1210 | nested cache drain rejects reentrant ownership without blocking | internal: Elixir's limit cache |
+| 1227 | cache refills after a durable clear resets its session | internal: Elixir's limit cache |
+| 1280 | flush never releases a cached reservation taken before atomic detach | internal: Elixir's limit cache |
+| 1334 | failed flush release merges detached reservations with a concurrent refill | internal: Elixir's limit cache |
+| 1379 | unknown flush release outcome fences detached reservations before reuse | internal: Elixir's limit cache |
+| 1418 | clear refuses to erase live cached reservations without a durable flush | internal: Elixir's limit cache |
+| 1453 | governed retry still wakes claim waiters after releasing its reservation | ported (`audit::governance_limits::a_governed_retry_still_wakes_a_waiting_claim`) |
 
 ## `flow_governance_limit_storage_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 16 | catalog publication codecs reject non-canonical and out-of-range records | open |
-| 47 | limit record decoders reject non-canonical external terms | open |
-| 79 | individual reservation records enforce the reservation id bound | open |
-| 85 | reservation records require the current explicit status field | open |
-| 100 | limit owner bytes stay bounded as detached reservations grow | open |
-| 149 | identical replicated spend and release commands replay idempotently | open |
-| 214 | released reservation history rotates despite lease renewal | open |
-| 274 | public spend rejects caller ids and delayed old releases cannot affect a new epoch | open |
-| 333 | expired reservation cleanup is resumable and bounded to 256 entries | open |
-| 365 | production cleaner drains expired pages without a hot-path scan | open |
-| 404 | a corrupt catalog entry does not starve a later expired limit | open |
-| 445 | cleaner tick enforces its Raft page-command budget | open |
-| 470 | shard, version, and time bounds keep owner and command terms finite | open |
-| 525 | all valid shards are bounded and large policy versions are fingerprinted | open |
-| 558 | internal preallocated spends validate ids and replay exactly | open |
-| 603 | reservation history cap rejects before detached writes | open |
-| 636 | unknown public spend outcomes preserve exact ids for compensation | open |
-| 662 | binary policy changes require an explicit monotonic config version | open |
-| 688 | current owner records reject embedded reservations as corruption | open |
-| 717 | an uncataloged current owner is repaired before it creates detached storage | open |
-| 761 | existing owner reads renewals and releases repair catalog membership | open |
-| 811 | missing spends do not register ghosts and the cleaner prunes stale members | open |
-| 833 | new owners commit before catalog publication so pruning cannot race lease creation | open |
-| 870 | durable owner publication repairs a catalog member after caller-side loss | open |
-| 925 | catalog publication batches owner reads and the idempotent catalog write | open |
-| 996 | catalog publication discards a torn intent whose owner never committed | open |
-| 1021 | catalog publication acknowledges only the valid prefix before a corrupt owner | open |
-| 1086 | catalog publication backlog is strictly bounded | open |
-| 1096 | removed metadata binding and reservation scan APIs stay unavailable | open |
+| 16 | catalog publication codecs reject non-canonical and out-of-range records | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 47 | limit record decoders reject non-canonical external terms | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 79 | individual reservation records enforce the reservation id bound | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 85 | reservation records require the current explicit status field | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 100 | limit owner bytes stay bounded as detached reservations grow | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 149 | identical replicated spend and release commands replay idempotently | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 214 | released reservation history rotates despite lease renewal | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 274 | public spend rejects caller ids and delayed old releases cannot affect a new epoch | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 333 | expired reservation cleanup is resumable and bounded to 256 entries | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 365 | production cleaner drains expired pages without a hot-path scan | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 404 | a corrupt catalog entry does not starve a later expired limit | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 445 | cleaner tick enforces its Raft page-command budget | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 470 | shard, version, and time bounds keep owner and command terms finite | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 525 | all valid shards are bounded and large policy versions are fingerprinted | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 558 | internal preallocated spends validate ids and replay exactly | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 603 | reservation history cap rejects before detached writes | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 636 | unknown public spend outcomes preserve exact ids for compensation | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 662 | binary policy changes require an explicit monotonic config version | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 688 | current owner records reject embedded reservations as corruption | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 717 | an uncataloged current owner is repaired before it creates detached storage | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 761 | existing owner reads renewals and releases repair catalog membership | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 811 | missing spends do not register ghosts and the cleaner prunes stale members | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 833 | new owners commit before catalog publication so pruning cannot race lease creation | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 870 | durable owner publication repairs a catalog member after caller-side loss | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 925 | catalog publication batches owner reads and the idempotent catalog write | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 996 | catalog publication discards a torn intent whose owner never committed | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 1021 | catalog publication acknowledges only the valid prefix before a corrupt owner | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 1086 | catalog publication backlog is strictly bounded | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
+| 1096 | removed metadata binding and reservation scan APIs stay unavailable | internal: Elixir's limit owner storage, catalog publication and cleaner (the node's limit record codec: `governance::tests::stored_limits_round_trip_and_refuse_damage`) |
 
 ## `flow_governance_models_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 11 | policy normalization keeps limits, budgets, circuits, and approvals | open |
-| 57 | policy normalization rejects unenforced limit modes without crashing | open |
-| 68 | policy normalization returns errors for every malformed enum value | open |
-| 79 | policy normalization rejects circuit windows larger than tracked samples | open |
-| 107 | resolved governance policy carries stable version metadata | open |
-| 123 | scope resolution prefers explicit governance scope over partition key | open |
-| 138 | scope resolution falls back to partition key and then auto bucket | open |
-| 150 | credit owner grants leases, spends credits, and refuses over-limit requests | open |
-| 170 | credit owner reclaims expired lease credits | open |
-| 182 | credit release by reservation id is idempotent and cannot free a sibling | open |
-| 201 | credit release rejects invalid reservation value shapes | open |
-| 225 | credit owner applies monotonic config versions and drains capacity on decreases | open |
-| 288 | credit owner marks reclaim when global credits exist on another shard | open |
-| 298 | budget fixed window resets and returns structured exhaustion | open |
-| 320 | budget commit settles actual usage and records overage | open |
-| 346 | budget release refunds unused reservation | open |
-| 361 | circuit opens after threshold and half-opens after cooldown | open |
-| 376 | default circuit success is no-op until a prior failure needs reset | open |
-| 394 | failure-rate circuit still records closed successes for exact rate math | open |
-| 409 | circuit supports sliding failure rate latency filters and slow-start probes | open |
-| 453 | circuit error filters ignore missing classes and sequential half-open probes can close | open |
-| 481 | approval request accepts exactly one terminal decision | open |
+| 11 | policy normalization keeps limits, budgets, circuits, and approvals | covered for state governance (`flow_policy_governance::state_governance_is_normalized_merged_and_kept`); Elixir's policy model on hand-built maps |
+| 57 | policy normalization rejects unenforced limit modes without crashing | covered (`flow_policy_governance::state_governance_is_normalized_merged_and_kept`, its refusals) |
+| 68 | policy normalization returns errors for every malformed enum value | covered (`flow_policy_governance::state_governance_is_normalized_merged_and_kept`, its refusals) |
+| 79 | policy normalization rejects circuit windows larger than tracked samples | covered (`flow_circuit::impossible_rules_are_refused_before_anything_is_stored`) |
+| 107 | resolved governance policy carries stable version metadata | internal: type-level governance is Elixir's in-process API (see Recorded decisions) |
+| 123 | scope resolution prefers explicit governance scope over partition key | covered (`flow_effect::refusals_are_structured_and_each_recorded`: an explicit governance_scope names the scope) |
+| 138 | scope resolution falls back to partition key and then auto bucket | covered (`flow_effect::lease::reads_default_to_the_flow_ids_auto_partition`) |
+| 150 | credit owner grants leases, spends credits, and refuses over-limit requests | covered (`flow_limit::leases_spends_and_releases_move_credits`) |
+| 170 | credit owner reclaims expired lease credits | covered (`flow_limit::expired_leases_in_use_are_reclaimed`) |
+| 182 | credit release by reservation id is idempotent and cannot free a sibling | covered (`audit::governance_limits::a_public_release_names_its_exact_reservations`) |
+| 201 | credit release rejects invalid reservation value shapes | covered (`audit::governance_limits::a_public_release_names_its_exact_reservations`) |
+| 225 | credit owner applies monotonic config versions and drains capacity on decreases | covered (`flow_limit::configuration_versions_guard_limit_changes`, `flow_limit::spends_and_lower_limits_respect_what_is_leased`) |
+| 288 | credit owner marks reclaim when global credits exist on another shard | covered (`flow_limit::leases_spends_and_releases_move_credits`: a refused shard marks a reclaim) |
+| 298 | budget fixed window resets and returns structured exhaustion | covered (`flow_budget::a_fixed_window_refuses_past_its_limit_and_resets`) |
+| 320 | budget commit settles actual usage and records overage | covered (`flow_budget::reservations_settle_with_what_was_used`) |
+| 346 | budget release refunds unused reservation | covered (`flow_budget::reservations_settle_with_what_was_used`) |
+| 361 | circuit opens after threshold and half-opens after cooldown | internal: type-level governance is Elixir's in-process API (see Recorded decisions): effect-driven circuits |
+| 376 | default circuit success is no-op until a prior failure needs reset | internal: type-level governance is Elixir's in-process API (see Recorded decisions): effect-driven circuits |
+| 394 | failure-rate circuit still records closed successes for exact rate math | internal: type-level governance is Elixir's in-process API (see Recorded decisions): effect-driven circuits |
+| 409 | circuit supports sliding failure rate latency filters and slow-start probes | internal: type-level governance is Elixir's in-process API (see Recorded decisions): effect-driven circuits |
+| 453 | circuit error filters ignore missing classes and sequential half-open probes can close | internal: type-level governance is Elixir's in-process API (see Recorded decisions): effect-driven circuits |
+| 481 | approval request accepts exactly one terminal decision | covered (`flow_approval::a_request_takes_one_terminal_decision_and_survives_restarts`) |
 
 ## `flow_governance_release_outbox_test.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 29 | release outbox codecs reject non-canonical and invalid records | open |
-| 61 | governed claims do not rewrite the limit owner to bind Flow metadata | open |
-| 81 | terminal Raft apply leaves a durable release intent when API release is skipped | open |
-| 150 | release reconciliation bounds reservations and batches Flow reads by partition | open |
-| 212 | release reconciliation fails closed when the Flow record is corrupt | open |
-| 235 | release reconciliation fails closed when the Flow shard is unavailable | open |
-| 311 | replayed duplicate intents release one reservation and acknowledge every replay | open |
-| 327 | a retained head rotates reconciliation to a nonempty later shard | open |
-| 369 | a corrupt outbox shard is reported without starving a healthy later shard | open |
-| 410 | release outbox acknowledgements are bounded to one page | open |
-| 423 | release reconciliation uses one bounded cursor format | open |
-| 442 | release classification distinguishes missing from malformed read status | open |
-| 460 | release outbox page materializes 256 cold entries with one shard batch call | open |
-| 509 | shard batch reads reject unbounded and oversized requests before dispatch | open |
-| 531 | 512 cold shard reads are deferred as one batch without blocking the shard caller | open |
-| 572 | a fail-closed head does not starve entries beyond the first page | open |
+| 29 | release outbox codecs reject non-canonical and invalid records | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 61 | governed claims do not rewrite the limit owner to bind Flow metadata | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 81 | terminal Raft apply leaves a durable release intent when API release is skipped | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 150 | release reconciliation bounds reservations and batches Flow reads by partition | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 212 | release reconciliation fails closed when the Flow record is corrupt | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 235 | release reconciliation fails closed when the Flow shard is unavailable | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 311 | replayed duplicate intents release one reservation and acknowledge every replay | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 327 | a retained head rotates reconciliation to a nonempty later shard | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 369 | a corrupt outbox shard is reported without starving a healthy later shard | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 410 | release outbox acknowledgements are bounded to one page | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 423 | release reconciliation uses one bounded cursor format | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 442 | release classification distinguishes missing from malformed read status | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 460 | release outbox page materializes 256 cold entries with one shard batch call | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 509 | shard batch reads reject unbounded and oversized requests before dispatch | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 531 | 512 cold shard reads are deferred as one batch without blocking the shard caller | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
+| 572 | a fail-closed head does not starve entries beyond the first page | internal: Elixir's release outbox and reconciler; the node releases credits once the round that frees them is durable |
 
 ## `flow_governance_test.exs`
 
