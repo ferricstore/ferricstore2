@@ -57,7 +57,7 @@ fn text(opts: &Opts<'_>, key: &str) -> Result<Option<Vec<u8>>, FlowError> {
 /// # Errors
 /// Elixir's text for an invalid option.
 pub fn parse(args: &Term) -> Result<List, FlowError> {
-    let opts = Opts::new(
+    let opts = super::guard::options(
         "FLOW.SCHEDULE.LIST",
         args,
         &[

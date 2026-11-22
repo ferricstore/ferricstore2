@@ -1,6 +1,7 @@
 //! The schedule requests a shard answers, and their dispatch.
 
 use wf_application::commands::flow::schedule::definition::Definition;
+use wf_application::commands::flow::schedule::guard::Expect;
 use wf_application::commands::flow::schedule::plan::Apply;
 use wf_application::commands::queue::ServiceError;
 
@@ -10,11 +11,13 @@ use super::{Claimed, Stored};
 
 /// What a schedule request asks of its shard.
 pub(crate) enum ScheduleOp {
-    /// Create, or with `overwrite` replace.
+    /// Create, or with `overwrite` replace (only the schedule `guard`
+    /// expects, when given).
     Create {
         key: Key,
         definition: Box<Definition>,
         overwrite: bool,
+        guard: Option<Expect>,
         now: u64,
     },
     /// Read one schedule.
@@ -27,6 +30,7 @@ pub(crate) enum ScheduleOp {
         now: u64,
         worker: Vec<u8>,
         lease_ms: u64,
+        expect: Expect,
     },
     /// Lease up to `limit` due schedules.
     ClaimDue {
@@ -44,9 +48,14 @@ pub(crate) enum ScheduleOp {
         now: u64,
     },
     /// Pause (`pause`) or resume.
-    Pause { key: Key, pause: bool, now: u64 },
+    Pause {
+        key: Key,
+        pause: bool,
+        expect: Expect,
+        now: u64,
+    },
     /// Cancel.
-    Delete { key: Key, now: u64 },
+    Delete { key: Key, expect: Expect, now: u64 },
 }
 
 /// A schedule request's answer.
@@ -72,7 +81,8 @@ impl ShardState {
         let mut claimed = Vec::new();
         let mut logged = Vec::new();
         for key in self.due_schedules(now, limit) {
-            if let Ok((one, change)) = self.schedule_claim(&key, (now, worker, lease_ms)) {
+            let claim = self.schedule_claim(&key, (now, worker, lease_ms), &Expect::default());
+            if let Ok((one, change)) = claim {
                 claimed.push(one);
                 logged.push(change);
             }
@@ -97,8 +107,9 @@ impl ShardState {
                 key,
                 definition,
                 overwrite,
+                guard,
                 now,
-            } => one(self.schedule_create(&key, *definition, overwrite, now)),
+            } => one(self.schedule_create(&key, *definition, (overwrite, guard.as_ref()), now)),
             ScheduleOp::Read { key } => (
                 Ok(ScheduleReply::One(self.schedule(&key).map(Box::new))),
                 Vec::new(),
@@ -109,7 +120,8 @@ impl ShardState {
                 now,
                 worker,
                 lease_ms,
-            } => match self.schedule_claim(&key, (now, &worker, lease_ms)) {
+                expect,
+            } => match self.schedule_claim(&key, (now, &worker, lease_ms), &expect) {
                 Ok((claimed, logged)) => (Ok(ScheduleReply::Claimed(vec![claimed])), vec![logged]),
                 Err(error) => (Err(error), Vec::new()),
             },
@@ -129,11 +141,18 @@ impl ShardState {
                 apply,
                 now,
             } => one(self.schedule_apply(&key, (&token, fence), *apply, (now, wall))),
-            ScheduleOp::Pause { key, pause, now } => one(self.schedule_pause(&key, pause, now)),
-            ScheduleOp::Delete { key, now } => match self.schedule_delete(&key, (now, wall)) {
-                Ok(logged) => (Ok(ScheduleReply::Done), vec![logged]),
-                Err(error) => (Err(error), Vec::new()),
-            },
+            ScheduleOp::Pause {
+                key,
+                pause,
+                expect,
+                now,
+            } => one(self.schedule_pause(&key, (pause, &expect), now)),
+            ScheduleOp::Delete { key, expect, now } => {
+                match self.schedule_delete(&key, &expect, (now, wall)) {
+                    Ok(logged) => (Ok(ScheduleReply::Done), vec![logged]),
+                    Err(error) => (Err(error), Vec::new()),
+                }
+            }
         }
     }
 }

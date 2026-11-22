@@ -174,10 +174,12 @@ pub(super) fn run(router: &Router, command: Command) -> Result<Term, ServiceErro
             let definition = create::definition(&request, wall)?;
             let now = definition.created_at_ms;
             let key = key_of(&request.id);
+            let guard = (request.overwrite && request.expect.any()).then_some(request.expect);
             let created = ScheduleOp::Create {
                 key,
                 definition: Box::new(definition),
                 overwrite: request.overwrite,
+                guard,
                 now,
             };
             let stored = one(op(router, created, None)?).ok_or(ServiceError::Unavailable)?;
@@ -199,6 +201,7 @@ pub(super) fn run(router: &Router, command: Command) -> Result<Term, ServiceErro
                 router,
                 ScheduleOp::Delete {
                     key: key_of(&target.id),
+                    expect: target.expect,
                     now,
                 },
                 None,
@@ -214,6 +217,7 @@ pub(super) fn run(router: &Router, command: Command) -> Result<Term, ServiceErro
                 now,
                 worker: manual_worker(),
                 lease_ms: DEFAULT_LEASE_MS,
+                expect: target.expect,
             };
             let ScheduleReply::Claimed(claimed) = op(router, claim, None)? else {
                 return Err(ServiceError::Unavailable);
@@ -273,6 +277,7 @@ fn pause(
         ScheduleOp::Pause {
             key: key_of(&target.id),
             pause,
+            expect: target.expect.clone(),
             now,
         },
         None,

@@ -24,11 +24,21 @@ const TARGET_KEYS: [&str; 14] = [
     "values",
 ];
 
-/// The normalized target: known keys only, `type` required, `state`
-/// defaulting to `queued`.
+/// Elixir's default bound on a target's inline payload and values.
+const INLINE_MAX_BYTES: usize = 8 * 1024;
+
+/// The normalized target: a map (an empty list is an empty one), known
+/// keys only, `type` required, `state` defaulting to `queued`.
 pub(super) fn normalize_target(options: &Term) -> Result<Term, FlowError> {
-    let Some(Term::Map(entries)) = options.get(b"target") else {
-        return Err(rejected("ERR flow schedule target is required"));
+    let entries = match options.get(b"target") {
+        Some(Term::Map(entries)) => entries.as_slice(),
+        Some(Term::List(items)) if items.is_empty() => &[],
+        Some(Term::List(_)) => {
+            return Err(rejected(
+                "ERR flow schedule target must be a keyword list or map",
+            ));
+        }
+        _ => return Err(rejected("ERR flow schedule target is required")),
     };
     if let Some((key, _)) = entries.iter().find(|(key, _)| {
         !TARGET_KEYS
@@ -88,6 +98,23 @@ pub(super) fn normalize_target(options: &Term) -> Result<Term, FlowError> {
     Ok(map(target))
 }
 
+/// A target's inline payload and values stay within
+/// [`INLINE_MAX_BYTES`] encoded; larger ones go by reference.
+fn inline_values(target: &Term) -> Result<(), FlowError> {
+    for key in ["payload", "values"] {
+        if let Some(value) = target.get(key.as_bytes()) {
+            let mut encoded = Vec::new();
+            let fits = value.encode(&mut encoded).is_some() && encoded.len() <= INLINE_MAX_BYTES;
+            if !fits {
+                return Err(rejected(format!(
+                    "ERR flow schedule {key} too large; use {key}_ref/value_refs"
+                )));
+            }
+        }
+    }
+    Ok(())
+}
+
 pub(super) fn target_rules(kind: Kind, target: &Term) -> Result<(), FlowError> {
     let has = |key: &[u8]| target.get(key).is_some();
     if has(b"id") && has(b"id_prefix") {
@@ -109,5 +136,5 @@ pub(super) fn target_rules(kind: Kind, target: &Term) -> Result<(), FlowError> {
             )));
         }
     }
-    Ok(())
+    inline_values(target)
 }

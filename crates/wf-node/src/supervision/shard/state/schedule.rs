@@ -7,6 +7,7 @@
 
 use wf_application::commands::flow::record::FlowMeta;
 use wf_application::commands::flow::schedule::definition::Definition;
+use wf_application::commands::flow::schedule::guard::Expect;
 use wf_application::commands::flow::schedule::plan::Apply;
 use wf_application::commands::flow::schedule::{HISTORY_MAX_EVENTS, SCHEDULE_TYPE};
 use wf_application::commands::flow::value_codec;
@@ -22,6 +23,7 @@ use wf_types::version::{Fence, TimestampMillis};
 use super::super::command::Logged;
 use super::{Key, ShardState, query};
 
+mod control;
 mod ops;
 
 pub(crate) use ops::{ScheduleOp, ScheduleReply};
@@ -149,14 +151,19 @@ impl ShardState {
             })
     }
 
-    /// Creates the schedule, or with `overwrite` replaces an unleased one.
+    /// Creates the schedule, or with `overwrite` replaces an unleased one;
+    /// a `guard` replaces only the schedule the caller read.
     pub(crate) fn schedule_create(
         &mut self,
         key: &Key,
         mut definition: Definition,
-        overwrite: bool,
+        (overwrite, guard): (bool, Option<&Expect>),
         now: u64,
     ) -> Result<(Stored, Logged), ServiceError> {
+        if let Some(guard) = guard {
+            let stored = self.stored(key).ok_or_else(not_found)?;
+            guard.check(&stored.state, stored.version)?;
+        }
         definition.secret = query::cursor_key().to_vec();
         let next = definition.next_run_at_ms.map(TimestampMillis::new);
         let data = match self.hot(key) {
@@ -216,8 +223,10 @@ impl ShardState {
         &mut self,
         key: &Key,
         (now, worker, lease_ms): (u64, &[u8], u64),
+        expect: &Expect,
     ) -> Result<(Claimed, Logged), ServiceError> {
         let stored = self.stored(key).ok_or_else(not_found)?;
+        expect.check(&stored.state, stored.version)?;
         let entry = self.hot(key).ok_or_else(not_found)?;
         let expired = entry
             .record
@@ -317,58 +326,5 @@ impl ShardState {
         let logged = self.rewrite(key, data, meta, (kind, now))?;
         let stored = self.stored(key).ok_or(ServiceError::Unavailable)?;
         Ok((stored, logged))
-    }
-
-    /// Pauses an active schedule, or resumes a paused one at its next run.
-    pub(crate) fn schedule_pause(
-        &mut self,
-        key: &Key,
-        pause: bool,
-        now: u64,
-    ) -> Result<(Stored, Logged), ServiceError> {
-        let stored = self.stored(key).ok_or_else(not_found)?;
-        let entry = self.hot(key).ok_or_else(not_found)?;
-        let mut data = data_of(&entry.record);
-        if pause {
-            if stored.state.as_slice() != b"active" {
-                return Err(rejected("ERR flow schedule is not active"));
-            }
-            data.state = b"paused".to_vec();
-        } else {
-            if stored.state.as_slice() != b"paused" {
-                return Err(rejected("ERR flow schedule is not paused"));
-            }
-            let next = stored
-                .definition
-                .next_run_at_ms
-                .ok_or_else(|| rejected("ERR flow schedule has no next run time"))?;
-            data.state = b"active".to_vec();
-            data.next_run_at = Some(TimestampMillis::new(next));
-        }
-        let meta = self.meta_of(key);
-        let logged = self.rewrite(key, data, meta, (EventKind::Transitioned, now))?;
-        let stored = self.stored(key).ok_or(ServiceError::Unavailable)?;
-        Ok((stored, logged))
-    }
-
-    /// Cancels a schedule that has not ended.
-    pub(crate) fn schedule_delete(
-        &mut self,
-        key: &Key,
-        (now, wall): (u64, u64),
-    ) -> Result<Logged, ServiceError> {
-        let stored = self.stored(key).ok_or_else(not_found)?;
-        if terminal(&stored.state) {
-            return Err(rejected("ERR flow is terminal; use FLOW.REWIND"));
-        }
-        let entry = self.hot(key).ok_or_else(not_found)?;
-        let mut data = data_of(&entry.record);
-        data.state = b"cancelled".to_vec();
-        data.lease = None;
-        data.run_state = None;
-        data.next_run_at = None;
-        let mut meta = self.meta_of(key);
-        meta.terminal_until = Some(now.max(wall).saturating_add(meta.retention_ttl_ms));
-        self.rewrite(key, data, meta, (EventKind::Cancelled, now))
     }
 }

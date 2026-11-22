@@ -156,12 +156,40 @@ pub fn without_client_time(args: &Term) -> Term {
     )
 }
 
+/// Elixir's `Internal.reject_reserved_id/2`: a client may not read or
+/// change a schedule's internal Flow (its history stays readable). A batch
+/// naming one is refused whole, as Elixir builds every item first; creates
+/// refuse it while reading (`create::parse`) and single mutations in the
+/// domain (`reduce_profile`).
+fn public_ids(command: FlowCommand) -> Result<FlowCommand, FlowError> {
+    let ids: Vec<&[u8]> = match &command {
+        FlowCommand::Get(get) => vec![&get.id],
+        FlowCommand::Many(batch) => batch.items.iter().map(|item| item.id.as_slice()).collect(),
+        FlowCommand::Rewind(rewind) => vec![&rewind.id],
+        FlowCommand::SpawnChildren(spawn) => vec![&spawn.parent_id],
+        _ => Vec::new(),
+    };
+    if ids
+        .into_iter()
+        .any(|id| id.starts_with(schedule::FLOW_ID_PREFIX.as_bytes()))
+    {
+        return Err(FlowError::rejected(
+            "ERR flow id is reserved for internal use".to_owned(),
+        ));
+    }
+    Ok(command)
+}
+
 /// Reads command `name` with options `args`.
 ///
 /// # Errors
 /// The Elixir server's refusal text for invalid options, or an unknown
 /// command.
 pub fn parse(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
+    commands(name, args).and_then(public_ids)
+}
+
+fn commands(name: &str, args: &Term) -> Result<FlowCommand, FlowError> {
     match name {
         "FLOW.CREATE" => create::parse(args).map(|create| FlowCommand::Create(Box::new(create))),
         "FLOW.CREATE_MANY" => {

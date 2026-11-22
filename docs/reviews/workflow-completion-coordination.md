@@ -66855,3 +66855,55 @@ the past, so the retention sweep removed it at once; G13 had fixed this
 only for mutations. `create_flow` now takes the shard's clock and stamps
 a terminal create's `terminal_until` from max(command time, clock), as
 `mutate::meta` does. Removing the stamp fails three tests.
+
+### Flow test audit: schedule API rules; G42-G45 (22 Nov)
+
+`flow/schedule_test.exs`, first part: its cron cases ported as
+`schedule::cron_tests` (malformed fields, aliases, steps, leap days,
+zones, both DST folds), its API rules as `audit::schedule_api` and its
+fire cases as `audit::schedule_fires` (one-shot targets with their own
+state and payload, interval reschedules without attempts, delays from
+command time, whole-recurrence views, FIRE_DUE claim waves up to the
+limit, concurrent FIRE_DUE leasing once, concurrent manual fires never
+sharing a fire number). Elixir's keyword-list and duplicate-option
+checks have no wire form.
+
+G42 closed. RED: `FLOW.SCHEDULE.CREATE` with `worker` and
+`FLOW.SCHEDULE.PAUSE` with `payload` succeeded. `schedule::guard::options`
+now refuses a known Flow option the command does not take by name;
+unknown names keep the wire's text, and GET's internal options stay
+accepted.
+
+G43 closed. RED: `expected_state` was refused as an unknown option, so a
+caller could not keep a pause, fire, delete or overwrite to the schedule
+it read. `guard::Expect` reads both guards with Elixir's texts; the shard
+checks them against the stored record inside the same op (create when
+`overwrite` and a guard are given, claim for a manual fire, pause and
+resume, delete), so read and change are one step. Elixir's wire refuses
+these names too; its API and dashboard use them, and this node's only
+API is the wire. Recorded decision: the wire takes them.
+
+G44 closed. RED: a 9 KB inline target payload was accepted into the
+definition, and a list target answered "target is required". Target
+payload and values are held to 8 KiB encoded, Elixir's default, and a
+non-empty list target gets Elixir's "must be a keyword list or map".
+
+G45 closed, found by porting "public flow APIs reject internal schedule
+namespace". RED: `FLOW.GET` of `__ferricstore_schedule__:kept` in the
+schedule's internal partition returned the internal record. Elixir
+refuses reserved ids on GET, create, start-and-claim, spawn (parent),
+every mutation and rewind, and keeps history readable. The node already
+refused creates (`create::parse`) and single mutations (the domain's
+`reduce_profile`); `flow::parse` now refuses GET, REWIND, SPAWN_CHILDREN
+and every batch item by name, a batch whole as Elixir builds all items
+first (it answered a per-item error before). Recorded decision: the
+refusal follows the command's other option checks; Elixir checks the
+name right after the id's shape, which only changes which error a
+malformed command sees first.
+
+Mutation checks: removing the strict option check, either guard
+comparison, either guard's shape check, the guard at create, claim,
+pause or delete, the composition's guard hand-off, the inline bound,
+the values bound, or the list-target text each fail a test (13 of 13);
+removing the reserved-id check, or its GET, batch, rewind or spawn arm,
+each fail one (5 of 5).

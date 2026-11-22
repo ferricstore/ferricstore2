@@ -11,7 +11,10 @@
 
 pub mod create;
 pub mod cron;
+#[cfg(test)]
+mod cron_tests;
 pub mod definition;
+pub mod guard;
 pub mod list;
 pub mod plan;
 pub mod target;
@@ -22,6 +25,7 @@ use super::FlowError;
 use super::opts::{MAX_EXACT, Opts};
 use super::term::Term;
 use crate::routing::Partition;
+use guard::{Expect, options};
 
 /// The internal Flow type of schedules.
 pub const SCHEDULE_TYPE: &str = "__ferricstore_schedule";
@@ -41,6 +45,8 @@ pub struct Target {
     pub id: Vec<u8>,
     /// Command time, when given.
     pub now_ms: Option<u64>,
+    /// The state and version the caller read.
+    pub expect: Expect,
 }
 
 /// `FLOW.SCHEDULE.CREATE`, read when it runs.
@@ -50,6 +56,8 @@ pub struct Request {
     pub id: Vec<u8>,
     /// Replace an existing schedule.
     pub overwrite: bool,
+    /// With `overwrite`, the state and version the caller read.
+    pub expect: Expect,
     /// The options.
     pub options: Term,
 }
@@ -143,8 +151,9 @@ pub(super) fn integer(opts: &Opts<'_>, key: &str) -> Result<Option<u64>, FlowErr
 
 fn simple(name: &str, args: &Term, extra: &[&str]) -> Result<(Target, Option<u64>), FlowError> {
     let mut allowed = vec!["id", "now_ms", "deadline_ms"];
+    allowed.extend_from_slice(&Expect::KEYS);
     allowed.extend_from_slice(extra);
-    let opts = Opts::new(name, args, &allowed)?;
+    let opts = options(name, args, &allowed)?;
     let id = id(&opts)?;
     let now_ms = integer(&opts, "now_ms")?;
     let fire_at_ms = if extra.contains(&"fire_at_ms") {
@@ -152,13 +161,14 @@ fn simple(name: &str, args: &Term, extra: &[&str]) -> Result<(Target, Option<u64
     } else {
         None
     };
-    Ok((Target { id, now_ms }, fire_at_ms))
+    let expect = Expect::read(&opts)?;
+    Ok((Target { id, now_ms, expect }, fire_at_ms))
 }
 
 /// `FLOW.SCHEDULE.CREATE`: the id and `overwrite` now, the options when
 /// it runs.
 fn parse_create(name: &str, args: &Term) -> Result<Command, FlowError> {
-    let opts = Opts::new(
+    let opts = options(
         name,
         args,
         &[
@@ -178,10 +188,13 @@ fn parse_create(name: &str, args: &Term) -> Result<Command, FlowError> {
             "overlap_retry_ms",
             "max_fires",
             "end_at_ms",
+            "expected_state",
+            "expected_version",
             "deadline_ms",
         ],
     )?;
     let id = id(&opts)?;
+    let expect = Expect::read(&opts)?;
     let overwrite = match opts.get("overwrite") {
         None => false,
         Some(Term::Bool(flag)) => *flag,
@@ -195,21 +208,24 @@ fn parse_create(name: &str, args: &Term) -> Result<Command, FlowError> {
         entries
             .into_iter()
             .filter(|(key, value)| {
-                !matches!(key.as_slice(), b"id" | b"overwrite" | b"deadline_ms")
-                    && *value != Term::Nil
+                !matches!(
+                    key.as_slice(),
+                    b"id" | b"overwrite" | b"deadline_ms" | b"expected_state" | b"expected_version"
+                ) && *value != Term::Nil
             })
             .collect(),
     );
     Ok(Command::Create(Request {
         id,
         overwrite,
+        expect,
         options,
     }))
 }
 
 /// `FLOW.SCHEDULE.FIRE_DUE`.
 fn parse_fire_due(name: &str, args: &Term) -> Result<Command, FlowError> {
-    let opts = Opts::new(
+    let opts = options(
         name,
         args,
         &[
@@ -252,10 +268,22 @@ pub fn parse(name: &str, args: &Term) -> Result<Command, FlowError> {
     match name {
         "FLOW.SCHEDULE.CREATE" => parse_create(name, args),
         "FLOW.SCHEDULE.GET" => {
-            let opts = Opts::new(name, args, &["id", "deadline_ms"])?;
+            // Elixir's internal routing and payload options stay its own.
+            let opts = options(
+                name,
+                args,
+                &[
+                    "id",
+                    "partition_key",
+                    "payload",
+                    "payload_max_bytes",
+                    "deadline_ms",
+                ],
+            )?;
             Ok(Command::Get(Target {
                 id: id(&opts)?,
                 now_ms: None,
+                expect: Expect::default(),
             }))
         }
         "FLOW.SCHEDULE.DELETE" => {

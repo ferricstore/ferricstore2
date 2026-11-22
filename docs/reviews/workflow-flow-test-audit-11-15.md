@@ -25,6 +25,34 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
   it, so a malformed one answered "not found"; it is checked first (1 to
   64 bytes of letters, digits, `_-:.`), with Elixir's "invalid query
   index id" text.
+- G42 (closed): the schedule commands silently ignored a Flow option they
+  do not take (`worker` on CREATE, `payload` on PAUSE). Each now takes
+  only its own options, as Elixir's `validate_option_fields/3`: a known
+  Flow option is refused with "ERR unsupported flow schedule option X",
+  a name no command knows keeps the wire's "unknown flow option" text,
+  and GET keeps accepting (and ignoring) Elixir's `partition_key`,
+  `payload` and `payload_max_bytes`.
+- G43 (closed): operator changes to a schedule had no
+  `expected_state`/`expected_version` guards, so a stale pause, fire or
+  delete applied over a newer change. CREATE with `overwrite`, FIRE,
+  PAUSE, RESUME and DELETE now take them, checked in the shard against the
+  stored state and version ("ERR flow schedule changed concurrently");
+  a guarded overwrite needs the schedule to exist. Elixir reaches these
+  through its API and dashboard; the node's only API is the wire, so the
+  wire takes them.
+- G44 (closed): a schedule target was not bounded: a 9 KB inline payload
+  or values map was stored in the definition, and a list target answered
+  "target is required". Inline payload and values are now held to 8 KiB
+  encoded ("too large; use payload_ref/value_refs"), and a non-empty list
+  target is refused as not a keyword list or map, as Elixir's.
+- G45 (closed): public Flow commands could reach a schedule's internal
+  Flow: `FLOW.GET` on `__ferricstore_schedule__:<id>` in its internal
+  partition returned the record, and REWIND, SPAWN_CHILDREN (as parent)
+  and batch items were not refused by name. As Elixir's
+  `Internal.reject_reserved_id/2`, they are now refused with "ERR flow id
+  is reserved for internal use" (a batch whole); creates and single
+  mutations were already refused, and the schedule's history stays
+  readable.
 
 ## `flow/governance_argument_errors_test.exs`
 
@@ -1310,40 +1338,40 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 
 | Line | Test | Status |
 |---|---|---|
-| 59 | delay schedule defaults are based on the cluster-adjusted clock | open |
-| 85 | one-shot schedule fires target flow once and completes schedule | open |
-| 132 | schedule views preserve the complete recurrence configuration | open |
-| 198 | scheduled targets preserve Flow create resource governance and activity | open |
-| 244 | fire_due drains multiple bounded claim waves without losing schedules | open |
-| 277 | fire_due returns after an exact full dispatch wave below the requested limit | open |
-| 307 | interval schedule reschedules without consuming retry attempts | open |
-| 368 | concurrent schedule firing leases a due schedule once | open |
-| 412 | concurrent manual fires fence before creating distinct targets | open |
-| 467 | recurring schedule rejects fixed target id | open |
-| 476 | schedule target rejects ambiguous fixed and generated ids | open |
-| 486 | schedule creation rejects timing fields from another kind | open |
-| 506 | schedule creation rejects ambiguous absolute start timestamps | open |
-| 518 | overlap retry is accepted only by queue_after_previous | open |
-| 532 | public flow APIs reject internal schedule namespace | open |
-| 550 | public callers cannot forge the internal schedule capability | open |
-| 574 | internal schedule creation rejects non-active states | open |
-| 611 | schedule replacement cannot mutate ordinary flow records | open |
-| 649 | non-claim schedule replacement rejects scheduler-internal states | open |
-| 709 | schedule APIs reject non-keyword option lists without raising | open |
-| 724 | schedule APIs report invalid identifiers before storage access | open |
-| 736 | schedule creation rejects unknown and duplicate options | open |
-| 756 | schedule creation rejects malformed, unknown, and duplicate target fields | open |
-| 778 | schedule listing rejects unknown and duplicate options | open |
-| 786 | schedule operations reject unknown and duplicate options before storage access | open |
-| 812 | schedule listing rejects invalid states and inverted time ranges | open |
-| 820 | manual fire without a timestamp uses the current command time | open |
-| 841 | schedule get keeps internal routing and payload options authoritative | open |
-| 867 | stored schedules remain hydratable when the public payload return limit changes | open |
-| 901 | schedule rejects large inline target payloads | open |
-| 913 | schedule rejects large inline target named values | open |
-| 925 | schedule rejects reserved target ids and prefixes | open |
-| 946 | schedule rejects target definitions that cannot create a flow | open |
-| 968 | schedule time inputs are bounded and cron conversion never raises | open |
+| 59 | delay schedule defaults are based on the cluster-adjusted clock | ported (`audit::schedule_fires::a_delay_starts_from_the_command_time`; the node's command clock is its wall clock, Elixir's hybrid-clock hook is its own) |
+| 85 | one-shot schedule fires target flow once and completes schedule | ported (`audit::schedule_fires::a_one_shot_creates_its_target_once`) |
+| 132 | schedule views preserve the complete recurrence configuration | ported (`audit::schedule_fires::views_keep_the_whole_recurrence`; its internal-record field checks are Elixir's) |
+| 198 | scheduled targets preserve Flow create resource governance and activity | internal: Elixir's pluggable `FerricStore.ResourceLimits` probe (acquire, activity, release callbacks); the node has no such hook, and a scheduled target is a FLOW.CREATE on its own shard (`composition::schedule::fire`) |
+| 244 | fire_due drains multiple bounded claim waves without losing schedules | ported (`audit::schedule_fires::fire_due_drains_every_claim_wave_up_to_its_limit`) |
+| 277 | fire_due returns after an exact full dispatch wave below the requested limit | ported (`audit::schedule_fires::fire_due_drains_every_claim_wave_up_to_its_limit`) |
+| 307 | interval schedule reschedules without consuming retry attempts | ported (`audit::schedule_fires::an_interval_reschedules_without_spending_attempts`) |
+| 368 | concurrent schedule firing leases a due schedule once | ported (`audit::schedule_fires::concurrent_fire_due_leases_a_schedule_once`) |
+| 412 | concurrent manual fires fence before creating distinct targets | ported (`audit::schedule_fires::concurrent_manual_fires_number_their_targets_apart`: the node's shard serializes the two fires, so one is refused while the other holds the lease, or both fire under numbers 1 and 2; never two targets for one number) |
+| 467 | recurring schedule rejects fixed target id | covered (`schedule::tests::targets_and_end_conditions_follow_the_kind`) |
+| 476 | schedule target rejects ambiguous fixed and generated ids | covered (`schedule::tests::targets_and_end_conditions_follow_the_kind`) |
+| 486 | schedule creation rejects timing fields from another kind | covered (`schedule::tests::timing_fields_belong_to_their_kind`) |
+| 506 | schedule creation rejects ambiguous absolute start timestamps | covered (`schedule::tests::timing_fields_belong_to_their_kind`) |
+| 518 | overlap retry is accepted only by queue_after_previous | covered (`schedule::tests::targets_and_end_conditions_follow_the_kind`) |
+| 532 | public flow APIs reject internal schedule namespace | fixed (`audit::schedule_namespace::public_flow_commands_keep_out_of_the_schedule_namespace`; G45: FLOW.GET returned a schedule's internal record) |
+| 550 | public callers cannot forge the internal schedule capability | internal: Elixir's in-process capability token; on the wire `__ferricstore_internal__` is an unknown option (`audit::schedule_namespace::public_flow_commands_keep_out_of_the_schedule_namespace`) |
+| 574 | internal schedule creation rejects non-active states | internal: `Flow.create_internal/3`, the scheduler's own create; the node's schedule ops write only active schedules (`supervision::shard::state::schedule`) |
+| 611 | schedule replacement cannot mutate ordinary flow records | internal: `Router.flow_schedule_replace/2`; the node's schedule ops read only records of the schedule type (`ShardState::stored`) |
+| 649 | non-claim schedule replacement rejects scheduler-internal states | internal: `Router.flow_schedule_replace/2` and its metadata checks; the node rewrites schedules only through its own ops |
+| 709 | schedule APIs reject non-keyword option lists without raising | internal: Elixir's keyword-list option shape; a wire payload is a map (`ERR native ... payload must be a map`) |
+| 724 | schedule APIs report invalid identifiers before storage access | ported (`audit::schedule_api::schedule_ids_are_non_empty_texts`) |
+| 736 | schedule creation rejects unknown and duplicate options | fixed (`audit::schedule_api::each_command_takes_only_its_own_options`; G42; duplicate options have no wire form) |
+| 756 | schedule creation rejects malformed, unknown, and duplicate target fields | fixed (`audit::schedule_api::a_target_is_a_map_that_can_create_a_flow`; G44: a list target answered "target is required"; duplicate fields have no wire form) |
+| 778 | schedule listing rejects unknown and duplicate options | fixed (`audit::schedule_api::each_command_takes_only_its_own_options`; G42) |
+| 786 | schedule operations reject unknown and duplicate options before storage access | fixed (`audit::schedule_api::each_command_takes_only_its_own_options`; G42) |
+| 812 | schedule listing rejects invalid states and inverted time ranges | ported (`audit::schedule_api::listing_names_its_states_and_keeps_ranges_ordered`) |
+| 820 | manual fire without a timestamp uses the current command time | ported (`audit::schedule_fires::a_manual_fire_without_a_time_uses_the_command_time`) |
+| 841 | schedule get keeps internal routing and payload options authoritative | ported (`audit::schedule_api::get_keeps_its_internal_routing_and_payload_options`; G42 keeps them accepted) |
+| 867 | stored schedules remain hydratable when the public payload return limit changes | internal: Elixir's application env `flow_payload_return_max_bytes`; the node reads a definition from its own record, with no runtime payload-return setting |
+| 901 | schedule rejects large inline target payloads | fixed (`audit::schedule_api::inline_target_values_stay_small`; G44) |
+| 913 | schedule rejects large inline target named values | fixed (`audit::schedule_api::inline_target_values_stay_small`; G44) |
+| 925 | schedule rejects reserved target ids and prefixes | ported (`audit::schedule_api::a_target_is_a_map_that_can_create_a_flow`; `schedule::tests::targets_and_end_conditions_follow_the_kind`) |
+| 946 | schedule rejects target definitions that cannot create a flow | ported (`audit::schedule_api::a_target_is_a_map_that_can_create_a_flow`) |
+| 968 | schedule time inputs are bounded and cron conversion never raises | ported (`audit::schedule_api::time_inputs_stay_within_exact_and_calendar_bounds`) |
 | 1013 | cron fire at the calendar ceiling completes after emitting exactly one target | open |
 | 1062 | duplicate target id must belong to the schedule before it is treated as idempotent | open |
 | 1094 | predictable scheduler correlation cannot forge target ownership | open |
@@ -1370,7 +1398,7 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 | 1999 | one-shot and delay schedules reject recurring end conditions | open |
 | 2018 | manual schedule fire targets one schedule immediately | open |
 | 2043 | pause and resume controls schedule firing | open |
-| 2075 | operator schedule mutations reject stale expected state and version | open |
+| 2075 | operator schedule mutations reject stale expected state and version | fixed (`audit::schedule_api::operator_changes_keep_to_their_expected_state_and_version`, `audit::schedule_api::a_guarded_overwrite_needs_the_schedule_as_expected`; G43) |
 | 2123 | schedule lifecycle writes explicit signal history events | open |
 | 2154 | overlap policy skip advances recurring schedule without creating a new target | open |
 | 2185 | strict overlap state reads use the replicated state-only path | open |
@@ -1386,22 +1414,22 @@ fixed it, or why it is Elixir-internal. Gaps continue the numbering of
 | 2624 | overlap policy fail_schedule marks recurring schedule failed | open |
 | 2656 | manual fail_schedule overlap persists the same terminal details | open |
 | 2692 | schedule delete cancels future schedule | open |
-| 2725 | invalid cron is rejected during schedule creation | open |
-| 2734 | recurrence planning failures do not create orphan targets | open |
-| 2799 | recurrence planning failures terminate an overlap skip | open |
-| 2836 | manual overlap skip persists recurrence planning failures | open |
-| 2876 | invalid cron range is rejected during schedule creation | open |
-| 2888 | cron fields reject empty comma elements before searching the time window | open |
-| 2902 | cron rejects impossible calendar combinations before searching minutes | open |
-| 2915 | cron accepts leap-day schedules independently of mutable application limits | open |
-| 2939 | cron schedule supports aliases, ranges, and steps | open |
-| 2988 | cron schedule supports weekday aliases | open |
-| 3004 | cron schedule matches wall-clock time in configured timezone | open |
+| 2725 | invalid cron is rejected during schedule creation | ported (`schedule::cron_tests::malformed_expressions_are_refused_with_their_reason`) |
+| 2734 | recurrence planning failures do not create orphan targets | internal: a stored definition corrupted in place; its reason text is ported (`schedule::cron_tests::malformed_expressions_are_refused_with_their_reason`) |
+| 2799 | recurrence planning failures terminate an overlap skip | internal: a stored definition corrupted in place during an overlap skip |
+| 2836 | manual overlap skip persists recurrence planning failures | internal: a stored definition corrupted in place during a manual overlap skip |
+| 2876 | invalid cron range is rejected during schedule creation | ported (`schedule::cron_tests::malformed_expressions_are_refused_with_their_reason`) |
+| 2888 | cron fields reject empty comma elements before searching the time window | ported (`schedule::cron_tests::malformed_expressions_are_refused_with_their_reason`) |
+| 2902 | cron rejects impossible calendar combinations before searching minutes | ported (`schedule::cron_tests::malformed_expressions_are_refused_with_their_reason`) |
+| 2915 | cron accepts leap-day schedules independently of mutable application limits | ported (`schedule::cron_tests::aliases_ranges_steps_and_leap_days_plan_their_runs`) |
+| 2939 | cron schedule supports aliases, ranges, and steps | ported (`schedule::cron_tests::aliases_ranges_steps_and_leap_days_plan_their_runs`) |
+| 2988 | cron schedule supports weekday aliases | ported (`schedule::cron_tests::aliases_ranges_steps_and_leap_days_plan_their_runs`) |
+| 3004 | cron schedule matches wall-clock time in configured timezone | ported (`schedule::cron_tests::zones_and_daylight_saving_folds_plan_wall_clock_times`) |
 | 3027 | a schedule fire that fails transiently is released for the next poll | open |
-| 3073 | cron schedule handles repeated DST wall-clock minute as distinct due times | open |
-| 3100 | cron chooses the earliest instant across multiple DST fallback wall minutes | open |
+| 3073 | cron schedule handles repeated DST wall-clock minute as distinct due times | ported (`schedule::cron_tests::zones_and_daylight_saving_folds_plan_wall_clock_times`) |
+| 3100 | cron chooses the earliest instant across multiple DST fallback wall minutes | ported (`schedule::cron_tests::zones_and_daylight_saving_folds_plan_wall_clock_times`) |
 | 3113 | due schedule is not missed after hibernation removes its hot due key | open |
-| 3194 | cron schedule rejects invalid timezone | open |
+| 3194 | cron schedule rejects invalid timezone | ported (`schedule::cron_tests::malformed_expressions_are_refused_with_their_reason`) |
 | 3207 | cron schedule fires on matching UTC minutes and reschedules to next match | open |
 | 3263 | runtime bookkeeping cannot make an accepted schedule unreadable | open |
 | 3317 | schedule creation reserves hydration capacity for bounded runtime state | open |
