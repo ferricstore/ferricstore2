@@ -40,7 +40,7 @@ fn flow_get_options_are_read_by_the_application() -> TestResult {
         reply.body,
         wf_api_tcp::response::error(
             wf_api_tcp::response::STATUS_ERROR,
-            "ERR FLOW.GET option bogus is not supported by this server"
+            "ERR native unknown flow option bogus"
         )?
     );
     Ok(())

@@ -161,6 +161,13 @@ Gaps found so far:
   states were taken), and a lease deadline past the exact integer ceiling
   had its own text. A claim's states times partitions stay within 64, as
   Elixir bounds every claim, and the deadline refusal uses Elixir's text.
+- G35 (closed): every command refused any option outside its own list
+  ("ERR <command> option X is not supported by this server"), so a create
+  carrying `worker` or `lease_ms` failed where Elixir ignores them. The
+  node now reads options as Elixir's native server does: a known Flow
+  option a command does not read is ignored, `return` is refused where
+  the command takes none ("ERR flow return option is not supported"), and
+  any other key is "ERR native unknown flow option X".
 - P1 (open, performance): a batch's shared payload is logged in each
   Flow's after-image; Elixir logs it once per command. Clients see the
   same results; the log carries the payload once per Flow.
@@ -870,25 +877,25 @@ Gaps found so far:
 
 | Line | Test | Status |
 |---|---|---|
-| 7 | create_attrs preserves default state, auto partition, and named value options | open |
-| 23 | create_attrs accepts infinity while validating compact query metadata | open |
-| 33 | schedule discovery metadata is accepted only through the internal schedule path | open |
-| 63 | transition_attrs rejects direct transition into running | open |
-| 71 | create attrs rejects unleased running state before replicated mutation preparation | open |
-| 81 | batch and spawned child creation share the unleased running rejection | open |
-| 99 | create_attrs rejects timestamps that cannot be represented exactly by Flow indexes | open |
-| 116 | lease mutations reject deadlines outside the exact Flow timestamp range | open |
+| 7 | create_attrs preserves default state, auto partition, and named value options | ported (`audit::create_rules::a_create_defaults_its_state_and_partition_and_takes_infinity`; its value options are in `audit::value_refs`) |
+| 23 | create_attrs accepts infinity while validating compact query metadata | ported (same test; stored as no limit, as Elixir's `resolve_max_active_ms` stores it) |
+| 33 | schedule discovery metadata is accepted only through the internal schedule path | ported (`audit::create_rules::schedule_metadata_is_not_a_client_option`; its internal path is the node's schedule thread) |
+| 63 | transition_attrs rejects direct transition into running | ported (`audit::reclaim_batches::a_transition_moves_state_due_time_and_history_but_never_into_running`) |
+| 71 | create attrs rejects unleased running state before replicated mutation preparation | fixed (`audit::create_rules::running_is_refused_on_every_create_path`; G35: `worker` and `lease_ms` were refused as unsupported options) |
+| 81 | batch and spawned child creation share the unleased running rejection | ported (same test) |
+| 99 | create_attrs rejects timestamps that cannot be represented exactly by Flow indexes | ported (`audit::create_rules::times_and_lease_deadlines_stay_within_the_exact_integer_range`) |
+| 116 | lease mutations reject deadlines outside the exact Flow timestamp range | ported (same test) |
 
 ## `flow_test/sections/flow_list_auto_partitions_merges_hot_ids_before_hydration.exs`
 
 | Line | Test | Status |
 |---|---|---|
-| 6 | Flow auto partition key list exposes all hidden buckets in order | open |
-| 15 | Flow list without partition merges hot auto partitions by update order | open |
-| 44 | Flow list applies reverse ordering before count on an explicit partition | open |
-| 76 | Flow list without partition preserves sparse auto partition ordering | open |
-| 108 | Flow list return meta trims heavy fields through embedded API | open |
-| 142 | Flow list without partition fetches more hot records from a skewed auto partition | open |
+| 6 | Flow auto partition key list exposes all hidden buckets in order | covered: the node's auto buckets are `__flow_auto__:0` to `255` (`Partition::Auto(u8)`); created Flows' buckets are checked in `audit::partition_scopes` |
+| 15 | Flow list without partition merges hot auto partitions by update order | internal: Elixir's in-process `Flow.list` across auto buckets; an FQL collection read names one partition |
+| 44 | Flow list applies reverse ordering before count on an explicit partition | ported (`audit::list_order::a_list_in_one_partition_orders_before_its_count`) |
+| 76 | Flow list without partition preserves sparse auto partition ordering | internal: as line 15 |
+| 108 | Flow list return meta trims heavy fields through embedded API | ported (`audit::list_order::a_projected_list_leaves_heavy_fields_out`; `return: :meta` as a projection) |
+| 142 | Flow list without partition fetches more hot records from a skewed auto partition | internal: as line 15 |
 
 ## `flow/many_item_opts_test.exs`
 

@@ -66695,3 +66695,26 @@ past 2^53-1 answered "exceeds the exact integer limit" where Elixir says
 whose states times partitions pass 64 (each counting at least one), as
 Elixir's `ClaimFilter` does for every claim; dropping the check, refusing
 at 64 or ignoring the partitions each fail the test.
+
+### Flow test audit: create rules and option handling; list order (22 Nov)
+
+`flow/mutation_attrs_test.exs` ported as the wire shows it
+(`audit::create_rules`). G35 closed. RED: a create with `state: running`,
+`worker` and `lease_ms` answered "ERR FLOW.CREATE option worker is not
+supported by this server" where Elixir answers that running is only
+entered by a claim. Elixir's native server checks option names against
+one list for every Flow command (`@known_flow_options`, 156 names) and
+ignores the ones a command does not read, refusing only `return` (in
+`MutationAttrs.validate_opts`) and unknown names. Decision: adopt that
+rule in `Opts::new` for drop-in compatibility (a client that works with
+Elixir must not fail on extra known options); unknown names are still
+refused, with Elixir's text. The known list is copied, sorted, into
+`opts.rs`. One TCP adapter test expected the old text for `bogus`.
+Refusing known options, ignoring `return` and ignoring unknown names
+each fail a test. Its `max_active_ms: :infinity` is the pre-resolution
+attribute; stored, it is no limit, as the node already stored it.
+
+`flow_test/sections/flow_list_auto_partitions_merges_hot_ids_before_
+hydration.exs`: a reverse list in one partition and a projected list
+ported (`audit::list_order`); its lists across auto buckets are Elixir's
+in-process `Flow.list`.
