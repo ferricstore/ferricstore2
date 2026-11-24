@@ -21,7 +21,7 @@ use wf_types::identity::RecordId;
 use wf_types::version::TimestampMillis;
 
 use super::super::command::Logged;
-use super::super::image;
+use super::super::image::{self, Kept};
 use super::{Entry, Key, Parts, ShardState, flow_key};
 
 /// A command's reply and the change to log, if any.
@@ -147,14 +147,15 @@ impl ShardState {
     }
 
     /// Logs the stored Flow under `key` as its after-image.
-    pub(super) fn after_image(&self, key: &Key) -> Result<Logged, ServiceError> {
+    pub(super) fn after_image(&mut self, key: &Key) -> Result<Logged, ServiceError> {
         self.after_image_events(key, 1)
     }
 
     /// The after-image of `key` carrying the `count` events its change
-    /// appended, so replay keeps what the record alone does not show.
+    /// appended and the value versions it kept, so replay keeps what the
+    /// record alone does not show; those versions are logged from now on.
     pub(super) fn after_image_events(
-        &self,
+        &mut self,
         key: &Key,
         count: usize,
     ) -> Result<Logged, ServiceError> {
@@ -173,8 +174,15 @@ impl ShardState {
                 entry.meta.as_deref(),
                 Some(latest.as_slice()),
             ),
+            Kept::Unlogged,
         )
         .ok_or(ServiceError::Unavailable)?;
+        if let Some(meta) = self
+            .hot_mut(key)
+            .and_then(|entry| entry.meta.as_deref_mut())
+        {
+            meta.retained_unlogged.clear();
+        }
         Ok(Logged::Put {
             partition: key.0.clone(),
             image,

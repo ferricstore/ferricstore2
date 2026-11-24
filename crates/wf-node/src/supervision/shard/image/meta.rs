@@ -23,11 +23,21 @@ use wf_application::commands::flow::record::{FlowMeta, NamedValue, Retained, Ret
 
 use super::super::command::{Malformed, Reader, bin, optional_bin, optional_u64};
 
+/// Which kept value versions an image carries (perf note P2).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Kept {
+    /// Every one: a snapshot or cold file holds the whole Flow.
+    All,
+    /// Those no logged after-image carries yet: replay adds them to the
+    /// ones the Flow had, so a change logs only the versions it kept.
+    Unlogged,
+}
+
 fn term(out: &mut Vec<u8>, value: &Term) -> Option<()> {
     value.encode(out)
 }
 
-pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
+pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta, kept: Kept) -> Option<()> {
     for lineage in [
         &meta.parent_flow_id,
         &meta.parent_partition_key,
@@ -114,12 +124,20 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta) -> Option<()> {
     }
     // Kept value versions (ADR-016 phase C): kind, name, version, term
     // flag and bytes each.
-    out.extend_from_slice(&u32::try_from(meta.retained.len()).ok()?.to_be_bytes());
-    for ((kind, name, version), kept) in &meta.retained {
+    let versions: Vec<_> = match kept {
+        Kept::All => meta.retained.iter().collect(),
+        Kept::Unlogged => meta
+            .retained_unlogged
+            .iter()
+            .filter_map(|key| meta.retained.get_key_value(key))
+            .collect(),
+    };
+    out.extend_from_slice(&u32::try_from(versions.len()).ok()?.to_be_bytes());
+    for ((kind, name, version), version_bytes) in versions {
         out.push(*kind);
         bin(out, name)?;
         out.extend_from_slice(&version.to_be_bytes());
-        bin(out, &kept.bytes)?;
+        bin(out, &version_bytes.bytes)?;
     }
     // A stored value as the payload (audit gap G16).
     optional_bin(out, meta.payload_ref.as_deref())?;
@@ -227,6 +245,7 @@ pub(super) fn decode(reader: &mut Reader<'_>) -> Result<FlowMeta, Malformed> {
             refs
         },
         retained: decode_retained(reader)?,
+        retained_unlogged: Vec::new(),
         payload_ref: reader.optional_bin()?,
     })
 }

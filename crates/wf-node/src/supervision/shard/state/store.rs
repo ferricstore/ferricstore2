@@ -45,6 +45,29 @@ impl ShardState {
         );
     }
 
+    /// Stores a logged after-image: it carries the value versions its
+    /// change kept, so the Flow keeps the ones it had too (perf note P2).
+    pub(super) fn put_logged(
+        &mut self,
+        key: Key,
+        (record, priority, mut meta): (WorkflowRecord, u8, Option<Box<FlowMeta>>),
+        events: &[HistoryEvent],
+    ) {
+        let mut previous = self.take_entry(&key);
+        let had = previous
+            .as_mut()
+            .and_then(|previous| previous.meta.as_deref_mut());
+        if let (Some(meta), Some(had)) = (meta.as_deref_mut(), had) {
+            // The few logged versions go into the many kept, not the
+            // other way round.
+            let mut kept = std::mem::take(&mut had.retained);
+            kept.extend(std::mem::take(&mut meta.retained));
+            meta.retained = kept;
+        }
+        let flow = self.stamped((record, priority, meta));
+        self.write(key, flow, previous, events);
+    }
+
     /// Stores a whole Flow with the events its change appended, in order;
     /// a change that went through several versions at once (a step chain,
     /// or its replay) appends each.

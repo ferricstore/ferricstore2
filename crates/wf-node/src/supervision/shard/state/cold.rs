@@ -19,7 +19,7 @@ use std::sync::mpsc::{Receiver, Sender, channel};
 use wf_application::commands::queue::ServiceError;
 use wf_storage::cold::{ColdQueue, ColdStore, Location};
 
-use super::super::image;
+use super::super::image::{self, Kept};
 use super::events::History;
 use super::{Entry, Key, Map, Parts, ShardState};
 
@@ -127,6 +127,7 @@ fn encode(key: &Key, entry: &Entry) -> Option<Vec<u8>> {
         &key.1,
         entry.priority,
         (&entry.record, entry.meta.as_deref(), None),
+        Kept::All,
     )?;
     let (packed, count, last) = entry.history.packed();
     let mut out = Vec::with_capacity(record.len().saturating_add(packed.len()).saturating_add(12));
@@ -179,6 +180,14 @@ impl ShardState {
     /// The Flow under `key` when it is in memory.
     pub(super) fn hot(&self, key: &Parts) -> Option<&Entry> {
         match self.records.get(key)? {
+            Slot::Hot(entry) | Slot::Warm(entry, _) => Some(entry),
+            Slot::Cold(_) => None,
+        }
+    }
+
+    /// [`Self::hot`], to change in place.
+    pub(super) fn hot_mut(&mut self, key: &Parts) -> Option<&mut Entry> {
+        match self.records.get_mut(key)? {
             Slot::Hot(entry) | Slot::Warm(entry, _) => Some(entry),
             Slot::Cold(_) => None,
         }

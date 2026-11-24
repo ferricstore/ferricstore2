@@ -12,8 +12,11 @@
 mod history;
 mod holdings;
 mod meta;
+mod one;
 
 pub(crate) use holdings::{Holding, HoldingEntry, encode as encode_holdings};
+pub(crate) use meta::Kept;
+pub(crate) use one::{decode_one, encode_one};
 
 use wf_application::commands::flow::history::HistoryEvent;
 use wf_application::commands::flow::record::FlowMeta;
@@ -66,6 +69,7 @@ pub(crate) fn encode_record(
     id: &[u8],
     priority: u8,
     (record, flow_meta, events): Parts<'_>,
+    kept: Kept,
 ) -> Option<()> {
     bin(out, &partition.name())?;
     bin(out, id)?;
@@ -103,7 +107,7 @@ pub(crate) fn encode_record(
         None => out.push(0),
         Some(flow_meta) => {
             out.push(1);
-            meta::encode(out, flow_meta)?;
+            meta::encode(out, flow_meta, kept)?;
         }
     }
     match events {
@@ -192,26 +196,6 @@ fn decode_record(reader: &mut Reader<'_>, limits: AdmissionLimits) -> Result<Res
         meta,
         history,
     })
-}
-
-/// Encodes one record alone, as a logged after-image.
-pub(crate) fn encode_one(
-    partition: &Partition,
-    id: &[u8],
-    priority: u8,
-    record: Parts<'_>,
-) -> Option<Vec<u8>> {
-    let mut out = Vec::new();
-    encode_record(&mut out, partition, id, priority, record)?;
-    Some(out)
-}
-
-/// Decodes a record encoded by [`encode_one`].
-pub(crate) fn decode_one(bytes: &[u8]) -> Option<Restored> {
-    let limits = AdmissionLimits::new(MAX_INLINE_BYTES, usize::MAX, 1).ok()?;
-    let mut reader = Reader(bytes);
-    let restored = decode_record(&mut reader, limits).ok()?;
-    reader.0.is_empty().then_some(restored)
 }
 
 /// Decodes a whole image; `None` when it is not exactly a count and that

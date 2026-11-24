@@ -251,8 +251,9 @@ impl ShardState {
             }
             Logged::Put { image: bytes, .. } => match image::decode_one(bytes) {
                 Some(restored) => {
-                    // An after-image carries the events its change appended.
-                    self.put_events(
+                    // An after-image carries the events its change appended
+                    // and the value versions it kept.
+                    self.put_logged(
                         flow_key(restored.partition, restored.id),
                         (
                             restored.record,

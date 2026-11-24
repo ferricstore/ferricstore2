@@ -79,10 +79,13 @@ name it, so a rewind restores it and `FLOW.HISTORY values: true` reads it
 
 Phase C landed on 21 Nov: `FlowMeta::retained` keeps replaced and dropped
 named values and replaced payloads, results and errors (with their term
-flag) by version, bounded by the history cap; reads by reference, rewind
-and `FLOW.HISTORY values: true` use them, and they travel with the Flow's
-image to disk. Named value versions now rise above every version the name
-has had, so a reference never names two values.
+flag) by version, until the Flow is removed (audit gap G37 revised);
+reads by reference, rewind and `FLOW.HISTORY values: true` use them, and
+they travel with the Flow's image to disk. Named value versions now rise
+above every version the name has had, so a reference never names two
+values. A logged after-image carries only the versions its change kept
+(24 Nov, perf note P2), and replay adds them to those the Flow had;
+snapshots, cold files and the portable image carry every one.
 
 **Phase D: large values of hot Flows on disk** above a size threshold, with
 a small cache.

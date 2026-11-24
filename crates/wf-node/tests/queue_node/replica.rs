@@ -88,6 +88,49 @@ fn get(node: &QueueNode, id: &str) -> TestResult<Term> {
     Ok(call(|reply| node.execute(command, reply))??)
 }
 
+fn run(node: &QueueNode, name: &str, entries: &[(&str, Term)]) -> TestResult<Term> {
+    let options = entries
+        .iter()
+        .map(|(key, value)| (key.as_bytes().to_vec(), value.clone()))
+        .collect();
+    let command = flow::parse(name, &Term::Map(options))?;
+    Ok(call(|reply| node.execute(command, reply))??)
+}
+
+/// Creates Flow `kept` and replaces its payload three times: its payload
+/// references and payloads, oldest first, as `FLOW.VALUE.MGET` takes and
+/// answers them.
+fn kept_versions(node: &QueueNode) -> TestResult<(Term, Term)> {
+    let reference = |node: &QueueNode| -> TestResult<Term> {
+        Ok(get(node, "kept")?
+            .get(b"payload_ref")
+            .cloned()
+            .unwrap_or(Term::Nil))
+    };
+    let create = [
+        ("id", Term::text("kept")),
+        ("type", Term::text("kept")),
+        ("state", Term::text("a")),
+        ("payload", Term::text("v0")),
+    ];
+    run(node, "FLOW.CREATE", &create)?;
+    let (mut refs, mut payloads) = (vec![reference(node)?], vec![Term::text("v0")]);
+    for (at, (from, to)) in [("a", "b"), ("b", "a"), ("a", "b")].into_iter().enumerate() {
+        let payload = format!("v{}", at.saturating_add(1));
+        let transition = [
+            ("id", Term::text("kept")),
+            ("from_state", Term::text(from)),
+            ("to_state", Term::text(to)),
+            ("fencing_token", Term::Int(0)),
+            ("payload", Term::text(&payload)),
+        ];
+        run(node, "FLOW.TRANSITION", &transition)?;
+        refs.push(reference(node)?);
+        payloads.push(Term::text(&payload));
+    }
+    Ok((Term::List(refs), Term::List(payloads)))
+}
+
 fn state_of(node: &QueueNode, id: &str) -> TestResult<Term> {
     Ok(get(node, id)?.get(b"state").cloned().unwrap_or(Term::Nil))
 }
@@ -221,6 +264,8 @@ fn a_member_the_leader_s_log_no_longer_reaches_installs_a_snapshot() -> TestResu
     );
     // C misses the first batch; B snapshots it and drops its log.
     drop(nodes.remove(&c));
+    // A Flow's kept value versions reach C in B's image too.
+    let (refs, payloads) = kept_versions(nodes.get(&a).ok_or("no a")?)?;
     let first = batch(nodes.get(&a).ok_or("no a")?, "w1-", 40, 10)?;
     snapshotted(&path, b)?;
     // Without A, only B is up to date, so it leads, and C needs B's snapshot.
@@ -240,6 +285,8 @@ fn a_member_the_leader_s_log_no_longer_reaches_installs_a_snapshot() -> TestResu
     assert_eq!(completed.len(), 12);
     assert_states(leader, "w1-", 40, &completed)?;
     assert_states(leader, "w2-", 10, &completed)?;
+    let read = [("refs", refs)];
+    assert_eq!(run(leader, "FLOW.VALUE.MGET", &read)?, payloads);
     // B restarts from its snapshot and log and takes a third batch; without
     // C, only B has it, so B leads with everything.
     drop(nodes.remove(&a));

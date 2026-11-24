@@ -2,7 +2,7 @@
 
 use wf_application::commands::flow::history;
 
-use super::super::image::{self, Restored};
+use super::super::image::{self, Kept, Restored};
 use super::cold::{Slot, Stub};
 use super::events::History;
 use super::{Entry, Key, ShardState, flow_key};
@@ -34,6 +34,7 @@ impl ShardState {
                     entry.meta.as_deref(),
                     Some(events.as_slice()),
                 ),
+                Kept::All,
             )?;
         }
         self.encode_tail(now, &mut out)?;

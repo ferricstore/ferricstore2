@@ -3,7 +3,7 @@
 //! install it without this one's files; and its installation into a fresh
 //! shard, whose finished Flows then move to its own cold files.
 
-use super::super::image;
+use super::super::image::{self, Kept};
 use super::cold::Slot;
 use super::{Entry, Key, ShardState};
 
@@ -50,6 +50,7 @@ impl ShardState {
                     entry.meta.as_deref(),
                     Some(events.as_slice()),
                 ),
+                Kept::All,
             )?;
         }
         self.encode_tail(now, &mut out)?;

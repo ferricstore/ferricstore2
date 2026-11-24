@@ -67109,3 +67109,48 @@ memory and reports `sort`, which is what it does, with the same results.
 Mutation checks: removing the state merge, the batch forms, the two-value
 `ATTRIBUTE` width, `MIXED`, the retry nesting, the `PING` echo, the
 pipeline's batch mapping or its pairs each fail a test (9 of 9).
+
+### Perf note P2: kept versions logged once, not per change (24 Nov)
+
+P2 was worse than recorded. Since G37 (revised) a Flow keeps every
+replaced value version until it is removed, and each change logged the
+Flow's after-image with every kept version in it, so a Flow that replaces
+its payload on each change logged all its earlier payloads again: log
+bytes grew with the square of its changes. RED
+(`log_growth::a_change_logs_about_one_payload_however_many_versions_were_kept`,
+60 changes each replacing a 1 KiB payload): the last ten changes logged
+580,665 bytes against 70,575 for the first ten (changes 2-11). Now 23,730
+and 23,730.
+
+Fix: `FlowMeta::retain` also notes the version in `retained_unlogged`; a
+logged after-image (`Kept::Unlogged`) carries only those and then clears
+them, as it already carries only the events its change appended; replay
+(`put_logged`) adds them to the versions the Flow had, inserting the few
+into the many. Snapshots, cold files and the portable image a replica
+installs (`Kept::All`) still hold every version. A logged Put never
+replaces a different Flow under the same key: creation loads a Flow from
+its cold file before its duplicate check, and removals are logged. Logs
+written before this carry every version, which replay's merge reads the
+same way. `encode_one`/`decode_one` moved to `image/one.rs` (`image.rs`
+was at the 400-line limit).
+
+Tests: `every_kept_version_reads_after_the_log_replays` (six versions read
+by reference after a restart that replays only the log),
+`kept_versions_survive_a_snapshot_and_a_move_to_disk` (a snapshot, a
+change after it, then the finished Flow read back from its cold file),
+and the replica install test now also reads a Flow's kept versions on the
+member that installed another's image.
+
+Mutation checks (9 of 10 fail a test): logging every version, not clearing
+after logging, no merge on replay, a merge that drops the kept versions,
+`retain` not noting the version, and snapshot, cold-file and export images
+carrying only the unlogged ones (each call site, and in the encoder). The
+one that survives moves `hot_mut`'s warm slot to `None`: an after-image
+always follows the `put` that stored its Flow hot, so it cannot be
+observed; the arm mirrors `hot`.
+
+Still open in P2: kept versions stay in memory while a Flow is hot (Elixir
+keeps them on disk; ADR-016 phase D), and each change copies the Flow's
+fields including them: with 3,000 kept 1 KiB versions a change took
+4.97 ms against 4.50 ms when new (release build, one fsync per change);
+without kept versions it stays flat (4.54 and 4.25 ms).

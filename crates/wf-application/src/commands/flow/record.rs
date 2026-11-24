@@ -13,7 +13,8 @@ mod view;
 
 pub use include::{DEFAULT_PAYLOAD_MAX_BYTES, Include, Values};
 pub use retained::{
-    RETAINED_ERROR, RETAINED_NAMED, RETAINED_PAYLOAD, RETAINED_RESULT, Retained, RetainedMap,
+    RETAINED_ERROR, RETAINED_NAMED, RETAINED_PAYLOAD, RETAINED_RESULT, Retained, RetainedKey,
+    RetainedMap,
 };
 pub use view::{View, attached, hydrated, payload_fields};
 
@@ -82,6 +83,10 @@ pub struct FlowMeta {
     pub governance: Option<Box<super::effect::Governance>>,
     /// Replaced value versions (ADR-016 phase C; see [`retained`]).
     pub retained: RetainedMap,
+    /// Kept versions no logged after-image carries yet: an after-image logs
+    /// only these and replay adds them to the ones the Flow had, so a change
+    /// logs the versions it kept, not every one (perf note P2).
+    pub retained_unlogged: Vec<RetainedKey>,
     /// References attached by name (`value_refs`, audit gap G9): values
     /// this Flow names but does not own.
     pub value_refs: BTreeMap<Vec<u8>, Vec<u8>>,
@@ -116,6 +121,7 @@ impl Default for FlowMeta {
             indexed_state_meta: None,
             governance: None,
             retained: BTreeMap::new(),
+            retained_unlogged: Vec::new(),
             value_refs: BTreeMap::new(),
             payload_ref: None,
         }

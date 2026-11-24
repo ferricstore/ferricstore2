@@ -12,8 +12,11 @@ pub const RETAINED_ERROR: u8 = b'e';
 /// A replaced or dropped named value.
 pub const RETAINED_NAMED: u8 = b'n';
 
+/// A kept version's kind, name and version.
+pub type RetainedKey = (u8, Vec<u8>, u64);
+
 /// Kept versions by kind, name and version.
-pub type RetainedMap = std::collections::BTreeMap<(u8, Vec<u8>, u64), Retained>;
+pub type RetainedMap = std::collections::BTreeMap<RetainedKey, Retained>;
 
 /// One kept value version, in the value codec's stored form.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -25,13 +28,17 @@ pub struct Retained {
 impl FlowMeta {
     /// Keeps a replaced version for as long as the Flow lives: Elixir keeps
     /// a replaced value readable after its events leave the history, until
-    /// retention cleanup removes the Flow (audit gap G37).
+    /// retention cleanup removes the Flow (audit gap G37). The version
+    /// waits in [`FlowMeta::retained_unlogged`] for the next logged
+    /// after-image.
     pub fn retain(&mut self, (kind, name, version): (u8, &[u8], u64), bytes: &[u8]) {
         if version == 0 {
             return;
         }
+        let key = (kind, name.to_vec(), version);
+        self.retained_unlogged.push(key.clone());
         self.retained.insert(
-            (kind, name.to_vec(), version),
+            key,
             Retained {
                 bytes: bytes.to_vec(),
             },
