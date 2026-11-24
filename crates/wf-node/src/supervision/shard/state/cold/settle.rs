@@ -7,10 +7,10 @@ use wf_application::commands::flow::schedule::SCHEDULE_TYPE;
 use wf_storage::cold::{ColdBatch, Location};
 
 use super::super::{Key, ShardState};
-use super::{HOUR_MS, Slot, values};
+use super::{Answer, HOUR_MS, Slot, values};
 
 /// A durable image of a Flow that finished, as the writer thread answers.
-pub(super) struct Ack {
+pub(in super::super) struct Ack {
     key: Key,
     version: u64,
     location: Location,
@@ -19,8 +19,9 @@ pub(super) struct Ack {
 
 impl ShardState {
     /// Ends a round: Flows loaded and left unchanged go back to their
-    /// stubs, Flows whose images are durable become stubs, and Flows that
-    /// turned terminal go to the cold writer.
+    /// stubs, Flows whose images are durable become stubs, Flows that
+    /// turned terminal go to the cold writer, and so do the kept versions
+    /// of running Flows over the budget (ADR-016 phase D).
     pub(crate) fn cool(&mut self) {
         for key in std::mem::take(&mut self.cold.warmed) {
             if let Some(Slot::Warm(_, stub)) = self.records.get(&*key) {
@@ -28,10 +29,11 @@ impl ShardState {
                 self.records.insert(key, Slot::Cold(stub));
             }
         }
-        while let Ok(acks) = self.cold.acks.1.try_recv() {
+        while let Ok(answer) = self.cold.acks.1.try_recv() {
             self.cold.in_flight = self.cold.in_flight.saturating_sub(1);
-            self.settle(acks);
+            self.answered(answer);
         }
+        self.spill();
         let demoted = std::mem::take(&mut self.cold.demote);
         let mut images = Vec::new();
         let mut pending = Vec::new();
@@ -64,7 +66,7 @@ impl ShardState {
                     Err(_) => Vec::new(),
                 };
                 // A stopped shard no longer needs its answer.
-                drop(sender.send(acks));
+                drop(sender.send(Answer::Cold(acks)));
             }),
         });
     }
@@ -79,12 +81,19 @@ impl ShardState {
                 deadline.saturating_duration_since(std::time::Instant::now())
             });
             match self.cold.acks.1.recv_timeout(left) {
-                Ok(acks) => {
+                Ok(answer) => {
                     self.cold.in_flight = self.cold.in_flight.saturating_sub(1);
-                    self.settle(acks);
+                    self.answered(answer);
                 }
                 Err(_) => break,
             }
+        }
+    }
+
+    fn answered(&mut self, answer: Answer) {
+        match answer {
+            Answer::Cold(acks) => self.settle(acks),
+            Answer::Kept(moved) => self.settle_kept(moved),
         }
     }
 
@@ -97,7 +106,7 @@ impl ShardState {
             return None;
         }
         let (removal, _) = self.removal_slot(entry)?;
-        let bytes = super::encode(key, entry)?;
+        let bytes = super::encode(key, entry, &self.cold.store)?;
         Some(((removal / HOUR_MS, bytes), entry.record.version(), removal))
     }
 

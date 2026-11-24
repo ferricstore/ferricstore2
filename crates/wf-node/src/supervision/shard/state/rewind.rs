@@ -25,9 +25,11 @@ use wf_domain::history::EventKind;
 use wf_domain::workflow::WorkflowRecord;
 use wf_domain::workflow::admission::{AdmissionLimits, MAX_INLINE_BYTES};
 use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
+use wf_storage::cold::ColdStore;
 use wf_types::version::{Fence, TimestampMillis};
 
 use super::super::command::Logged;
+use super::super::image;
 use super::flow::Executed;
 use super::{Key, ShardState, flow_key};
 
@@ -61,7 +63,7 @@ fn slot(meta: &mut FlowMeta, kind: u8) -> &mut u64 {
 /// the current ones or a kept version (ADR-016 phase C). The value it
 /// replaces is kept, so its references still read.
 fn restore(
-    meta: &mut FlowMeta,
+    (meta, store): (&mut FlowMeta, &ColdStore),
     kind: u8,
     named: Option<u64>,
     current: Option<&[u8]>,
@@ -76,7 +78,10 @@ fn restore(
         None => None,
         Some(wanted) => {
             let kept = meta.retained(kind, b"", wanted).ok_or_else(not_found)?;
-            Some((wanted, kept.bytes.clone()))
+            // On disk (phase D), a version that cannot be read fails the
+            // rewind rather than reading as missing.
+            let bytes = image::kept_bytes(store, kept).ok_or(ServiceError::Unavailable)?;
+            Some((wanted, bytes.into_owned()))
         }
     };
     if let Some(bytes) = current {
@@ -92,14 +97,24 @@ fn restore(
 /// The payload, result and error an event named; a `reason` replaces the
 /// error, keeping the one it replaces.
 fn restore_all(
-    meta: &mut FlowMeta,
+    (meta, store): (&mut FlowMeta, &ColdStore),
     record: &WorkflowRecord,
     target: &HistoryEvent,
     request: &Rewind,
     next: u64,
 ) -> Result<Restored, ServiceError> {
-    let payload = restore(meta, RETAINED_PAYLOAD, target.refs[0], record.payload())?;
-    let result = restore(meta, RETAINED_RESULT, target.refs[1], record.result())?;
+    let payload = restore(
+        (meta, store),
+        RETAINED_PAYLOAD,
+        target.refs[0],
+        record.payload(),
+    )?;
+    let result = restore(
+        (meta, store),
+        RETAINED_RESULT,
+        target.refs[1],
+        record.result(),
+    )?;
     let error = match &request.reason {
         Some(reason) => {
             if let Some(old) = record.error() {
@@ -108,7 +123,12 @@ fn restore_all(
             meta.error_version = next;
             Some(reason.clone())
         }
-        None => restore(meta, RETAINED_ERROR, target.refs[2], record.error())?,
+        None => restore(
+            (meta, store),
+            RETAINED_ERROR,
+            target.refs[2],
+            record.error(),
+        )?,
     };
     Ok((payload, result, error))
 }
@@ -120,9 +140,9 @@ type Restored = (Option<Vec<u8>>, Option<Vec<u8>>, Option<Vec<u8>>);
 /// ones it leaves out or replaces are kept.
 fn named_values(
     event: &HistoryEvent,
-    meta: &mut FlowMeta,
+    (meta, store): (&mut FlowMeta, &ColdStore),
 ) -> Result<BTreeMap<Vec<u8>, NamedValue>, ServiceError> {
-    let restored = event_values(event, meta)?;
+    let restored = event_values(event, meta, store)?;
     let replaced: Vec<(Vec<u8>, NamedValue)> = meta
         .values
         .iter()
@@ -142,6 +162,7 @@ fn named_values(
 fn event_values(
     event: &HistoryEvent,
     meta: &FlowMeta,
+    store: &ColdStore,
 ) -> Result<BTreeMap<Vec<u8>, NamedValue>, ServiceError> {
     let current = &meta.values;
     let Some(text) = &event.extras[0] else {
@@ -162,18 +183,19 @@ fn event_values(
                 (Some(value), Some(version)) if value.version == version => {
                     Ok((name.clone(), value.clone()))
                 }
-                (_, Some(version)) => meta
-                    .retained(RETAINED_NAMED, name, version)
-                    .map(|kept| {
-                        (
-                            name.clone(),
-                            NamedValue {
-                                version,
-                                bytes: kept.bytes.clone(),
-                            },
-                        )
-                    })
-                    .ok_or_else(not_found),
+                (_, Some(version)) => {
+                    let kept = meta
+                        .retained(RETAINED_NAMED, name, version)
+                        .ok_or_else(not_found)?;
+                    let bytes = image::kept_bytes(store, kept).ok_or(ServiceError::Unavailable)?;
+                    Ok((
+                        name.clone(),
+                        NamedValue {
+                            version,
+                            bytes: bytes.into_owned(),
+                        },
+                    ))
+                }
                 (_, None) => Err(not_found()),
             }
         })
@@ -270,8 +292,10 @@ impl ShardState {
             .version()
             .checked_add(1)
             .ok_or(ServiceError::Unavailable)?;
-        let (payload, result, error) = restore_all(&mut meta, record, &target, request, next)?;
-        meta.values = named_values(&target, &mut meta)?;
+        let store = self.cold_store();
+        let (payload, result, error) =
+            restore_all((&mut meta, store), record, &target, request, next)?;
+        meta.values = named_values(&target, (&mut meta, store))?;
         meta.value_refs = event_refs(&target);
         (meta.attributes, meta.state_meta) = fields(&target)?;
         meta.rewound_to = Some(request.to_event.clone());

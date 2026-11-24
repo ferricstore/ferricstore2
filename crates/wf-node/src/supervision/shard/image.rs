@@ -13,12 +13,14 @@ mod history;
 mod holdings;
 mod meta;
 mod one;
+mod stored;
 
 pub(crate) use holdings::{Holding, HoldingEntry, encode as encode_holdings};
-pub(crate) use meta::Kept;
+pub(crate) use meta::{Kept, kept_bytes};
 pub(crate) use one::{
     SHARED as SHARED_PAYLOAD, decode_one, encode_one, payload_split, with_payload,
 };
+pub(crate) use stored::{Stored, StoredEntry, encode as encode_stored};
 
 use wf_application::commands::flow::history::HistoryEvent;
 use wf_application::commands::flow::record::FlowMeta;
@@ -71,7 +73,7 @@ pub(crate) fn encode_record(
     id: &[u8],
     priority: u8,
     (record, flow_meta, events): Parts<'_>,
-    kept: Kept,
+    kept: Kept<'_>,
 ) -> Option<()> {
     bin(out, &partition.name())?;
     bin(out, id)?;
@@ -244,6 +246,7 @@ pub(crate) fn decode(bytes: &[u8]) -> Option<Image> {
         stubs.push(decode_stub(&mut reader).ok()?);
     }
     let holdings = holdings::decode(&mut reader).ok()?;
+    let stored = stored::decode(&mut reader).ok()?;
     reader.0.is_empty().then_some(Image {
         records,
         shared,
@@ -251,6 +254,7 @@ pub(crate) fn decode(bytes: &[u8]) -> Option<Image> {
         governance,
         stubs,
         holdings,
+        stored,
     })
 }
 
@@ -266,6 +270,8 @@ pub(crate) struct Image {
     pub(crate) stubs: Vec<StubImage>,
     /// References Flows hold to values they do not own (audit gap G10).
     pub(crate) holdings: Vec<Holding>,
+    /// Kept versions on disk (ADR-016 phase D).
+    pub(crate) stored: Vec<Stored>,
 }
 
 /// A finished Flow on disk as a shard image keeps it (ADR-016): where its

@@ -50,12 +50,13 @@ impl ShardState {
                     entry.meta.as_deref(),
                     Some(events.as_slice()),
                 ),
-                Kept::All,
+                Kept::All(self.cold_store()),
             )?;
         }
         self.encode_tail(now, &mut out)?;
         image::encode_stubs(&mut out, &[])?;
         self.encode_holdings(&mut out)?;
+        image::encode_stored(&mut out, &[])?;
         Some(out)
     }
 
@@ -86,6 +87,9 @@ impl ShardState {
         }
         for holding in decoded.holdings {
             fresh.restore_holdings(holding.partition, holding.id, &holding.refs);
+        }
+        for kept in decoded.stored {
+            fresh.restore_stored(kept.partition, kept.id, (kept.kept, kept.location));
         }
         *self = fresh;
         Some(())

@@ -27,7 +27,16 @@ pub(super) fn shards(
     let cold = ColdStore::open(&directory.join("cold")).map_err(|_| NodeError::Cold)?;
     let queue = Arc::new(ColdQueue::spawn(&cold).map_err(|_| NodeError::Thread)?);
     let states = (0..config.shards)
-        .map(|_| ShardState::new(config.retention_ms, (Arc::clone(&cold), Arc::clone(&queue))))
+        .map(|_| {
+            ShardState::new(
+                config.retention_ms,
+                (
+                    Arc::clone(&cold),
+                    Arc::clone(&queue),
+                    config.kept_memory_bytes,
+                ),
+            )
+        })
         .collect();
     Ok((cold, states))
 }

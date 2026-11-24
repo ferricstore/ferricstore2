@@ -53,6 +53,14 @@ impl ShardState {
         (record, priority, mut meta): (WorkflowRecord, u8, Option<Box<FlowMeta>>),
         events: &[HistoryEvent],
     ) {
+        if meta
+            .as_deref()
+            .is_some_and(|meta| !meta.retained.is_empty())
+        {
+            // It may now keep more than the budget in memory (ADR-016
+            // phase D).
+            self.kept_new(&key);
+        }
         let mut previous = self.take_entry(&key);
         let had = previous
             .as_mut()

@@ -1,30 +1,35 @@
 //! Payload, result and error versions, current or kept (ADR-016 phase C),
 //! as history with `values: true` shows them.
 
+use std::borrow::Cow;
 use wf_application::commands::flow::record::{
     FlowMeta, RETAINED_ERROR, RETAINED_PAYLOAD, RETAINED_RESULT, hydrated,
 };
+
 use wf_application::commands::flow::term::Term;
 use wf_domain::workflow::WorkflowRecord;
+use wf_storage::cold::ColdStore;
+
+use super::super::super::image;
 
 /// The stored bytes of a payload, result or error version, current or kept
-/// (ADR-016 phase C).
+/// (ADR-016 phase C), read from `store` when on disk (phase D).
 pub(in crate::supervision::shard::state) fn version_bytes<'a>(
-    record: &'a WorkflowRecord,
-    meta: &'a FlowMeta,
+    (record, meta): (&'a WorkflowRecord, &'a FlowMeta),
+    store: &ColdStore,
     kind: u8,
     version: u64,
-) -> Option<&'a [u8]> {
+) -> Option<Cow<'a, [u8]>> {
     let (current, stored) = match kind {
         RETAINED_PAYLOAD => (record.payload(), meta.payload_version),
         RETAINED_RESULT => (record.result(), meta.result_version),
         _ => (record.error(), meta.error_version),
     };
     match current {
-        Some(bytes) if stored == version => Some(bytes),
+        Some(bytes) if stored == version => Some(Cow::Borrowed(bytes)),
         _ => meta
             .retained(kind, b"", version)
-            .map(|kept| kept.bytes.as_slice()),
+            .and_then(|kept| image::kept_bytes(store, kept)),
     }
 }
 
@@ -32,8 +37,8 @@ pub(in crate::supervision::shard::state) fn version_bytes<'a>(
 /// `FLOW.HISTORY values: true` shows them.
 pub(in crate::supervision::shard::state) fn with_values(
     event: Term,
-    record: &WorkflowRecord,
-    meta: &FlowMeta,
+    (record, meta): (&WorkflowRecord, &FlowMeta),
+    store: &ColdStore,
     (refs, max_bytes): ([Option<u64>; 3], u64),
 ) -> Term {
     let Term::List(mut parts) = event else {
@@ -49,11 +54,12 @@ pub(in crate::supervision::shard::state) fn with_values(
             // Replaced versions are kept while the Flow lives (audit gap
             // G37); each is shown as Elixir's history hydration shows it:
             // the value and its size, omitted above `max_bytes` (G36).
-            let Some(bytes) = version.and_then(|v| version_bytes(record, meta, kind, v)) else {
+            let Some(bytes) = version.and_then(|v| version_bytes((record, meta), store, kind, v))
+            else {
                 continue;
             };
             fields.extend(
-                hydrated(name, bytes, max_bytes)
+                hydrated(name, &bytes, max_bytes)
                     .into_iter()
                     .map(|(field, value)| (field.as_bytes().to_vec(), value)),
             );

@@ -187,12 +187,12 @@ Gaps found so far:
   request could admit unbounded work. Both are capped as batches are, at
   100000 items (G15), and a step batch's items times steps at 100000,
   with Elixir's texts.
-- P2 (open, memory): a hot Flow keeps its replaced value versions in
-  memory (`FlowMeta::retained`) until it is removed, where Elixir keeps
+- P2 (closed 24 Nov): a hot Flow kept its replaced value versions in
+  memory (`FlowMeta::retained`) until it was removed, where Elixir keeps
   them in its value store on disk; a long-lived Flow that replaces values
-  often grows. A finished Flow carries them to its cold file. Its log
-  half is closed (24 Nov): a change logs only the versions it kept, not
-  every one.
+  often grew. Log half: a change logs only the versions it kept, not every
+  one. Memory half (ADR-016 phase D): past `kept_memory_bytes` (16 KiB) a
+  running Flow's versions go to cold files and stay readable from there.
 - P1 (closed 24 Nov): a batch's shared payload was logged in each Flow's
   after-image; a run of after-images holding one payload is now one log
   record with the payload once, as Elixir logs it once per command.

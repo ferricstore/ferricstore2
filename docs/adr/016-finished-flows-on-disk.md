@@ -87,8 +87,31 @@ values. A logged after-image carries only the versions its change kept
 (24 Nov, perf note P2), and replay adds them to those the Flow had;
 snapshots, cold files and the portable image carry every one.
 
-**Phase D: large values of hot Flows on disk** above a size threshold, with
-a small cache.
+**Phase D: kept value versions of hot Flows on disk.** A running Flow
+keeps every replaced version until it is removed (phase C), so a
+long-lived Flow that replaces values often grew in memory without bound.
+
+Phase D landed on 24 Nov. Once the versions a running Flow keeps in memory
+(each at least 64 bytes; smaller ones cost about as much on disk) pass
+`kept_memory_bytes` (16 KiB by default), the end of the round hands them
+to the cold writer, in a file group of their own that rolls by size only.
+Once durable, each becomes a reference (file, offset, length) that holds
+its file until its last copy goes; reads by reference, history values and
+rewinds read the file, and the page cache is the cache. A snapshot image
+carries the versions in memory in each record and names those on disk in
+a section of its own (image version 17); a logged after-image carries only
+versions still in memory; a cold image and a portable image read the ones
+on disk back, so a finished Flow's file holds its whole image and the
+value files can go. Short Flows stay under the budget and never write a
+value twice. What stays in memory per version on disk is its key and
+reference (about 100 bytes). Measured: 100 Flows replacing 1 KiB payloads
+200 times each grew RSS by 10 MB against 27 MB with every version in
+memory, for about 3% more time per change.
+
+Cold files and value files now share one lifetime rule: an unused file
+waits until a snapshot begun after it became unused is written, since
+replay from the last snapshot reads the files it names (see the review
+entry of 24 Nov); a replicated member deletes it at once.
 
 ## Consequences
 

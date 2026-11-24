@@ -122,8 +122,8 @@ impl ShardState {
                     if query.values {
                         super::value::with_values(
                             term,
-                            &entry.record,
-                            meta,
+                            (&entry.record, meta),
+                            self.cold_store(),
                             (event.refs, query.max_bytes),
                         )
                     } else {
@@ -174,14 +174,20 @@ impl ShardState {
                 entry.meta.as_deref(),
                 Some(latest.as_slice()),
             ),
-            Kept::Unlogged,
+            Kept::Unlogged(self.cold_store()),
         )
         .ok_or(ServiceError::Unavailable)?;
+        let mut kept_new = false;
         if let Some(meta) = self
             .hot_mut(key)
             .and_then(|entry| entry.meta.as_deref_mut())
         {
+            kept_new = !meta.retained_unlogged.is_empty();
             meta.retained_unlogged.clear();
+        }
+        if kept_new {
+            // It may now keep more than the budget in memory (phase D).
+            self.kept_new(key);
         }
         Ok(Logged::Put {
             partition: key.0.clone(),

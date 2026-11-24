@@ -6,6 +6,8 @@
 //! A shared value lives under its reference until its optional deadline.
 //! Reads resolve a reference's hash tag to a partition of this shard.
 
+use std::borrow::Cow;
+
 use wf_application::commands::flow::history::{HistoryEvent, HistoryKind};
 use wf_application::commands::flow::keys;
 use wf_application::commands::flow::record::{FlowMeta, NamedValue, RETAINED_NAMED};
@@ -17,6 +19,8 @@ use wf_domain::workflow::WorkflowRecord;
 use wf_domain::workflow::admission::{AdmissionLimits, MAX_INLINE_BYTES};
 use wf_domain::workflow::restoration::{WorkflowRecordData, restore_record};
 use wf_types::version::TimestampMillis;
+
+use super::super::image;
 
 mod attached;
 mod held;
@@ -331,9 +335,10 @@ impl ShardState {
                 if stored == version {
                     bytes.map(<[u8]>::to_vec)
                 } else {
-                    // A replaced version (ADR-016 phase C).
+                    // A replaced version (ADR-016 phase C), on disk or not.
                     meta.retained(kind, b"", version)
-                        .map(|kept| kept.bytes.clone())
+                        .and_then(|kept| image::kept_bytes(self.cold_store(), kept))
+                        .map(Cow::into_owned)
                 }
             }
             ValueRef::Named {
@@ -347,7 +352,8 @@ impl ShardState {
                     Some(value) if value.version == version => Some(value.bytes.clone()),
                     _ => meta
                         .retained(RETAINED_NAMED, &name, version)
-                        .map(|kept| kept.bytes.clone()),
+                        .and_then(|kept| image::kept_bytes(self.cold_store(), kept))
+                        .map(Cow::into_owned),
                 }
             }
             ValueRef::Shared => None,

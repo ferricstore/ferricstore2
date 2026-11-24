@@ -32,8 +32,9 @@ use super::router::{Router, shard_index};
 /// governance ledger and kept value versions) and each shard's governance
 /// records, its history (with timeout and rewind extras), the shard's
 /// shared values, its Flow type policies (ADR-014) and the stubs of its
-/// finished Flows on disk (ADR-016).
-const VERSION: u8 = 16;
+/// finished Flows on disk (ADR-016); version 17 names the kept value
+/// versions on disk of running Flows (ADR-016 phase D).
+const VERSION: u8 = 17;
 
 struct Progress {
     next: u64,
@@ -122,6 +123,12 @@ pub(crate) fn load(
                 .and_then(|index| states.get_mut(index))
                 .ok_or(NodeError::SnapshotImage)?;
             state.restore_holdings(holding.partition, holding.id, &holding.refs);
+        }
+        for kept in decoded.stored {
+            let state = shard_index(&kept.partition, shards)
+                .and_then(|index| states.get_mut(index))
+                .ok_or(NodeError::SnapshotImage)?;
+            state.restore_stored(kept.partition, kept.id, (kept.kept, kept.location));
         }
     }
     Ok(Cut::new(id, base, count))

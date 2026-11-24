@@ -52,6 +52,10 @@ use started::Started;
 /// scheduler sleeps between empty polls.
 const SCHEDULE_POLL: Duration = Duration::from_secs(1);
 
+/// Bytes of replaced value versions a running Flow keeps in memory by
+/// default (ADR-016 phase D): a dozen or so typical payloads.
+const KEPT_MEMORY_BYTES: u64 = 16 * 1024;
+
 /// How often the snapshot thread checks whether a snapshot is due.
 const SNAPSHOT_CHECK: Duration = Duration::from_millis(250);
 
@@ -72,6 +76,9 @@ pub struct QueueNodeConfig {
     pub schedule_poll: Option<Duration>,
     /// Per-shard backlog limits for client requests (ADR-017).
     pub admission: Admission,
+    /// Bytes of replaced value versions a running Flow keeps in memory;
+    /// beyond them its versions go to disk (ADR-016 phase D).
+    pub kept_memory_bytes: u64,
 }
 
 impl Default for QueueNodeConfig {
@@ -86,6 +93,7 @@ impl Default for QueueNodeConfig {
             snapshot_segments: 2,
             schedule_poll: Some(SCHEDULE_POLL),
             admission: Admission::default(),
+            kept_memory_bytes: KEPT_MEMORY_BYTES,
         }
     }
 }

@@ -21,6 +21,9 @@ fn config() -> QueueNodeConfig {
         shards: 4,
         snapshot_segments: 0,
         schedule_poll: None,
+        // Replaced payloads go to disk, so an image carries them from there
+        // (ADR-016 phase D).
+        kept_memory_bytes: 0,
         ..QueueNodeConfig::default()
     }
 }
@@ -97,6 +100,11 @@ fn run(node: &QueueNode, name: &str, entries: &[(&str, Term)]) -> TestResult<Ter
     Ok(call(|reply| node.execute(command, reply))??)
 }
 
+/// A payload long enough to go to disk once replaced.
+fn long_payload(at: usize) -> String {
+    format!("v{at}-").repeat(40)
+}
+
 /// Creates Flow `kept` and replaces its payload three times: its payload
 /// references and payloads, oldest first, as `FLOW.VALUE.MGET` takes and
 /// answers them.
@@ -111,12 +119,12 @@ fn kept_versions(node: &QueueNode) -> TestResult<(Term, Term)> {
         ("id", Term::text("kept")),
         ("type", Term::text("kept")),
         ("state", Term::text("a")),
-        ("payload", Term::text("v0")),
+        ("payload", Term::text(&long_payload(0))),
     ];
     run(node, "FLOW.CREATE", &create)?;
-    let (mut refs, mut payloads) = (vec![reference(node)?], vec![Term::text("v0")]);
+    let (mut refs, mut payloads) = (vec![reference(node)?], vec![Term::text(&long_payload(0))]);
     for (at, (from, to)) in [("a", "b"), ("b", "a"), ("a", "b")].into_iter().enumerate() {
-        let payload = format!("v{}", at.saturating_add(1));
+        let payload = long_payload(at.saturating_add(1));
         let transition = [
             ("id", Term::text("kept")),
             ("from_state", Term::text(from)),

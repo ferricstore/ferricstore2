@@ -1,5 +1,8 @@
 //! Replaced value versions a Flow keeps (ADR-016 phase C), so their
-//! references still read, a rewind restores them and history shows them.
+//! references still read, a rewind restores them and history shows them;
+//! in memory, or on disk once a running Flow keeps too many (phase D).
+
+use std::sync::Arc;
 
 use super::FlowMeta;
 
@@ -20,9 +23,68 @@ pub type RetainedMap = std::collections::BTreeMap<RetainedKey, Retained>;
 
 /// One kept value version, in the value codec's stored form.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Retained {
-    /// The stored bytes.
-    pub bytes: Vec<u8>,
+pub enum Retained {
+    /// The stored bytes, in memory.
+    Bytes(Vec<u8>),
+    /// Where the stored bytes are on disk (ADR-016 phase D).
+    Stored(Arc<StoredValue>),
+}
+
+/// The files kept versions on disk are in.
+pub trait ValueFiles: Send + Sync {
+    /// One kept version in `file` is gone.
+    fn release(&self, file: u64);
+}
+
+/// Where a kept version's stored bytes are on disk. It holds its file:
+/// dropping it releases the hold.
+pub struct StoredValue {
+    /// The file.
+    pub file: u64,
+    /// Where its record starts in the file.
+    pub offset: u64,
+    /// The length of the stored bytes.
+    pub length: u32,
+    files: Arc<dyn ValueFiles>,
+}
+
+impl StoredValue {
+    /// A version at `file`, `offset` and `length` whose hold on its file
+    /// `files` already counts.
+    #[must_use]
+    pub fn new((file, offset, length): (u64, u64, u32), files: Arc<dyn ValueFiles>) -> Self {
+        Self {
+            file,
+            offset,
+            length,
+            files,
+        }
+    }
+}
+
+impl Drop for StoredValue {
+    fn drop(&mut self) {
+        self.files.release(self.file);
+    }
+}
+
+impl PartialEq for StoredValue {
+    fn eq(&self, other: &Self) -> bool {
+        (self.file, self.offset, self.length) == (other.file, other.offset, other.length)
+    }
+}
+
+impl Eq for StoredValue {}
+
+impl std::fmt::Debug for StoredValue {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("StoredValue")
+            .field("file", &self.file)
+            .field("offset", &self.offset)
+            .field("length", &self.length)
+            .finish_non_exhaustive()
+    }
 }
 
 impl FlowMeta {
@@ -37,12 +99,7 @@ impl FlowMeta {
         }
         let key = (kind, name.to_vec(), version);
         self.retained_unlogged.push(key.clone());
-        self.retained.insert(
-            key,
-            Retained {
-                bytes: bytes.to_vec(),
-            },
-        );
+        self.retained.insert(key, Retained::Bytes(bytes.to_vec()));
     }
 
     /// A kept version, if any.

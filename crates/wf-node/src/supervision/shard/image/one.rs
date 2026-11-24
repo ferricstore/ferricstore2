@@ -7,13 +7,14 @@ use super::{Kept, Parts, Restored, decode_record, encode_record};
 use wf_application::commands::queue::Partition;
 
 /// Encodes one record alone: a logged after-image carries the kept value
-/// versions no earlier one logged ([`Kept::Unlogged`]), a cold file all.
+/// versions no earlier one logged ([`Kept::Unlogged`]), a cold file all
+/// ([`Kept::All`]).
 pub(crate) fn encode_one(
     partition: &Partition,
     id: &[u8],
     priority: u8,
     record: Parts<'_>,
-    kept: Kept,
+    kept: Kept<'_>,
 ) -> Option<Vec<u8>> {
     let mut out = Vec::new();
     encode_record(&mut out, partition, id, priority, record, kept)?;

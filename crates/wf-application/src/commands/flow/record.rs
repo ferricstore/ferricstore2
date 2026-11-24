@@ -14,7 +14,7 @@ mod view;
 pub use include::{DEFAULT_PAYLOAD_MAX_BYTES, Include, Values};
 pub use retained::{
     RETAINED_ERROR, RETAINED_NAMED, RETAINED_PAYLOAD, RETAINED_RESULT, Retained, RetainedKey,
-    RetainedMap,
+    RetainedMap, StoredValue, ValueFiles,
 };
 pub use view::{View, attached, hydrated, payload_fields};
 

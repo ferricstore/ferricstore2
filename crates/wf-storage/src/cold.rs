@@ -45,6 +45,12 @@ pub struct Location {
     pub length: u32,
 }
 
+/// The CRC32 a record carries for `image`, to recognise the same bytes.
+#[must_use]
+pub fn checksum(image: &[u8]) -> u32 {
+    crc32fast::hash(image)
+}
+
 /// A failed read.
 #[derive(Debug)]
 pub enum ColdError {
@@ -342,7 +348,7 @@ impl ColdStore {
         let unreferenced = state
             .usage
             .iter_mut()
-            .filter(|(file, usage)| usage.sealed && !referenced.contains(file));
+            .filter(|(file, usage)| usage.sealed && usage.stubs == 0 && !referenced.contains(file));
         for (file, usage) in unreferenced {
             match snapshots {
                 Some(begun) if named.contains(file) => {

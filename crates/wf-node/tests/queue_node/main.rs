@@ -46,6 +46,7 @@ mod flow_steps;
 mod flow_text;
 mod flow_text_batches;
 mod flow_value;
+mod kept_on_disk;
 mod lifecycle;
 mod log_growth;
 mod reclaim;

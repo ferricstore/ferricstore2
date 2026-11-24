@@ -188,3 +188,31 @@ fn a_restart_keeps_the_files_the_loaded_snapshot_names_for_the_next() -> TestRes
     assert_eq!(store.files()?, Vec::<u64>::new());
     Ok(())
 }
+
+#[test]
+fn a_file_still_held_at_a_restart_waits_for_a_snapshot_after_its_release() -> TestResult {
+    // A kept version on disk holds its file from the loaded snapshot on;
+    // the next snapshot's capture names it, so a release after that capture
+    // began must wait for the snapshot after.
+    let path = directory("held")?;
+    let location = {
+        let store = ColdStore::open(&path)?;
+        let mut writer = store.writer()?;
+        let location = writer.append(b"held")?;
+        writer.sync()?;
+        location
+    };
+    let store = ColdStore::open(&path)?;
+    store.keep_for_snapshots();
+    store.hold(location.file, 1);
+    let named = store.held();
+    store.remove_unreferenced(&HashSet::new(), &named)?;
+    let begun = store.snapshot_begins().ok_or("snapshots are kept for")?;
+    store.release(location.file, 1)?;
+    store.snapshot_written(begun)?;
+    assert_eq!(store.read(location)?, b"held");
+    let next = store.snapshot_begins().ok_or("snapshots are kept for")?;
+    store.snapshot_written(next)?;
+    assert_eq!(store.files()?, Vec::<u64>::new());
+    Ok(())
+}

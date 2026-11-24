@@ -67239,3 +67239,82 @@ restart, and a standalone node not keeping files for snapshots. Not
 observable without fault injection: a failed batch giving its counts
 back, and `hold` clearing a file's unused mark (nothing holds an unused
 file again at run time).
+
+### ADR-016 phase D: kept versions of running Flows on disk (24 Nov)
+
+Closes perf note P2's memory half. A running Flow keeps every replaced
+version until it is removed (G37 revised); they sat in memory, so a
+long-lived Flow that replaced values often grew without bound, where
+Elixir keeps them in its value store on disk.
+
+RED: `kept_on_disk::a_running_flow_s_replaced_values_go_to_disk_and_still_
+read` (budget 0, ten 832-byte payloads replaced): "cold files hold 0 of
+8320 bytes" with the round's spill taken out, which is the code before
+this change.
+
+Decision: once the versions a running Flow keeps in memory (each of at
+least 64 bytes) pass `QueueNodeConfig::kept_memory_bytes` (16 KiB by
+default), the end of the round (`cool`, then `spill`) hands them to the
+cold writer, in a file group of their own (removal hour `u64::MAX`, so
+files roll by size only). The writer's answer turns each version that is
+still the same bytes (CRC32 and length) into `Retained::Stored`, an
+`Arc<StoredValue>` naming file, offset and length that holds its file:
+the hold taken at append moves to it, and its `Drop` gives it back, so
+copies of a Flow's fields (each change clones them) share one hold. A
+version that changed or a Flow that went gives the hold back at once.
+Reads by reference, history values and rewinds read the file
+(`image::kept_bytes`); a rewind whose version cannot be read fails with
+`Unavailable` instead of reading as missing. Images: a snapshot record
+carries the versions in memory (`Kept::Resident`) and a new section after
+the holdings names those on disk (image version 17), restored with a new
+hold each; a logged after-image carries only versions still in memory
+(`Kept::Unlogged`); a cold image and a portable image read the ones on
+disk back (`Kept::All`), so a finished Flow's file holds its whole image
+and its value files can go. Replay notes Flows whose logged images
+carried versions, so a restart moves them to disk before it serves.
+Versions handed to the writer are tracked until answered (`moving`), so a
+Flow changing again before the answer does not send them twice: the first
+`small_kept_versions_stay_in_memory` run wrote the one large version twice. Value
+files follow the cold-file rule of the entry above: unused, they wait for
+a snapshot that no longer names them. A file something holds is never
+swept at a restart (`remove_unreferenced` skips held files).
+
+Measured (release build, one shard, one fsync per change, 1 KiB
+payloads, a temporary test not kept): 100 Flows each replacing its
+payload 200 times grew RSS by 10 MB with the default budget against 27 MB
+with every version in memory (20 MB of kept bytes); one Flow replacing it
+3,000 times, 3 MB against 9 MB. A change cost 4.70 to 4.77 ms against
+4.52 to 4.71 ms (alternating runs, two each): the value files' writes and
+syncs, about 3%, close to the noise. Flows that replace no values (the
+benchmark path) do no new work beyond an empty check per round.
+
+Not done: a cache beyond the page cache (reads of old versions are rare);
+the per-version key and reference stay in memory (about 100 bytes each);
+a file one long-lived Flow still holds keeps its other, released versions
+on disk until that Flow goes (no compaction).
+
+Tests besides the RED: `kept_versions_within_the_budget_stay_in_memory`,
+`small_kept_versions_stay_in_memory` (versions under 64 bytes, budget 0:
+one record on disk, the one large payload, written once),
+`kept_versions_on_disk_survive_a_snapshot_a_crash_and_the_flow_s_move_to_
+disk` (a restart moves replayed versions to disk, a snapshot names them, a
+change after it, a crash, the Flow cancelled and moved to its own cold
+file, and a restart from the same snapshot reading every version again,
+so value files outlive their last hold until a newer snapshot), and the
+replica install test now replaces payloads long enough to go to disk on
+the follower that exports its image.
+`cold_files::a_file_still_held_at_a_restart_waits_for_a_snapshot_after_
+its_release` covers the sweep's new rule: marking a file still held at a
+restart would let a release after the next capture began delete a file
+that capture names.
+
+Mutation checks (14 of 16 fail a test): no budget, no snapshot section,
+restoring without a hold, cold and portable images without the versions
+on disk, no note on replay or live, reads from disk failing, a reference
+that keeps its hold when dropped, spilling small versions, spilling
+finished Flows (an extra value file outlives the next snapshot), sending
+versions in flight again, the sweep taking held files, and no spill at
+all (the RED). Two survive, both for a Flow removed and created again
+under the same id before the writer answers, which no test can time:
+swapping without the same-bytes check (it would name the old Flow's
+bytes) and not giving back the hold of a version that changed (a leak).

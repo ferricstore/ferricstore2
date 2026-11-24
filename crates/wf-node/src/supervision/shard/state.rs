@@ -25,6 +25,7 @@ mod fifo;
 mod flow;
 mod governance;
 mod index;
+mod kept;
 mod key;
 mod mutate;
 mod policy;
@@ -152,13 +153,7 @@ fn token(bytes: &[u8]) -> Result<LeaseToken, ServiceError> {
 impl ShardState {
     /// An empty shard that keeps terminal records for `retention_ms`, on
     /// disk in `cold` (ADR-016).
-    pub(crate) fn new(
-        retention_ms: u64,
-        (cold, queue): (
-            Arc<wf_storage::cold::ColdStore>,
-            Arc<wf_storage::cold::ColdQueue>,
-        ),
-    ) -> Self {
+    pub(crate) fn new(retention_ms: u64, cold: cold::Handles) -> Self {
         Self {
             records: Map::default(),
             queues: Map::default(),
@@ -185,7 +180,7 @@ impl ShardState {
             timeouts_due: 0,
             catalog: Map::default(),
             cursor_key: query::cursor_key(),
-            cold: cold::Cold::new(cold, queue),
+            cold: cold::Cold::new(cold),
         }
     }
 

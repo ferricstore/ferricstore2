@@ -34,7 +34,8 @@ impl ShardState {
                     entry.meta.as_deref(),
                     Some(events.as_slice()),
                 ),
-                Kept::All,
+                // Versions on disk are named in their own section.
+                Kept::Resident,
             )?;
         }
         self.encode_tail(now, &mut out)?;
@@ -61,6 +62,7 @@ impl ShardState {
             .collect();
         image::encode_stubs(&mut out, &stubs)?;
         self.encode_holdings(&mut out)?;
+        image::encode_stored(&mut out, &self.kept_on_disk())?;
         Some(out)
     }
 

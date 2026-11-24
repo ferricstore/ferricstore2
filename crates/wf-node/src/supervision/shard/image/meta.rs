@@ -12,6 +12,7 @@
 //! ledger as an optional binary of their own encoding, the attached
 //! references, the kept value versions and the payload reference.
 
+use std::borrow::Cow;
 use std::collections::BTreeMap;
 
 use wf_application::commands::flow::Term;
@@ -19,25 +20,86 @@ use wf_application::commands::flow::children::ChildGroup;
 use wf_application::commands::flow::create::MaxActive;
 use wf_application::commands::flow::effect::Governance;
 use wf_application::commands::flow::meta::{Attributes, StateMeta};
-use wf_application::commands::flow::record::{FlowMeta, NamedValue, Retained, RetainedMap};
+use wf_application::commands::flow::record::{
+    FlowMeta, NamedValue, Retained, RetainedKey, RetainedMap,
+};
+use wf_storage::cold::{ColdStore, Location};
 
 use super::super::command::{Malformed, Reader, bin, optional_bin, optional_u64};
 
-/// Which kept value versions an image carries (perf note P2).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum Kept {
-    /// Every one: a snapshot or cold file holds the whole Flow.
-    All,
+/// Which kept value versions an image carries (perf note P2), with the
+/// store to read those on disk from (ADR-016 phase D).
+#[derive(Clone, Copy)]
+pub(crate) enum Kept<'a> {
+    /// Every one, read back when on disk: a cold file or a portable image
+    /// holds the whole Flow.
+    All(&'a ColdStore),
+    /// Those in memory: a snapshot names those on disk in a section of its
+    /// own.
+    Resident,
     /// Those no logged after-image carries yet: replay adds them to the
     /// ones the Flow had, so a change logs only the versions it kept.
-    Unlogged,
+    Unlogged(&'a ColdStore),
+}
+
+/// The bytes of a kept version, read from its cold file when on disk;
+/// `None` when that read fails.
+pub(crate) fn kept_bytes<'a>(store: &ColdStore, kept: &'a Retained) -> Option<Cow<'a, [u8]>> {
+    match kept {
+        Retained::Bytes(bytes) => Some(Cow::Borrowed(bytes)),
+        Retained::Stored(stored) => store
+            .read(Location {
+                file: stored.file,
+                offset: stored.offset,
+                length: stored.length,
+            })
+            .ok()
+            .map(Cow::Owned),
+    }
+}
+
+/// Kept versions with their bytes, in memory or read back.
+type Selected<'a> = Vec<(&'a RetainedKey, Cow<'a, [u8]>)>;
+
+/// The versions `kept` selects with their bytes; `None` when one on disk
+/// cannot be read.
+fn selected<'a>(meta: &'a FlowMeta, kept: Kept<'_>) -> Option<Selected<'a>> {
+    let mut versions = Vec::new();
+    let mut add = |key: &'a RetainedKey, version: &'a Retained, store: Option<&ColdStore>| {
+        match (version, store) {
+            (Retained::Bytes(bytes), _) => versions.push((key, Cow::Borrowed(bytes.as_slice()))),
+            (Retained::Stored(_), Some(store)) => versions.push((key, kept_bytes(store, version)?)),
+            (Retained::Stored(_), None) => {}
+        }
+        Some(())
+    };
+    match kept {
+        Kept::All(store) => {
+            for (key, version) in &meta.retained {
+                add(key, version, Some(store))?;
+            }
+        }
+        Kept::Resident => {
+            for (key, version) in &meta.retained {
+                add(key, version, None)?;
+            }
+        }
+        Kept::Unlogged(store) => {
+            for key in &meta.retained_unlogged {
+                if let Some((key, version)) = meta.retained.get_key_value(key) {
+                    add(key, version, Some(store))?;
+                }
+            }
+        }
+    }
+    Some(versions)
 }
 
 fn term(out: &mut Vec<u8>, value: &Term) -> Option<()> {
     value.encode(out)
 }
 
-pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta, kept: Kept) -> Option<()> {
+pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta, kept: Kept<'_>) -> Option<()> {
     for lineage in [
         &meta.parent_flow_id,
         &meta.parent_partition_key,
@@ -124,20 +186,13 @@ pub(super) fn encode(out: &mut Vec<u8>, meta: &FlowMeta, kept: Kept) -> Option<(
     }
     // Kept value versions (ADR-016 phase C): kind, name, version, term
     // flag and bytes each.
-    let versions: Vec<_> = match kept {
-        Kept::All => meta.retained.iter().collect(),
-        Kept::Unlogged => meta
-            .retained_unlogged
-            .iter()
-            .filter_map(|key| meta.retained.get_key_value(key))
-            .collect(),
-    };
+    let versions = selected(meta, kept)?;
     out.extend_from_slice(&u32::try_from(versions.len()).ok()?.to_be_bytes());
     for ((kind, name, version), version_bytes) in versions {
         out.push(*kind);
         bin(out, name)?;
         out.extend_from_slice(&version.to_be_bytes());
-        bin(out, &version_bytes.bytes)?;
+        bin(out, &version_bytes)?;
     }
     // A stored value as the payload (audit gap G16).
     optional_bin(out, meta.payload_ref.as_deref())?;
@@ -259,7 +314,7 @@ fn decode_retained(reader: &mut Reader<'_>) -> Result<RetainedMap, Malformed> {
         let name = reader.bin()?.to_vec();
         let version = reader.u64()?;
         let bytes = reader.bin()?.to_vec();
-        retained.insert((kind, name, version), Retained { bytes });
+        retained.insert((kind, name, version), Retained::Bytes(bytes));
     }
     Ok(retained)
 }

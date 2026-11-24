@@ -11,16 +11,18 @@
 //! removal schedule) stay as they were: they are computed from fields the
 //! stub keeps.
 
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 use std::ops::Deref;
 use std::sync::Arc;
 use std::sync::mpsc::{Receiver, Sender, channel};
 
+use wf_application::commands::flow::record::{RetainedKey, ValueFiles};
 use wf_application::commands::queue::ServiceError;
 use wf_storage::cold::{ColdQueue, ColdStore, Location};
 
 use super::super::image::{self, Kept};
 use super::events::History;
+use super::kept::{Files, Moved};
 use super::{Entry, Key, Map, Parts, ShardState};
 
 /// Flows removed in the same hour share files.
@@ -73,14 +75,33 @@ impl Deref for Seen<'_> {
     }
 }
 
+/// What the cold writer answers a shard: finished Flows' images, or kept
+/// versions (ADR-016 phase D), now durable.
+pub(super) enum Answer {
+    Cold(Vec<Ack>),
+    Kept(Vec<Moved>),
+}
+
+/// The cold store and writer, and the bytes of kept versions a running
+/// Flow keeps in memory before they go to disk (ADR-016 phase D).
+pub(crate) type Handles = (Arc<ColdStore>, Arc<ColdQueue>, u64);
+
 /// One shard's link to the cold files and the Flows of this round to move
 /// or restore.
 pub(super) struct Cold {
-    store: Arc<ColdStore>,
-    queue: Arc<ColdQueue>,
-    acks: (Sender<Vec<Ack>>, Receiver<Vec<Ack>>),
+    pub(super) store: Arc<ColdStore>,
+    pub(super) queue: Arc<ColdQueue>,
+    pub(super) acks: (Sender<Answer>, Receiver<Answer>),
     /// Batches sent and not answered yet.
-    in_flight: usize,
+    pub(super) in_flight: usize,
+    /// Kept versions a running Flow keeps in memory before they go to disk.
+    pub(super) budget: u64,
+    /// The holds of kept versions on disk.
+    pub(super) files: Arc<dyn ValueFiles>,
+    /// Flows that kept new versions this round.
+    pub(super) kept: Vec<Key>,
+    /// Kept versions handed to the writer and not answered yet.
+    pub(super) moving: Map<Key, BTreeSet<RetainedKey>>,
     /// Flows that turned terminal this round.
     pub(super) demote: Vec<Key>,
     /// Flows loaded for this round.
@@ -90,17 +111,26 @@ pub(super) struct Cold {
 }
 
 impl Cold {
-    /// The store and writer queue, for a fresh shard on the same files.
-    pub(super) fn handles(&self) -> (Arc<ColdStore>, Arc<ColdQueue>) {
-        (Arc::clone(&self.store), Arc::clone(&self.queue))
+    /// The store, writer queue and budget, for a fresh shard on the same
+    /// files.
+    pub(super) fn handles(&self) -> Handles {
+        (
+            Arc::clone(&self.store),
+            Arc::clone(&self.queue),
+            self.budget,
+        )
     }
 
-    pub(super) fn new(store: Arc<ColdStore>, queue: Arc<ColdQueue>) -> Self {
+    pub(super) fn new((store, queue, budget): Handles) -> Self {
         Self {
+            files: Arc::new(Files(Arc::clone(&store))),
             store,
             queue,
             acks: channel(),
             in_flight: 0,
+            budget,
+            kept: Vec::new(),
+            moving: Map::default(),
             demote: Vec::new(),
             warmed: Vec::new(),
             names: Map::default(),
@@ -121,13 +151,15 @@ impl Cold {
 /// length and bytes, then the packed history as it is in memory (event
 /// count and newest offset as `u32`, then its bytes), so a Flow goes to
 /// disk without decoding and encoding its events again.
-fn encode(key: &Key, entry: &Entry) -> Option<Vec<u8>> {
+fn encode(key: &Key, entry: &Entry, store: &ColdStore) -> Option<Vec<u8>> {
+    // Kept versions on disk are read back: a cold image holds the whole
+    // Flow, and the files they were in can go.
     let record = image::encode_one(
         &key.0,
         &key.1,
         entry.priority,
         (&entry.record, entry.meta.as_deref(), None),
-        Kept::All,
+        Kept::All(store),
     )?;
     let (packed, count, last) = entry.history.packed();
     let mut out = Vec::with_capacity(record.len().saturating_add(packed.len()).saturating_add(12));
