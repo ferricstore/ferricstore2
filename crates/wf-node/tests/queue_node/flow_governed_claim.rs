@@ -3,13 +3,22 @@
 //! node's cache of credits spent ahead), is refused when none is left and
 //! work is due, answers with nothing when no work is due, and a Flow's
 //! credit is released when it leaves `running`; a policy's running limit
-//! governs claims the same way, leasing on demand.
+//! governs claims the same way, leasing on demand. Claimed Flows holding
+//! one payload log it once and replay with their leases.
 
 use wf_application::commands::flow::{self, FlowService, Term};
 use wf_application::commands::queue::{ClaimedFlow, QueueService, ServiceError};
 use wf_node::composition::QueueNode;
 
 use super::{TestResult, call, directory, open};
+
+fn log_bytes(path: &std::path::Path) -> TestResult<u64> {
+    let mut total = 0;
+    for entry in std::fs::read_dir(path.join("log"))? {
+        total += entry?.metadata()?.len();
+    }
+    Ok(total)
+}
 
 fn map(entries: Vec<(&str, Term)>) -> Term {
     Term::Map(
@@ -287,5 +296,63 @@ fn a_refused_batch_keeps_its_flows_credit() -> TestResult {
     ));
     complete(&node, &held, 1_004)?;
     assert_eq!(claim(&node, "tr", 1_005, Some("g5"))??.len(), 1);
+    Ok(())
+}
+
+#[test]
+fn a_governed_claim_logs_a_shared_payload_once_and_replays_the_leases() -> TestResult {
+    // A governed claim logs each Flow's after-image, lease included; Flows
+    // holding one payload share a record (perf note P1).
+    let path = directory("governed-claim-shared-payload")?;
+    let node = open(&path, 1)?;
+    lease(&node, "g-shared", 3)?;
+    let payload = text(&"p".repeat(4_096));
+    for id in ["s1", "s2", "s3"] {
+        run(
+            &node,
+            "FLOW.CREATE",
+            vec![
+                ("id", text(id)),
+                ("type", text("shared")),
+                ("partition_key", text("p")),
+                ("payload", payload.clone()),
+                ("run_at_ms", Term::Int(1_000)),
+                ("now_ms", Term::Int(1_000)),
+            ],
+        )??;
+    }
+    let before = log_bytes(&path)?;
+    let parsed = flow::claim::parse(
+        "FLOW.CLAIM_DUE",
+        &map(vec![
+            ("type", text("shared")),
+            ("state", text("queued")),
+            ("partition_key", text("p")),
+            ("worker", text("worker-1")),
+            ("limit", Term::Int(3)),
+            ("now_ms", Term::Int(1_100)),
+            ("governance_limit_scope", text("g-shared")),
+            ("governance_shard_id", Term::Int(0)),
+        ]),
+    )?;
+    let claimed = call(|reply| QueueService::claim(&node, parsed.request, reply))??;
+    assert_eq!(claimed.len(), 3);
+    let logged = log_bytes(&path)?.saturating_sub(before);
+    assert!(logged < 2 * 4_096, "the claim logged {logged} bytes");
+    drop(node);
+    let node = open(&path, 1)?;
+    for job in &claimed {
+        let get = vec![
+            ("id", Term::Bin(job.id.clone())),
+            ("partition_key", text("p")),
+            ("full", Term::Bool(true)),
+        ];
+        let flow = run(&node, "FLOW.GET", get)??;
+        assert_eq!(flow.get(b"state"), Some(&text("running")));
+        assert_eq!(flow.get(b"payload"), Some(&payload));
+        complete(&node, job, 1_200)?;
+    }
+    drop(node);
+    std::fs::remove_dir_all(path)?;
     Ok(())
 }

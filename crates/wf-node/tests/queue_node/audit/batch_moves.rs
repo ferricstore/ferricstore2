@@ -1,8 +1,9 @@
 //! `flow_test/sections/flow_claim_due_automatically_reclaims_expired_
 //! leases_ratio.exs`, its batches: `TRANSITION_MANY` and `COMPLETE_MANY`
 //! move a partition's Flows together or not at all, an independent batch
-//! answers per item, a shared payload gives each Flow its own reference,
-//! and items without a partition go to their own auto partition.
+//! answers per item, a shared payload gives each Flow its own reference
+//! and is logged once, and items without a partition go to their own auto
+//! partition.
 
 use wf_application::commands::flow::Term;
 use wf_node::composition::QueueNode;
@@ -186,6 +187,60 @@ fn a_shared_batch_payload_gives_each_flow_its_own_reference() -> TestResult {
             .all(|record| super::sorted(&field(record, "payload")) == super::sorted(&payload))
     );
     Ok(())
+}
+
+fn log_bytes(path: &std::path::Path) -> TestResult<u64> {
+    let mut total = 0;
+    for entry in std::fs::read_dir(path.join("log"))? {
+        total += entry?.metadata()?.len();
+    }
+    Ok(total)
+}
+
+/// Elixir: "`flow_transition_many` shared payload is encoded once in the
+/// replicated command" and "independent `flow_transition_many` shared
+/// payload is encoded once per shard": 40 Flows take one 4 KiB payload and
+/// the log grows by less than 20 of it; the Flows read it after replay.
+fn a_shared_payload_is_logged_once(tag: &str, independent: bool) -> TestResult {
+    let path = directory(tag)?;
+    let node = open(&path, 4)?;
+    let ids: Vec<String> = (1..=40).map(|index| format!("shared-{index}")).collect();
+    let ids: Vec<&str> = ids.iter().map(String::as_str).collect();
+    create_many(&node, "bulk-shared-log", &ids)?;
+    let payload = text(&"x".repeat(4_096));
+    let mut extra = vec![("payload", payload.clone())];
+    if independent {
+        extra.push(("independent", Term::Bool(true)));
+    }
+    let before = log_bytes(&path)?;
+    let items = fenced(&ids.iter().map(|id| (*id, 0)).collect::<Vec<_>>());
+    transition_many(&node, "ready", items, &extra)??;
+    let logged = log_bytes(&path)?.saturating_sub(before);
+    assert!(logged < 4_096 * 20, "the batch logged {logged} bytes");
+    drop(node);
+    let node = open(&path, 4)?;
+    for id in ids {
+        let full = get(
+            &node,
+            id,
+            &[("partition_key", text(P)), ("full", Term::Bool(true))],
+        )?;
+        assert_eq!(field(&full, "payload"), payload, "{id}");
+        assert_eq!(field(&full, "state"), text("ready"), "{id}");
+    }
+    drop(node);
+    std::fs::remove_dir_all(path)?;
+    Ok(())
+}
+
+#[test]
+fn a_batch_s_shared_payload_is_logged_once() -> TestResult {
+    a_shared_payload_is_logged_once("audit-batch-shared-log", false)
+}
+
+#[test]
+fn an_independent_batch_s_shared_payload_is_logged_once_per_shard() -> TestResult {
+    a_shared_payload_is_logged_once("audit-batch-shared-log-independent", true)
 }
 
 fn lease_items(records: &[Term], bump: Option<&str>) -> TestResult<Term> {

@@ -4,12 +4,13 @@
 use wf_application::commands::queue::Partition;
 
 use super::{
-    GOVERNANCE, GROUP, Logged, Malformed, POLICY, PUT, Reader, SHARED, bin, decode, optional_bin,
-    optional_u64,
+    GOVERNANCE, GROUP, Logged, Malformed, POLICY, PUT, RUN, Reader, SHARED, bin, decode,
+    optional_bin, optional_u64, shared,
 };
 
 /// Records that store state as logged: a group, a shared value, an
-/// after-image, a policy or a governance record; `None` for any other tag.
+/// after-image, a run of after-images sharing a payload, a policy or a
+/// governance record; `None` for any other tag.
 pub(super) fn decode_stored(tag: u8, reader: &mut Reader<'_>) -> Result<Option<Logged>, Malformed> {
     let logged = match tag {
         GROUP => {
@@ -29,6 +30,7 @@ pub(super) fn decode_stored(tag: u8, reader: &mut Reader<'_>) -> Result<Option<L
             bytes: reader.bin()?.to_vec(),
             expires_at: reader.optional_u64()?,
         },
+        RUN => shared::decode(reader)?,
         PUT => Logged::Put {
             partition: Partition::parse(reader.bin()?),
             image: reader.bin()?.to_vec(),

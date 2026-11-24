@@ -131,6 +131,52 @@ fn kept_versions(node: &QueueNode) -> TestResult<(Term, Term)> {
     Ok((Term::List(refs), Term::List(payloads)))
 }
 
+/// Moves three new Flows `shared-*` with one payload, which the leader
+/// logs once for the three: the payload.
+fn shared_batch(node: &QueueNode) -> TestResult<Term> {
+    let ids: Vec<Term> = (0..3)
+        .map(|index| Term::text(&format!("shared-{index}")))
+        .collect();
+    let create = [
+        ("partition_key", Term::text("shared")),
+        ("type", Term::text("shared")),
+        ("state", Term::text("a")),
+        ("items", Term::List(ids.clone())),
+    ];
+    run(node, "FLOW.CREATE_MANY", &create)?;
+    let items = ids
+        .into_iter()
+        .map(|id| {
+            Term::Map(vec![
+                (b"id".to_vec(), id),
+                (b"fencing_token".to_vec(), Term::Int(0)),
+            ])
+        })
+        .collect();
+    let payload = Term::text(&"s".repeat(512));
+    let transition = [
+        ("partition_key", Term::text("shared")),
+        ("from_state", Term::text("a")),
+        ("to_state", Term::text("b")),
+        ("items", Term::List(items)),
+        ("payload", payload.clone()),
+    ];
+    run(node, "FLOW.TRANSITION_MANY", &transition)?;
+    Ok(payload)
+}
+
+fn assert_shared_batch(node: &QueueNode, payload: &Term) -> TestResult {
+    for index in 0..3 {
+        let get = [
+            ("id", Term::text(&format!("shared-{index}"))),
+            ("partition_key", Term::text("shared")),
+            ("full", Term::Bool(true)),
+        ];
+        assert_eq!(run(node, "FLOW.GET", &get)?.get(b"payload"), Some(payload));
+    }
+    Ok(())
+}
+
 fn state_of(node: &QueueNode, id: &str) -> TestResult<Term> {
     Ok(get(node, id)?.get(b"state").cloned().unwrap_or(Term::Nil))
 }
@@ -266,6 +312,7 @@ fn a_member_the_leader_s_log_no_longer_reaches_installs_a_snapshot() -> TestResu
     drop(nodes.remove(&c));
     // A Flow's kept value versions reach C in B's image too.
     let (refs, payloads) = kept_versions(nodes.get(&a).ok_or("no a")?)?;
+    let shared = shared_batch(nodes.get(&a).ok_or("no a")?)?;
     let first = batch(nodes.get(&a).ok_or("no a")?, "w1-", 40, 10)?;
     snapshotted(&path, b)?;
     // Without A, only B is up to date, so it leads, and C needs B's snapshot.
@@ -273,6 +320,8 @@ fn a_member_the_leader_s_log_no_longer_reaches_installs_a_snapshot() -> TestResu
     nodes.insert(c, open_with(&path, c, &peers, 20)?);
     let led = serving(&nodes, "probe-b")?;
     assert_eq!(led, b);
+    // B applied A's round, whose three after-images shared one record.
+    assert_shared_batch(nodes.get(&b).ok_or("no b")?, &shared)?;
     let second = batch(nodes.get(&b).ok_or("no b")?, "w2-", 10, 2)?;
     // Without B, A lacks the second batch, so C leads with all of it.
     drop(nodes.remove(&b));

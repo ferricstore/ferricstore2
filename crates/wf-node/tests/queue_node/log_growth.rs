@@ -5,6 +5,7 @@
 
 use wf_application::commands::flow::{self, FlowService, Term};
 use wf_node::composition::{QueueNode, QueueNodeConfig};
+use wf_storage::log::GroupLogLimits;
 
 use super::{TestResult, call, directory, open, open_with};
 
@@ -191,6 +192,76 @@ fn kept_versions_survive_a_snapshot_and_a_move_to_disk() -> TestResult {
     drop(node);
     let node = open_with(&path, config())?;
     assert_eq!(read(&node)?, Term::List(payloads));
+    drop(node);
+    std::fs::remove_dir_all(path)?;
+    Ok(())
+}
+
+#[test]
+fn a_long_run_sharing_a_payload_is_logged_in_records_that_fit() -> TestResult {
+    // After-images sharing a payload are logged as one record only up to
+    // what one record takes, here less than half a block; a longer run is
+    // split.
+    let path = directory("log-growth-run-cap")?;
+    let config = || QueueNodeConfig {
+        shards: 1,
+        snapshot_segments: 0,
+        log: GroupLogLimits {
+            max_record_bytes: 8 * 1_024,
+            max_block_bytes: 64 * 1_024,
+            ..QueueNodeConfig::default().log
+        },
+        ..QueueNodeConfig::default()
+    };
+    let node = open_with(&path, config())?;
+    let ids: Vec<Term> = (0..100)
+        .map(|index| Term::text(&format!("run-{index}")))
+        .collect();
+    run(
+        &node,
+        "FLOW.CREATE_MANY",
+        &[
+            ("partition_key", Term::text("p")),
+            ("type", Term::text("run")),
+            ("state", Term::text("a")),
+            ("run_at_ms", Term::Int(9_000_000)),
+            ("now_ms", Term::Int(1_000)),
+            ("items", Term::List(ids.clone())),
+        ],
+    )?;
+    let items = ids
+        .iter()
+        .map(|id| map(&[("id", id.clone()), ("fencing_token", Term::Int(0))]))
+        .collect();
+    let payload = Term::Bin(vec![b'y'; 1_024]);
+    run(
+        &node,
+        "FLOW.TRANSITION_MANY",
+        &[
+            ("partition_key", Term::text("p")),
+            ("from_state", Term::text("a")),
+            ("to_state", Term::text("b")),
+            ("items", Term::List(items)),
+            ("payload", payload.clone()),
+            ("run_at_ms", Term::Int(9_000_000)),
+            ("now_ms", Term::Int(1_001)),
+        ],
+    )?;
+    drop(node);
+    let node = open_with(&path, config())?;
+    for id in ids {
+        let flow = run(
+            &node,
+            "FLOW.GET",
+            &[
+                ("id", id.clone()),
+                ("partition_key", Term::text("p")),
+                ("full", Term::Bool(true)),
+            ],
+        )?;
+        assert_eq!(flow.get(b"state"), Some(&Term::text("b")), "{id:?}");
+        assert_eq!(flow.get(b"payload"), Some(&payload), "{id:?}");
+    }
     drop(node);
     std::fs::remove_dir_all(path)?;
     Ok(())

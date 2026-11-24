@@ -16,7 +16,9 @@ mod one;
 
 pub(crate) use holdings::{Holding, HoldingEntry, encode as encode_holdings};
 pub(crate) use meta::Kept;
-pub(crate) use one::{decode_one, encode_one};
+pub(crate) use one::{
+    SHARED as SHARED_PAYLOAD, decode_one, encode_one, payload_split, with_payload,
+};
 
 use wf_application::commands::flow::history::HistoryEvent;
 use wf_application::commands::flow::record::FlowMeta;

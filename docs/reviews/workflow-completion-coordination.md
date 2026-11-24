@@ -67154,3 +67154,45 @@ keeps them on disk; ADR-016 phase D), and each change copies the Flow's
 fields including them: with 3,000 kept 1 KiB versions a change took
 4.97 ms against 4.50 ms when new (release build, one fsync per change);
 without kept versions it stays flat (4.54 and 4.25 ms).
+
+### Perf note P1: a shared payload logged once per run (24 Nov)
+
+Ports of Elixir's "flow_transition_many shared payload is encoded once in
+the replicated command" and "independent flow_transition_many shared
+payload is encoded once per shard" (40 Flows, one 4 KiB payload, the log
+grows by less than 20 payloads): `audit::batch_moves::a_batch_s_shared_
+payload_is_logged_once` and `..._independent_..._once_per_shard`, which
+also read every Flow's payload after a restart. RED: both batches logged
+177,055 bytes, one after-image with its own copy per Flow. Now 16,964.
+
+Fix, in the log encoding only: `command::records` turns a round's changes
+into records, and a run of consecutive after-images holding the same
+payload becomes one `RUN` record: the payload once, then each image with
+its payload field written as mark `2` (`image::payload_split` finds the
+field after partition, id, priority, type, state, five integers, next
+run, run state and lease). `RUN` decodes to `Logged::Group` of the
+after-images with the payload put back, so replay, replicas and snapshot
+cuts apply what the shard did. The shard's own changes are untouched. A
+run's record stays within one append, which is now also at most one
+record (`max_append_bytes` = half a block, capped at `max_record_bytes`);
+a proposal holds its round whole, so a run there is not split. Elixir's
+unit is the command; here it is the run, so a governed claim of Flows
+holding one payload, or two commands in a round giving the same payload,
+share a record too.
+
+Tests besides the ports: `log_growth::a_long_run_sharing_a_payload_is_
+logged_in_records_that_fit` (100 Flows in records of 8 KiB, under half
+a 64 KiB block, replayed); `flow_governed_claim::a_governed_claim_logs_a_
+shared_payload_once_and_replays_the_leases` (leased after-images, one
+record, completed with their tokens after a restart); the replica install
+test now reads a shared batch on the follower that applied the leader's
+round; unit tests in `command::shared::tests` (a run with and without
+leases round-trips, a proposal holds the payload once, an image without
+the mark does not read).
+
+Mutation checks (10 of 10 fail a test): never merging, no run size cap,
+no record-limit cap on appends, merging unequal payloads, a wrong mark,
+restoring without checking the mark, skipping the run state or the lease
+wrongly, unmerged appends and unmerged proposals. A first cap of a fixed
+1 MiB per run survived (nothing reaches it) and was replaced by the log's
+own record limit.

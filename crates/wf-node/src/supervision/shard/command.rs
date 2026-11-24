@@ -23,8 +23,13 @@ const SHARED: u8 = 8;
 const GROUP: u8 = 9;
 const POLICY: u8 = 10;
 const GOVERNANCE: u8 = 11;
+/// After-images sharing one payload, logged with it once (perf note P1).
+const RUN: u8 = 12;
 
+mod shared;
 mod stored;
+
+pub(crate) use shared::records;
 
 use stored::decode_stored;
 

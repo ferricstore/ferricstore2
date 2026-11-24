@@ -12,7 +12,7 @@ use wf_consensus::group::Proposer;
 use wf_storage::log::GroupLog;
 
 use super::super::completer::{Completion, Finish};
-use super::command::Logged;
+use super::command::{self, Logged};
 
 /// A shard's sink.
 #[derive(Clone)]
@@ -21,6 +21,7 @@ pub(crate) enum Sink {
     Local {
         log: Arc<GroupLog>,
         completions: Sender<Completion>,
+        /// The most bytes one append, and so one record, takes.
         max_append_bytes: usize,
     },
     /// A replicated group's proposer, and whether a lost round stopped the
@@ -46,8 +47,7 @@ fn append(log: &GroupLog, logged: &[Logged], max_bytes: usize, previous: u64) ->
     let mut sequence = previous;
     let mut chunk: Vec<Vec<u8>> = Vec::new();
     let mut chunk_bytes = 0_usize;
-    for change in logged {
-        let record = change.encode()?;
+    for record in command::records(logged, max_bytes)? {
         let size = record.len().saturating_add(4);
         if !chunk.is_empty() && chunk_bytes.saturating_add(size) > max_bytes {
             sequence = log.append_batch(std::mem::take(&mut chunk)).ok()?;
@@ -63,11 +63,12 @@ fn append(log: &GroupLog, logged: &[Logged], max_bytes: usize, previous: u64) ->
 }
 
 /// A round's records as one proposal: each a `u32` length and its bytes;
-/// empty for a round without changes.
+/// empty for a round without changes. A run of after-images sharing a
+/// payload is one record however long: the proposal holds the round
+/// whole either way.
 pub(crate) fn proposal(logged: &[Logged]) -> Option<Vec<u8>> {
     let mut body = Vec::new();
-    for change in logged {
-        let record = change.encode()?;
+    for record in command::records(logged, usize::MAX)? {
         body.extend_from_slice(&u32::try_from(record.len()).ok()?.to_be_bytes());
         body.extend_from_slice(&record);
     }

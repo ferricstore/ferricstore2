@@ -39,7 +39,11 @@ for example by claiming with `now_ms` 30 s ahead to reclaim an expired lease.
 2. **The node logs after-images for these commands.** A change is logged as
    `Put`: the Flow's whole image (the snapshot image record, now with the
    extra fields). Replay stores it without deciding anything, so replay does
-   not depend on command semantics that later releases change. The fast path
+   not depend on command semantics that later releases change. (24 Nov:
+   an after-image carries only the value versions its change kept, and a
+   round's run of after-images holding one payload is one record, `RUN`,
+   with the payload once, read back as a group of after-images; perf notes
+   P1 and P2.) The fast path
    keeps its logical records. Snapshot images move to version 2 (the extra
    fields after each record); version 1 snapshots are refused, which affects
    only benchmark data.

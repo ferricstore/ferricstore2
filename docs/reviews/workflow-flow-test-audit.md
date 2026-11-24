@@ -190,10 +190,12 @@ Gaps found so far:
 - P2 (open, memory): a hot Flow keeps its replaced value versions in
   memory (`FlowMeta::retained`) until it is removed, where Elixir keeps
   them in its value store on disk; a long-lived Flow that replaces values
-  often grows. A finished Flow carries them to its cold file.
-- P1 (open, performance): a batch's shared payload is logged in each
-  Flow's after-image; Elixir logs it once per command. Clients see the
-  same results; the log carries the payload once per Flow.
+  often grows. A finished Flow carries them to its cold file. Its log
+  half is closed (24 Nov): a change logs only the versions it kept, not
+  every one.
+- P1 (closed 24 Nov): a batch's shared payload was logged in each Flow's
+  after-image; a run of after-images holding one payload is now one log
+  record with the payload once, as Elixir logs it once per command.
 
 ## `flow_write_contract_test.exs`
 
@@ -600,8 +602,8 @@ Gaps found so far:
 | 271 | flow_transition_many atomically moves one-partition batch | ported (`audit::batch_moves::a_transition_batch_moves_a_partition_together_or_not_at_all`) |
 | 325 | flow_transition_many rejects direct moves into running state | ported (same test) |
 | 359 | flow_transition_many shared payload keeps per-flow refs and values | ported (`audit::batch_moves::a_shared_batch_payload_gives_each_flow_its_own_reference`) |
-| 414 | flow_transition_many shared payload is encoded once in the replicated command | open perf P1: a batch's shared payload is logged once per Flow (after-images); Elixir logs it once per command |
-| 453 | independent flow_transition_many shared payload is encoded once per shard | open perf P1 (same, per shard for an independent batch) |
+| 414 | flow_transition_many shared payload is encoded once in the replicated command | ported (`audit::batch_moves::a_batch_s_shared_payload_is_logged_once`: the node's log grows by less than 20 payloads, as Elixir's Raft log; P1 closed) |
+| 453 | independent flow_transition_many shared payload is encoded once per shard | ported (`audit::batch_moves::an_independent_batch_s_shared_payload_is_logged_once_per_shard`) |
 | 494 | flow_transition_many rolls back when any item fails guard | ported (`audit::batch_moves::a_transition_batch_moves_a_partition_together_or_not_at_all`) |
 | 545 | flow_transition_many independent keeps successful items when one item fails | ported (`audit::batch_moves::an_independent_transition_batch_keeps_its_successes`) |
 | 577 | flow transition pipeline batch preserves duplicate key ordering | covered (`audit::records_and_claims::each_command_of_an_independent_batch_answers_for_itself`, two transitions in order) |

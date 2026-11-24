@@ -219,7 +219,14 @@ impl QueueNode {
         let sink = Sink::Local {
             log: Arc::clone(&log),
             completions: completion_sender,
-            max_append_bytes: config.log.max_block_bytes.checked_div(2).unwrap_or(0),
+            // Half a block, and no more than one record takes: a run of
+            // after-images sharing a payload is one record (perf note P1).
+            max_append_bytes: config
+                .log
+                .max_block_bytes
+                .checked_div(2)
+                .unwrap_or(0)
+                .min(config.log.max_record_bytes),
         };
         let started = Started::new(states, &config, sink, Role::single())?;
         let router = Arc::clone(&started.router);
