@@ -32,16 +32,22 @@ pub(super) fn shards(
     Ok((cold, states))
 }
 
-/// Moves replay's finished Flows to disk and removes unnamed cold files.
-pub(super) fn tidy(cold: &ColdStore, states: &mut [ShardState]) -> Result<(), NodeError> {
+/// Moves replay's finished Flows to disk and removes cold files no stub
+/// names; those the loaded snapshot names (`named`) wait for the next
+/// snapshot when the store keeps them for snapshots.
+pub(super) fn tidy(
+    cold: &ColdStore,
+    states: &mut [ShardState],
+    named: &HashSet<u64>,
+) -> Result<(), NodeError> {
     for state in states.iter_mut() {
         state.cool();
     }
-    let mut named = HashSet::new();
+    let mut referenced = HashSet::new();
     for state in states.iter_mut() {
         state.settle_cold(SETTLE);
-        named.extend(state.cold_files());
+        referenced.extend(state.cold_files());
     }
-    cold.remove_unreferenced(&named)
+    cold.remove_unreferenced(&referenced, named)
         .map_err(|_| NodeError::Cold)
 }

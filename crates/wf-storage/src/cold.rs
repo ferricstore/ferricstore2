@@ -6,23 +6,30 @@
 //! a `u32` length, the CRC32 of the image and the image, big-endian. File
 //! ids are node-wide, so a location keeps working when the shard count
 //! changes. Each file counts the stubs that point into it; once its writer
-//! is sealed and the count reaches zero, the file is deleted.
+//! is sealed and the count reaches zero, the file is unused.
 //!
 //! Durability: [`ColdWriter::sync`] makes appended records durable. A
 //! snapshot syncs its shards' writers first, so a stub in a snapshot names
-//! durable bytes; anything written later is written again by replay.
+//! durable bytes; anything written later is written again by replay. Replay
+//! reads the files the last snapshot names, so a store that keeps files for
+//! snapshots ([`ColdStore::keep_for_snapshots`]) deletes an unused file
+//! only once a snapshot begun after it became unused is written; one that
+//! does not (a replicated member, which applies every committed round again
+//! and names no earlier file) deletes it at once.
 
 use std::collections::{HashMap, HashSet};
 use std::fs::{self, File, OpenOptions};
-use std::io::{self, Write};
+use std::io;
 use std::os::unix::fs::FileExt;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 mod queue;
+mod writer;
 
-pub use queue::{ColdBatch, ColdQueue};
+pub use queue::{ColdBatch, ColdQueue, MAX_FILE_BYTES};
+pub use writer::ColdWriter;
 
 const SUFFIX: &str = ".cold";
 const HEADER_BYTES: u64 = 8;
@@ -68,6 +75,16 @@ impl From<io::Error> for ColdError {
 struct Usage {
     stubs: u64,
     sealed: bool,
+    /// The snapshot count when the file became unused, while it waits for
+    /// a snapshot that no longer names it.
+    unused_since: Option<u64>,
+}
+
+#[derive(Default)]
+struct Files {
+    usage: HashMap<u64, Usage>,
+    /// Snapshots begun, when unused files wait for one.
+    snapshots: Option<u64>,
 }
 
 /// The node's cold files.
@@ -75,7 +92,7 @@ pub struct ColdStore {
     directory: PathBuf,
     next: AtomicU64,
     readers: Mutex<HashMap<u64, Arc<File>>>,
-    usage: Mutex<HashMap<u64, Usage>>,
+    files: Mutex<Files>,
 }
 
 /// Critical sections only move values, so a poisoned lock still holds
@@ -100,18 +117,70 @@ impl ColdStore {
             directory: directory.to_path_buf(),
             next: AtomicU64::new(0),
             readers: Mutex::new(HashMap::new()),
-            usage: Mutex::new(HashMap::new()),
+            files: Mutex::new(Files::default()),
         };
         let files = store.files()?;
         let next = files.iter().max().map_or(0, |last| last.saturating_add(1));
         store.next.store(next, Ordering::Relaxed);
         {
-            let mut usage = lock(&store.usage);
+            let mut state = lock(&store.files);
             for file in files {
-                usage.entry(file).or_default().sealed = true;
+                state.usage.entry(file).or_default().sealed = true;
             }
         }
         Ok(Arc::new(store))
+    }
+
+    /// Keeps each unused file until a snapshot begun after it became
+    /// unused is written ([`Self::snapshot_written`]), since replay from
+    /// the last snapshot reads the files it names.
+    pub fn keep_for_snapshots(&self) {
+        lock(&self.files).snapshots.get_or_insert(0);
+    }
+
+    /// Marks the start of a snapshot's capture; returns its number for
+    /// [`Self::snapshot_written`], or `None` when the store does not keep
+    /// files for snapshots.
+    #[must_use]
+    pub fn snapshot_begins(&self) -> Option<u64> {
+        let mut state = lock(&self.files);
+        let begun = state.snapshots?;
+        state.snapshots = Some(begun.saturating_add(1));
+        Some(begun)
+    }
+
+    /// Deletes the files unused before snapshot `begun` began, now that it
+    /// is written and names none of them.
+    ///
+    /// # Errors
+    /// A file cannot be deleted; it is tried again after the next snapshot.
+    pub fn snapshot_written(&self, begun: u64) -> io::Result<()> {
+        let unused: Vec<u64> = lock(&self.files)
+            .usage
+            .iter()
+            .filter(|(_, usage)| {
+                usage.sealed
+                    && usage.stubs == 0
+                    && usage.unused_since.is_some_and(|since| since <= begun)
+            })
+            .map(|(file, _)| *file)
+            .collect();
+        for file in unused {
+            self.delete(file)?;
+        }
+        Ok(())
+    }
+
+    /// The files stubs point into now: after a snapshot is loaded, the
+    /// files it names.
+    #[must_use]
+    pub fn held(&self) -> HashSet<u64> {
+        lock(&self.files)
+            .usage
+            .iter()
+            .filter(|(_, usage)| usage.stubs > 0)
+            .map(|(file, _)| *file)
+            .collect()
     }
 
     fn path(&self, file: u64) -> PathBuf {
@@ -144,7 +213,7 @@ impl ColdStore {
             .create_new(true)
             .append(true)
             .open(self.path(file))?;
-        lock(&self.usage).entry(file).or_default();
+        lock(&self.files).usage.entry(file).or_default();
         Ok(ColdWriter {
             store: Arc::clone(self),
             handle,
@@ -193,151 +262,95 @@ impl ColdStore {
 
     /// Counts `count` more stubs in `file`.
     pub fn hold(&self, file: u64, count: u64) {
-        let mut usage = lock(&self.usage);
-        let entry = usage.entry(file).or_default();
+        let mut state = lock(&self.files);
+        let entry = state.usage.entry(file).or_default();
         entry.stubs = entry.stubs.saturating_add(count);
+        entry.unused_since = None;
     }
 
     /// Counts `count` fewer stubs in `file`; a sealed file with none left is
-    /// deleted.
+    /// unused.
     ///
     /// # Errors
-    /// The file cannot be deleted; it is tried again when another stub of
-    /// it goes, or by [`Self::remove_unreferenced`].
+    /// An unused file cannot be deleted; it is tried again when another
+    /// stub of it goes, or by [`Self::remove_unreferenced`].
     pub fn release(&self, file: u64, count: u64) -> io::Result<()> {
-        let unused = {
-            let mut usage = lock(&self.usage);
-            let entry = usage.entry(file).or_default();
-            entry.stubs = entry.stubs.saturating_sub(count);
-            entry.sealed && entry.stubs == 0
-        };
-        if unused { self.delete(file) } else { Ok(()) }
+        let mut state = lock(&self.files);
+        let entry = state.usage.entry(file).or_default();
+        entry.stubs = entry.stubs.saturating_sub(count);
+        let unused = entry.sealed && entry.stubs == 0;
+        self.unused(state, file, unused)
     }
 
     fn seal(&self, file: u64) -> io::Result<()> {
-        let unused = {
-            let mut usage = lock(&self.usage);
-            let entry = usage.entry(file).or_default();
-            entry.sealed = true;
-            entry.stubs == 0
+        let mut state = lock(&self.files);
+        let entry = state.usage.entry(file).or_default();
+        entry.sealed = true;
+        let unused = entry.stubs == 0;
+        self.unused(state, file, unused)
+    }
+
+    /// Deletes `file` when `unused`, or marks it to wait for a snapshot.
+    fn unused(&self, mut state: MutexGuard<'_, Files>, file: u64, unused: bool) -> io::Result<()> {
+        if !unused {
+            return Ok(());
+        }
+        let Some(begun) = state.snapshots else {
+            drop(state);
+            return self.delete(file);
         };
-        if unused { self.delete(file) } else { Ok(()) }
+        if let Some(usage) = state.usage.get_mut(&file) {
+            usage.unused_since.get_or_insert(begun);
+        }
+        Ok(())
     }
 
     fn delete(&self, file: u64) -> io::Result<()> {
         lock(&self.readers).remove(&file);
-        lock(&self.usage).remove(&file);
+        lock(&self.files).usage.remove(&file);
         match fs::remove_file(self.path(file)) {
             Err(error) if error.kind() != io::ErrorKind::NotFound => Err(error),
             _ => Ok(()),
         }
     }
 
-    /// Deletes every sealed file not in `referenced`: after a restart, the
-    /// files no stub names (records written after the last snapshot, which
-    /// replay wrote again elsewhere, or files whose last stub went).
+    /// After a restart, handles every sealed file not in `referenced`: one
+    /// the loaded snapshot names (`named`) waits for the next snapshot when
+    /// the store keeps files for snapshots; any other is deleted (records
+    /// written after the last snapshot, which replay wrote again elsewhere,
+    /// or files whose last stub went).
     ///
     /// # Errors
     /// The directory cannot be listed or a file deleted.
-    pub fn remove_unreferenced(&self, referenced: &HashSet<u64>) -> io::Result<()> {
-        let sealed: Vec<u64> = lock(&self.usage)
-            .iter()
-            .filter(|(file, usage)| usage.sealed && !referenced.contains(file))
-            .map(|(file, _)| *file)
-            .collect();
-        for file in sealed {
+    pub fn remove_unreferenced(
+        &self,
+        referenced: &HashSet<u64>,
+        named: &HashSet<u64>,
+    ) -> io::Result<()> {
+        for file in self.unreferenced(referenced, named) {
             self.delete(file)?;
         }
         Ok(())
     }
-}
 
-/// Appends images to one cold file.
-pub struct ColdWriter {
-    store: Arc<ColdStore>,
-    handle: File,
-    file: u64,
-    length: u64,
-    /// Appended images not yet written to the file.
-    buffer: Vec<u8>,
-    dirty: bool,
-    /// Whether the directory entry of the file is durable.
-    named: bool,
-}
-
-impl ColdWriter {
-    /// The file this writer appends to.
-    #[must_use]
-    pub const fn file(&self) -> u64 {
-        self.file
-    }
-
-    /// Bytes appended so far, written or not.
-    #[must_use]
-    pub fn length(&self) -> u64 {
-        self.length
-            .saturating_add(u64::try_from(self.buffer.len()).unwrap_or(u64::MAX))
-    }
-
-    /// Appends one image to the writer's buffer; readable after the next
-    /// [`Self::flush`], durable after the next [`Self::sync`].
-    ///
-    /// # Errors
-    /// The image is larger than a record can hold.
-    pub fn append(&mut self, image: &[u8]) -> io::Result<Location> {
-        let length = u32::try_from(image.len())
-            .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "cold image too large"))?;
-        let location = Location {
-            file: self.file,
-            offset: self.length(),
-            length,
-        };
-        self.buffer.extend_from_slice(&length.to_be_bytes());
-        self.buffer
-            .extend_from_slice(&crc32fast::hash(image).to_be_bytes());
-        self.buffer.extend_from_slice(image);
-        Ok(location)
-    }
-
-    /// Writes the buffered images to the file with one call.
-    ///
-    /// # Errors
-    /// The write failed; the buffered images are kept for the next try.
-    pub fn flush(&mut self) -> io::Result<()> {
-        if self.buffer.is_empty() {
-            return Ok(());
+    /// Marks the unreferenced files `named` names to wait for a snapshot,
+    /// when the store keeps files for snapshots; returns the others.
+    fn unreferenced(&self, referenced: &HashSet<u64>, named: &HashSet<u64>) -> Vec<u64> {
+        let mut state = lock(&self.files);
+        let snapshots = state.snapshots;
+        let mut doomed = Vec::new();
+        let unreferenced = state
+            .usage
+            .iter_mut()
+            .filter(|(file, usage)| usage.sealed && !referenced.contains(file));
+        for (file, usage) in unreferenced {
+            match snapshots {
+                Some(begun) if named.contains(file) => {
+                    usage.unused_since.get_or_insert(begun);
+                }
+                _ => doomed.push(*file),
+            }
         }
-        self.handle.write_all(&self.buffer)?;
-        self.length = self.length();
-        self.buffer.clear();
-        self.dirty = true;
-        Ok(())
-    }
-
-    /// Makes every appended image durable.
-    ///
-    /// # Errors
-    /// The sync failed; the images may or may not survive a crash.
-    pub fn sync(&mut self) -> io::Result<()> {
-        self.flush()?;
-        if self.dirty {
-            self.handle.sync_data()?;
-            self.dirty = false;
-        }
-        if !self.named {
-            File::open(&self.store.directory)?.sync_all()?;
-            self.named = true;
-        }
-        Ok(())
-    }
-
-    /// Syncs and closes the file for appends; it is deleted once no stub
-    /// points into it.
-    ///
-    /// # Errors
-    /// The sync or a deletion failed.
-    pub fn seal(mut self) -> io::Result<()> {
-        self.sync()?;
-        self.store.seal(self.file)
+        doomed
     }
 }

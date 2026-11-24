@@ -181,10 +181,13 @@ impl QueueNode {
         }
         let files = SnapshotFiles::open(&directory.join("snapshots"))?;
         let (cold, mut states) = cold::shards(directory, &config)?;
+        // Replay from the last snapshot reads the cold files it names.
+        cold.keep_for_snapshots();
         let mut cut = match files.newest()? {
             Some((id, body)) => Some(snapshot::load(&mut states, id, &body, config.shards)?),
             None => None,
         };
+        let named = cold.held();
         // The snapshot files above created the data directory.
         let (log, recovered) = match log {
             Some(storage) => GroupLog::open_with(storage, config.log)?,
@@ -192,7 +195,7 @@ impl QueueNode {
         };
         let log = Arc::new(log);
         let newest_marker = replay(&mut states, &recovered.records, config.shards, cut.as_mut())?;
-        cold::tidy(&cold, &mut states)?;
+        cold::tidy(&cold, &mut states, &named)?;
         let (next, base) = match &cut {
             Some(cut) => (cut.id.max(newest_marker), cut.base),
             None => (
@@ -202,7 +205,7 @@ impl QueueNode {
         };
         let snapshots = Arc::new(Snapshots::new(
             files,
-            Arc::clone(&log),
+            (Arc::clone(&log), cold),
             config.snapshot_segments,
             next.saturating_add(1),
             base,

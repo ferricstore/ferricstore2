@@ -12,6 +12,7 @@ use std::sync::mpsc;
 use std::sync::{Arc, Mutex, PoisonError, Weak};
 
 use wf_application::commands::queue::Partition;
+use wf_storage::cold::ColdStore;
 use wf_storage::log::GroupLog;
 use wf_storage::snapshot::files::SnapshotFiles;
 
@@ -43,6 +44,8 @@ struct Progress {
 pub(crate) struct Snapshots {
     files: SnapshotFiles,
     log: Arc<GroupLog>,
+    /// Unused cold files wait for a snapshot that no longer names them.
+    cold: Arc<ColdStore>,
     every: u64,
     progress: Mutex<Progress>,
 }
@@ -128,7 +131,7 @@ impl Snapshots {
     /// `next` is the next snapshot id; `base` the segment the log starts at.
     pub(crate) fn new(
         files: SnapshotFiles,
-        log: Arc<GroupLog>,
+        (log, cold): (Arc<GroupLog>, Arc<ColdStore>),
         every: u64,
         next: u64,
         base: u64,
@@ -136,6 +139,7 @@ impl Snapshots {
         Self {
             files,
             log,
+            cold,
             every,
             progress: Mutex::new(Progress { next, base }),
         }
@@ -165,6 +169,8 @@ impl Snapshots {
         let id = progress.next;
         progress.next = id.saturating_add(1);
         let base = self.log.rotate()?;
+        // Cold files unused from here on may still be named by a capture.
+        let begun = self.cold.snapshot_begins();
         let images = capture(router, id)?;
         let count = u16::try_from(images.len()).map_err(|_| NodeError::Capture)?;
         let mut header = vec![VERSION];
@@ -184,6 +190,10 @@ impl Snapshots {
         progress.base = base;
         self.log.remove_before(base)?;
         self.files.remove_before(id)?;
+        if let Some(begun) = begun {
+            // A file not deleted now is tried again after the next one.
+            drop(self.cold.snapshot_written(begun));
+        }
         Ok(id)
     }
 

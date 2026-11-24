@@ -19,7 +19,7 @@ pub struct ColdBatch {
 }
 
 /// Most bytes one cold file takes before the next starts.
-const MAX_FILE_BYTES: u64 = 64 * 1024 * 1024;
+pub const MAX_FILE_BYTES: u64 = 64 * 1024 * 1024;
 
 /// The cold writer thread's queue.
 pub struct ColdQueue {
@@ -33,11 +33,19 @@ impl ColdQueue {
     /// # Errors
     /// The thread did not start.
     pub fn spawn(store: &Arc<ColdStore>) -> io::Result<Self> {
+        Self::spawn_sized(store, MAX_FILE_BYTES)
+    }
+
+    /// [`Self::spawn`] with files that take at most about `max_file_bytes`.
+    ///
+    /// # Errors
+    /// The thread did not start.
+    pub fn spawn_sized(store: &Arc<ColdStore>, max_file_bytes: u64) -> io::Result<Self> {
         let (sender, receiver) = std::sync::mpsc::channel::<ColdBatch>();
         let store = Arc::clone(store);
         let thread = std::thread::Builder::new()
             .name("wf-cold".into())
-            .spawn(move || write_loop(&store, &receiver))?;
+            .spawn(move || write_loop(&store, &receiver, max_file_bytes))?;
         Ok(Self {
             sender: Some(sender),
             thread: Some(thread),
@@ -77,40 +85,48 @@ fn wall_hour() -> u64 {
 /// One round of the writer: every queued batch, one sync per file.
 fn write_round(
     store: &Arc<ColdStore>,
-    writers: &mut BTreeMap<u64, ColdWriter>,
+    (writers, max_file_bytes): (&mut BTreeMap<u64, ColdWriter>, u64),
     batches: Vec<ColdBatch>,
 ) {
-    let mut placed: Vec<(ColdBatch, io::Result<Vec<Location>>)> = Vec::new();
+    let mut placed: Vec<(ColdBatch, Vec<Location>, Option<io::Error>)> = Vec::new();
     for mut batch in batches {
         let images = std::mem::take(&mut batch.images);
         let mut locations = Vec::with_capacity(images.len());
         let mut failure = None;
         for (hour, image) in &images {
-            match append_to(store, writers, *hour, image) {
-                Ok(location) => locations.push(location),
+            match append_to(store, (writers, max_file_bytes), *hour, image) {
+                Ok(location) => {
+                    // Counted at once: a file sealed full later in this
+                    // round still holds this image.
+                    store.hold(location.file, 1);
+                    locations.push(location);
+                }
                 Err(error) => {
                     failure = Some(error);
                     break;
                 }
             }
         }
-        placed.push((batch, failure.map_or(Ok(locations), Err)));
+        placed.push((batch, locations, failure));
     }
     let synced = writers
         .values_mut()
         .try_for_each(ColdWriter::sync)
         .map_err(|error| error.kind());
-    for (batch, located) in placed {
-        let answer = match (&synced, located) {
-            (Ok(()), located) => located,
-            (Err(kind), _) => Err(io::Error::new(*kind, "cold sync failed")),
-        };
-        if let Ok(locations) = &answer {
-            for location in locations {
-                store.hold(location.file, 1);
+    for (batch, locations, failure) in placed {
+        let error = match (&synced, failure) {
+            (Ok(()), None) => {
+                (batch.done)(Ok(locations));
+                continue;
             }
+            (Ok(()), Some(error)) => error,
+            (Err(kind), _) => io::Error::new(*kind, "cold sync failed"),
+        };
+        // Not handed out: nothing points at what was appended.
+        for location in &locations {
+            drop(store.release(location.file, 1));
         }
-        (batch.done)(answer);
+        (batch.done)(Err(error));
     }
     // Flows removed in past hours no longer join their files.
     let current = wall_hour();
@@ -124,13 +140,13 @@ fn write_round(
 
 fn append_to(
     store: &Arc<ColdStore>,
-    writers: &mut BTreeMap<u64, ColdWriter>,
+    (writers, max_file_bytes): (&mut BTreeMap<u64, ColdWriter>, u64),
     hour: u64,
     image: &[u8],
 ) -> io::Result<Location> {
     if writers
         .get(&hour)
-        .is_some_and(|writer| writer.length() >= MAX_FILE_BYTES)
+        .is_some_and(|writer| writer.length() >= max_file_bytes)
         && let Some(full) = writers.remove(&hour)
     {
         full.seal()?;
@@ -142,14 +158,18 @@ fn append_to(
     writer.append(image)
 }
 
-fn write_loop(store: &Arc<ColdStore>, receiver: &std::sync::mpsc::Receiver<ColdBatch>) {
+fn write_loop(
+    store: &Arc<ColdStore>,
+    receiver: &std::sync::mpsc::Receiver<ColdBatch>,
+    max_file_bytes: u64,
+) {
     let mut writers: BTreeMap<u64, ColdWriter> = BTreeMap::new();
     while let Ok(first) = receiver.recv() {
         let mut batches = vec![first];
         while let Ok(more) = receiver.try_recv() {
             batches.push(more);
         }
-        write_round(store, &mut writers, batches);
+        write_round(store, (&mut writers, max_file_bytes), batches);
     }
     for writer in std::mem::take(&mut writers).into_values() {
         drop(writer.seal());

@@ -89,7 +89,7 @@ impl QueueNode {
         // Every committed round is applied again, so no earlier cold file
         // is named.
         let (cold, mut states) = cold::shards(directory, &config)?;
-        cold::tidy(&cold, &mut states)?;
+        cold::tidy(&cold, &mut states, &std::collections::HashSet::new())?;
         let log = EntryLog::open(&directory.join("group"), config.log)
             .map_err(|_| NodeError::Group("the entry log did not open"))?;
         let proposer = Arc::new(OnceLock::new());

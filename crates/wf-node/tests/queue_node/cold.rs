@@ -184,3 +184,60 @@ fn retention_removes_finished_flows_and_then_their_cold_files() -> TestResult {
     assert!(cold_files(&path)?.is_empty(), "{:?}", cold_files(&path)?);
     Ok(())
 }
+
+fn history(node: &QueueNode, id: &str) -> TestResult<Term> {
+    Ok(run(node, "FLOW.HISTORY", &[("id", Term::text(id))])??)
+}
+
+fn rewind_to_created(node: &QueueNode, id: &str) -> TestResult {
+    let Term::List(events) = history(node, id)? else {
+        return Err("history is not a list".into());
+    };
+    let Some(Term::List(first)) = events.first() else {
+        return Err("no created event".into());
+    };
+    let created = first.first().cloned().unwrap_or(Term::Nil);
+    run(
+        node,
+        "FLOW.REWIND",
+        &[("id", Term::text(id)), ("to_event", created)],
+    )??;
+    Ok(())
+}
+
+#[test]
+fn a_cold_file_the_last_snapshot_names_outlives_its_last_stub() -> TestResult {
+    // A rewind takes the only stub of a sealed cold file; the last
+    // snapshot still names that file, so after a crash replay applies the
+    // rewind to the image there.
+    let path = directory("cold-snapshot-names")?;
+    let id = {
+        let node = open(&path, 4)?;
+        finish(&node, "g", 1)?.into_iter().next().ok_or("no flow")?
+    };
+    {
+        // Replay moves the Flow to a file the snapshot names.
+        let node = open(&path, 4)?;
+        node.snapshot()?;
+    }
+    let before = {
+        // A restart seals every file.
+        let node = open(&path, 4)?;
+        rewind_to_created(&node, &id)?;
+        history(&node, &id)?
+    };
+    let node = open(&path, 4)?;
+    assert_eq!(history(&node, &id)?, before);
+    assert_eq!(field(&get(&node, &id)?, "state"), Term::text("queued"));
+    assert!(
+        !cold_files(&path)?.is_empty(),
+        "the snapshot still names it"
+    );
+    node.snapshot()?;
+    assert!(
+        cold_files(&path)?.is_empty(),
+        "a newer snapshot no longer names it: {:?}",
+        cold_files(&path)?
+    );
+    Ok(())
+}

@@ -67196,3 +67196,46 @@ restoring without checking the mark, skipping the run state or the lease
 wrongly, unmerged appends and unmerged proposals. A first cap of a fixed
 1 MiB per run survived (nothing reaches it) and was replaced by the log's
 own record limit.
+
+### Cold files outlive the snapshot that names them (24 Nov)
+
+Found while designing ADR-016 phase D, whose value files need the same
+lifetime rules. Two ways a cold file went while something still needed it:
+
+- A file filled within one writer round was deleted at its seal. The
+  writer counted a round's images only after the round's sync, so sealing
+  a full file before the next image found no stub in it and deleted it,
+  images and all. A round of more than 64 MiB after a file switch (a
+  restart's replay of many finished Flows, or a burst) handed out
+  locations in a deleted file. RED: `cold_files::a_file_filled_within_
+  one_writer_round_keeps_its_images` (files of 16 bytes, three images in
+  one batch) read `NotFound`. Fix: each image is counted when appended; a
+  batch that fails releases its counts.
+- A file was deleted as soon as its last stub went, but replay from the
+  last snapshot reads the files that snapshot names. A rewind of the only
+  Flow in a sealed file, then a crash before the next snapshot: replay
+  could not load the image the rewind's after-image applies to, and the
+  Flow came back with only the rewind's event in its history (since P2's
+  log fix it would also lose its kept versions). RED: `cold::a_cold_file_
+  the_last_snapshot_names_outlives_its_last_stub`. Fix: a standalone
+  node's store keeps files for snapshots
+  (`ColdStore::keep_for_snapshots`): an unused file is marked with the
+  number of snapshots begun, and deleted once a snapshot begun after that
+  is written (`snapshot_begins` before the capture, `snapshot_written`
+  after the file is written). After a restart, an unreferenced file the
+  loaded snapshot names waits for the next snapshot; others go at once. A
+  replicated member deletes at once, as before: it applies every committed
+  round again and names no earlier file.
+
+Tests besides the REDs: the node test also checks that the next snapshot
+deletes the file; `cold_files::an_unused_file_waits_for_a_snapshot_begun_
+after_it` and `..._a_restart_keeps_the_files_the_loaded_snapshot_names_
+for_the_next`.
+
+Mutation checks (7 of 7 fail a test): no count at append, deleting
+unused files at once, never deleting after a snapshot, a strict snapshot
+bound, no snapshot count, ignoring the loaded snapshot's files at a
+restart, and a standalone node not keeping files for snapshots. Not
+observable without fault injection: a failed batch giving its counts
+back, and `hold` clearing a file's unused mark (nothing holds an unused
+file again at run time).
