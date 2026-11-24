@@ -67286,7 +67286,12 @@ with every version in memory (20 MB of kept bytes); one Flow replacing it
 3,000 times, 3 MB against 9 MB. A change cost 4.70 to 4.77 ms against
 4.52 to 4.71 ms (alternating runs, two each): the value files' writes and
 syncs, about 3%, close to the noise. Flows that replace no values (the
-benchmark path) do no new work beyond an empty check per round.
+benchmark path) do no new work beyond an empty check per round. The SDK
+queue benchmark (400k Flows, 4 clients, 6 alternating runs) compared
+e9e2777 with cd145eb, which carries this and the entry above: median
+274,149 against 278,583 flows/s (ranges 261k-285k and 270k-300k overlap),
+8.55 against 8.5 ms of server CPU per 1k Flows, RSS 431 against 424 MB.
+No change beyond the noise.
 
 Not done: a cache beyond the page cache (reads of old versions are rare);
 the per-version key and reference stay in memory (about 100 bytes each);
