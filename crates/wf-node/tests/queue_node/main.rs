@@ -44,6 +44,7 @@ mod flow_schedule;
 mod flow_signal;
 mod flow_steps;
 mod flow_text;
+mod flow_text_batches;
 mod flow_value;
 mod lifecycle;
 mod reclaim;

@@ -67065,3 +67065,47 @@ the post-durable renewal note is gone. A claim's spend keeps the credit
 lease to the Flow's lease deadline, so the two lapse together. Disabling
 the renew-first check, applying the extension after a refused renewal,
 or dropping the renewal's deadline update each fails a test (3 of 3).
+
+### SDK suites against the node; G55-G59 (22 Nov)
+
+The Python SDK's integration suite (42/60, 7 gated off) and the
+TypeScript SDK's live suite (origin/main 7cba5ae) ran against a fresh
+node with client clocks. Every Python failure and most TypeScript ones
+are surfaces a workflow-only node does not serve: key-value, streams,
+sorted sets, pub/sub, `COMMAND`/`ECHO`/`KEYS`, store and admin opcodes,
+cluster topology, and the SDK's comparison of the full FerricStore
+opcode table. The Python restart-recovery test is key-value and Docker
+driven; its business case, run with Flows against the binary (an
+existing client fails fast while the node is down, then recovers with its
+Flow intact and claimable), passes. The TypeScript suite went from 20 to
+24 passing with:
+
+- G55: a text claim's repeated `STATE` names several states, as
+  Elixir's `Keyword.get_values(opts, :state)`. RED: `STATE created STATE
+  charged` claimed only `created`. `text::claim_states` turns repeated
+  `state` entries into the typed `states` list.
+- G56: the text forms of `CREATE_MANY`, `COMPLETE_MANY`, `RETRY_MANY`,
+  `FAIL_MANY`, `CANCEL_MANY`, `TRANSITION_MANY` and `SPAWN_CHILDREN` were
+  refused as "not supported yet". `text::batch` reads them as Elixir's
+  `NativeAstParser` (positional arguments, options up to `ITEMS` with
+  two-value `ATTRIBUTE`/`ATTRIBUTE_MERGE`/`STATE_META`, fixed-width items,
+  `MIXED` per-item partitions, `-` for no lease, a retry's own limit
+  nested) into the typed map the typed opcode carries.
+- G57: `PING` with a `message` answers it, as Elixir's
+  `do_execute(@op_ping)`; plain `PING` still answers `PONG`.
+- G58: typed-map `COMPLETE_MANY` and `CREATE_MANY`, and `PING`, run in a
+  typed `PIPELINE` as they do alone; they were refused there.
+- G59: a typed `PIPELINE` honours `return`: `pairs`, and `compact` (whose
+  binary codec this node does not offer, so Elixir's fallback), answer
+  `[status, value]` pairs; otherwise each outcome is its map. The node
+  answered maps for every mode, which the SDK's fused complete-and-claim
+  could not read. The existing pipeline test that asserted maps for
+  `return: compact` encoded the gap and was corrected.
+
+Not changed: the TypeScript query test expects Elixir's planner to report
+`order: native` for a default list query; the node evaluates FQL in
+memory and reports `sort`, which is what it does, with the same results.
+
+Mutation checks: removing the state merge, the batch forms, the two-value
+`ATTRIBUTE` width, `MIXED`, the retry nesting, the `PING` echo, the
+pipeline's batch mapping or its pairs each fail a test (9 of 9).

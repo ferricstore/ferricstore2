@@ -16,7 +16,7 @@ use std::fmt;
 pub use compact::{claim_due, complete_many};
 pub use compact_create::compact_create_many;
 pub use compact_many::{is_compact, many_options};
-pub use term::{PipelineCommand, options, pipeline};
+pub use term::{PipelineCommand, options, pipeline, pipeline_pairs};
 pub use typed::{complete, create, create_many, startup};
 
 /// A refused request body. The message is the reply text.

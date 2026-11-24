@@ -44,7 +44,7 @@ pub(super) fn word(term: &Term) -> Option<&[u8]> {
     }
 }
 
-fn upper(term: &Term) -> Option<String> {
+pub(super) fn upper(term: &Term) -> Option<String> {
     word(term).map(|bytes| String::from_utf8_lossy(bytes).to_ascii_uppercase())
 }
 

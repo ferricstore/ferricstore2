@@ -43,6 +43,20 @@ pub fn options(name: &str, body: &[u8]) -> Result<Term, RequestError> {
     term(value)
 }
 
+/// Whether a typed `PIPELINE` body asks for `[status, value]` pairs:
+/// `return` `pairs`, or `compact`, whose compact codec this server does not
+/// offer, so it answers Elixir's fallback (audit gap G59).
+#[must_use]
+pub fn pipeline_pairs(body: &[u8]) -> bool {
+    let Ok(Term::Map(entries)) = options("PIPELINE", body) else {
+        return false;
+    };
+    entries.iter().any(|(key, value)| {
+        key == b"return"
+            && matches!(value, Term::Bin(mode) if mode.as_slice() == b"pairs" || mode.as_slice() == b"compact")
+    })
+}
+
 /// One command of a typed `PIPELINE` body.
 #[derive(Clone, Debug, PartialEq)]
 pub struct PipelineCommand {

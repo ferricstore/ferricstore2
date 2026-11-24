@@ -2,7 +2,7 @@
 //! handed to the service as options and its term reply is encoded as a
 //! typed value.
 
-use super::typed::{Typed, bin, encode, map};
+use super::typed::{Typed, at, bin, encode, map, reply};
 use super::{Client, TestResult, start};
 
 const GET: u16 = 0x0202;
@@ -146,28 +146,37 @@ fn a_typed_pipeline_reports_each_command_in_order() -> TestResult {
             ]),
         ),
     ]))?;
+    // `return: compact` answers Elixir's `[status, value]` pairs, the
+    // fallback of its compact codec, which this server does not offer
+    // (audit gap G59).
     let reply = client.call(0x000E, 1, 0, &request)?;
-    let outcome = |opcode: i64, request: i64, status: &str, value: Typed| {
-        map(&[
-            ("lane_id", Typed::Int(1)),
-            ("opcode", Typed::Int(opcode)),
-            ("request_id", Typed::Int(request)),
-            ("status", bin(status)),
-            ("value", value),
-        ])
-    };
+    let pair = |status: &str, value: Typed| Typed::List(vec![bin(status), value]);
     assert_eq!(
         reply.body,
         ok(&Typed::List(vec![
-            outcome(0x0202, 1, "ok", Typed::Nil),
-            outcome(0x0201, 2, "error", bin("ERR flow already exists")),
-            outcome(
-                0x0100,
-                3,
-                "error",
-                bin("ERR native field command must be binary")
-            ),
+            pair("ok", Typed::Nil),
+            pair("error", bin("ERR flow already exists")),
+            pair("error", bin("ERR native field command must be binary")),
         ]))?
+    );
+    // Without `return` each outcome is its map.
+    let maps = encode(&map(&[
+        ("atomicity", bin("none")),
+        (
+            "commands",
+            Typed::List(vec![command(0x0202, 1, map(&[("id", bin("none1"))]))]),
+        ),
+    ]))?;
+    let reply = client.call(0x000E, 1, 0, &maps)?;
+    assert_eq!(
+        reply.body,
+        ok(&Typed::List(vec![map(&[
+            ("lane_id", Typed::Int(1)),
+            ("opcode", Typed::Int(0x0202)),
+            ("request_id", Typed::Int(1)),
+            ("status", bin("ok")),
+            ("value", Typed::Nil),
+        ])]))?
     );
     Ok(())
 }
@@ -286,5 +295,72 @@ fn effect_opcodes_reach_the_service_and_refusals_are_maps() -> TestResult {
             ("safe_to_retry", Typed::Bool(false)),
         ])
     );
+    Ok(())
+}
+
+#[test]
+fn a_pipeline_runs_batches_and_pings_as_alone() -> TestResult {
+    // The TypeScript SDK's "completes acknowledged jobs and claims
+    // replacements in one native pipeline" (audit gap G58) and "keeps native
+    // control commands out of explicit and automatic pipelines" (G57):
+    // typed-map batches and PING run in a pipeline as they do alone, and a
+    // PING with a message answers it, as Elixir's `do_execute(@op_ping)`.
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let command = |opcode: i64, request: i64, body: Typed| {
+        map(&[
+            ("opcode", Typed::Int(opcode)),
+            ("lane_id", Typed::Int(1)),
+            ("request_id", Typed::Int(request)),
+            ("body", body),
+        ])
+    };
+    let item = map(&[
+        ("id", bin("m1")),
+        ("lease_token", bin("w:1:1")),
+        ("fencing_token", Typed::Int(1)),
+    ]);
+    let request = encode(&map(&[
+        ("atomicity", bin("none")),
+        (
+            "commands",
+            Typed::List(vec![
+                command(
+                    0x0210,
+                    1,
+                    map(&[
+                        ("partition_key", bin("p")),
+                        ("items", Typed::List(vec![item])),
+                    ]),
+                ),
+                command(
+                    0x020F,
+                    2,
+                    map(&[
+                        ("partition_key", bin("p")),
+                        ("type", bin("t")),
+                        ("items", Typed::List(vec![map(&[("id", bin("c1"))])])),
+                    ]),
+                ),
+                command(0x0003, 3, map(&[("message", bin("three"))])),
+                command(0x0003, 4, map(&[])),
+            ]),
+        ),
+    ]))?;
+    let answer = client.call(0x000E, 1, 0, &request)?;
+    let (status, items) = reply(&answer.body)?;
+    assert_eq!(status, 0);
+    let Typed::List(items) = items else {
+        return Err(format!("a list expected, got {items:?}").into());
+    };
+    let statuses: Vec<&Typed> = items
+        .iter()
+        .map(|item| at(item, &["status"]))
+        .collect::<Result<_, _>>()?;
+    assert_eq!(statuses, [&bin("ok"), &bin("ok"), &bin("ok"), &bin("ok")]);
+    assert_eq!(at(&items[2], &["value"])?, &bin("three"));
+    assert_eq!(at(&items[3], &["value"])?, &bin("PONG"));
+    let echoed = client.call(0x0003, 1, 0, &encode(&map(&[("message", bin("one"))]))?)?;
+    assert_eq!(echoed.body, ok(&bin("one"))?);
     Ok(())
 }

@@ -6,6 +6,7 @@
 //! opcode would carry, read by the same parsers, so both forms decide and
 //! answer alike.
 
+mod batch;
 mod options;
 mod policy;
 mod specs;
@@ -148,16 +149,21 @@ const FORMS: &[Form] = &[
     ),
 ];
 
-/// Text forms with item lists, not read by this server yet.
-const NOT_YET: [&str; 7] = [
-    "FLOW.CREATE_MANY",
-    "FLOW.COMPLETE_MANY",
-    "FLOW.RETRY_MANY",
-    "FLOW.FAIL_MANY",
-    "FLOW.CANCEL_MANY",
-    "FLOW.TRANSITION_MANY",
-    "FLOW.SPAWN_CHILDREN",
-];
+/// A claim's repeated `STATE`, which Elixir reads as one more state each
+/// (`Keyword.get_values(opts, :state)`, audit gap G55): several become the
+/// typed `states` list.
+fn claim_states(options: &mut Options) {
+    let states: Vec<Term> = options
+        .0
+        .iter()
+        .filter(|(key, _)| key.as_slice() == b"state")
+        .map(|(_, value)| value.clone())
+        .collect();
+    if states.len() > 1 {
+        options.0.retain(|(key, _)| key.as_slice() != b"state");
+        options.push("states", Term::List(states));
+    }
+}
 
 /// Reads one FLOW text command.
 ///
@@ -179,10 +185,15 @@ pub fn parse_with_clock(
     client_clock: bool,
 ) -> Result<Parsed, FlowError> {
     let name = String::from_utf8_lossy(name).to_ascii_uppercase();
-    if NOT_YET.contains(&name.as_str()) {
-        return Err(FlowError::rejected(format!(
-            "ERR {name} as a text command is not supported by this server yet"
-        )));
+    if batch::is_batch(&name) {
+        let args: Vec<Term> = args.iter().map(word).collect();
+        let map = batch::parse(&name, &args)?;
+        let map = if client_clock {
+            map
+        } else {
+            super::without_client_time(&map)
+        };
+        return super::parse(&name, &map).map(Parsed::Command);
     }
     if name == "FLOW.QUERY" {
         return super::query::parse_text(args)
@@ -203,13 +214,16 @@ pub fn parse_with_clock(
     let (positional, rest) = args
         .split_at_checked(form.positional.len())
         .ok_or_else(|| arity(&name))?;
-    let options = match form.grammar {
+    let mut options = match form.grammar {
         Grammar::General(spec) => general(rest, spec)?,
         Grammar::Read(spec) => read(rest, spec)?,
         Grammar::Signal => signal(rest)?,
         Grammar::Retry => nest_retry(general(rest, specs::RETRY)?),
         Grammar::Policy => policy::options(rest)?,
     };
+    if matches!(form.name, "FLOW.CLAIM_DUE" | "FLOW.RECLAIM") {
+        claim_states(&mut options);
+    }
     let named: Vec<(&str, &Term)> = form.positional.iter().copied().zip(positional).collect();
     let map = with(&named, options);
     let map = if client_clock {

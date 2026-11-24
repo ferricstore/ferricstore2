@@ -162,7 +162,14 @@ pub(super) fn handle(
             Err(error) => refuse(reply, error.message()),
         },
         Some(Opcode::Shards) => shards_reply(context, reply),
-        Some(Opcode::Ping) => reply.send(0, &response::ok_text(b"PONG").unwrap_or_default()),
+        Some(Opcode::Ping) => {
+            let message = crate::request::options("PING", body)
+                .map_or_else(|_| Term::text("PONG"), |body| pipeline::pong(&body));
+            match response::term(&message) {
+                Ok(answer) => reply.send(0, &answer),
+                Err(_) => refuse(reply, "ERR reply exceeds the frame limit"),
+            }
+        }
         Some(Opcode::Quit) => {
             reply.send(0, &response::ok_text(b"OK").unwrap_or_default());
             return Next::Quit;

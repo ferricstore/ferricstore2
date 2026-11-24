@@ -178,3 +178,101 @@ pub(super) const PARTITION: Spec = &[
     ("INCLUDE_COLD", "include_cold", Boolean),
     ("CONSISTENT_PROJECTION", "consistent_projection", Boolean),
 ];
+
+/// `spec(:create)` with `INDEPENDENT`, as `parse_flow_create_many/1`.
+pub(super) const CREATE_MANY: Spec = &[
+    ("TYPE", "type", Binary),
+    ("STATE", "state", Binary),
+    ("PAYLOAD", "payload", Binary),
+    ("PAYLOAD_REF", "payload_ref", Ref("payload_ref")),
+    ("PARENT_FLOW_ID", "parent_flow_id", Ref("parent_flow_id")),
+    ("ROOT_FLOW_ID", "root_flow_id", Ref("root_flow_id")),
+    ("CORRELATION_ID", "correlation_id", Ref("correlation_id")),
+    ("RUN_AT", "run_at_ms", NonNegative),
+    ("NOW", "now_ms", NonNegative),
+    ("PRIORITY", "priority", NonNegative),
+    ("PARTITION", "partition_key", Partition),
+    ("RETENTION_TTL", "retention_ttl_ms", Positive),
+    ("RETENTION_TTL_MS", "retention_ttl_ms", Positive),
+    ("MAX_ACTIVE_MS", "max_active_ms", Infinity),
+    (
+        "HISTORY_HOT_MAX_EVENTS",
+        "history_hot_max_events",
+        NonNegative,
+    ),
+    ("HISTORY_MAX_EVENTS", "history_max_events", Positive),
+    ("IDEMPOTENT", "idempotent", Boolean),
+    ("RETURN", "return", Binary),
+    ("INDEPENDENT", "independent", Boolean),
+];
+
+pub(super) const MANY_TERMINAL: Spec = &[
+    ("RESULT", "result", Binary),
+    ("PAYLOAD", "payload", Binary),
+    ("TTL", "ttl_ms", Positive),
+    ("NOW", "now_ms", NonNegative),
+    ("INDEPENDENT", "independent", Boolean),
+    ("RETURN", "return", Binary),
+];
+
+pub(super) const MANY_RETRY: Spec = &[
+    ("ERROR", "error", Binary),
+    ("PAYLOAD", "payload", Binary),
+    ("RUN_AT", "run_at_ms", NonNegative),
+    ("MAX_RETRIES", "max_retries", NonNegative),
+    ("EXHAUSTED_TO", "exhausted_to", Binary),
+    ("NOW", "now_ms", NonNegative),
+    ("PARTITION", "partition_key", Partition),
+    ("INDEPENDENT", "independent", Boolean),
+];
+
+pub(super) const MANY_FAIL: Spec = &[
+    ("ERROR", "error", Binary),
+    ("PAYLOAD", "payload", Binary),
+    ("TTL", "ttl_ms", Positive),
+    ("NOW", "now_ms", NonNegative),
+    ("PARTITION", "partition_key", Partition),
+    ("INDEPENDENT", "independent", Boolean),
+];
+
+pub(super) const MANY_CANCEL: Spec = &[
+    ("REASON", "reason", Binary),
+    ("REASON_REF", "reason_ref", Ref("reason_ref")),
+    ("TTL", "ttl_ms", Positive),
+    ("NOW", "now_ms", NonNegative),
+    ("PARTITION", "partition_key", Partition),
+    ("INDEPENDENT", "independent", Boolean),
+];
+
+pub(super) const MANY_TRANSITION: Spec = &[
+    ("RUN_AT", "run_at_ms", NonNegative),
+    ("PRIORITY", "priority", NonNegative),
+    ("PAYLOAD", "payload", Binary),
+    ("PAYLOAD_REF", "payload_ref", Ref("payload_ref")),
+    ("NOW", "now_ms", NonNegative),
+    ("INDEPENDENT", "independent", Boolean),
+];
+
+pub(super) const SPAWN_CHILDREN: Spec = &[
+    ("GROUP", "group_id", Binary),
+    ("PARTITION", "partition_key", Partition),
+    ("FENCING", "fencing_token", NonNegative),
+    ("WAIT", "wait", Binary),
+    ("ON_CHILD_FAILED", "on_child_failed", Binary),
+    ("ON_PARENT_CLOSED", "on_parent_closed", Binary),
+    ("SUCCESS", "success", Binary),
+    ("FAILURE", "failure", Binary),
+    ("FROM_STATE", "from_state", Binary),
+    ("WAIT_STATE", "wait_state", Binary),
+    ("LEASE_TOKEN", "lease_token", Binary),
+    ("NOW", "now_ms", NonNegative),
+    ("RETENTION_TTL", "retention_ttl_ms", Positive),
+    ("RETENTION_TTL_MS", "retention_ttl_ms", Positive),
+    ("MAX_ACTIVE_MS", "max_active_ms", Infinity),
+    (
+        "HISTORY_HOT_MAX_EVENTS",
+        "history_hot_max_events",
+        NonNegative,
+    ),
+    ("HISTORY_MAX_EVENTS", "history_max_events", Positive),
+];

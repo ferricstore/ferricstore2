@@ -21,13 +21,18 @@ struct Pending {
     remaining: usize,
     reply: Option<ReplyTo>,
     commands: Vec<PipelineCommand>,
+    /// Answer `[status, value]` pairs instead of maps (audit gap G59).
+    pairs: bool,
 }
 
-fn item(command: &PipelineCommand, outcome: Outcome) -> Term {
+fn item(command: &PipelineCommand, outcome: Outcome, pairs: bool) -> Term {
     let (status, value) = match outcome {
         Ok(value) => ("ok", value),
         Err(message) => ("error", Term::Bin(message.into_bytes())),
     };
+    if pairs {
+        return Term::List(vec![Term::text(status), value]);
+    }
     flow::term::map(vec![
         ("lane_id", Term::Int(command.lane_id)),
         ("opcode", Term::Int(i64::from(command.opcode))),
@@ -50,6 +55,7 @@ fn settle(pending: &Mutex<Pending>, position: usize, outcome: Outcome) {
         return;
     };
     let outcomes = std::mem::take(&mut state.outcomes);
+    let pairs = state.pairs;
     let items: Vec<Term> = state
         .commands
         .iter()
@@ -58,6 +64,7 @@ fn settle(pending: &Mutex<Pending>, position: usize, outcome: Outcome) {
             item(
                 command,
                 outcome.unwrap_or_else(|| Err("ERR flow store unavailable".to_owned())),
+                pairs,
             )
         })
         .collect();
@@ -68,9 +75,25 @@ fn settle(pending: &Mutex<Pending>, position: usize, outcome: Outcome) {
     }
 }
 
+/// `PING`'s reply: its `message`, or `PONG`, as Elixir's
+/// `do_execute(@op_ping)` (audit gap G57).
+pub(super) fn pong(body: &Term) -> Term {
+    body.get(b"message")
+        .cloned()
+        .unwrap_or_else(|| Term::text("PONG"))
+}
+
 fn run(context: &Context, command: &PipelineCommand, done: Box<dyn FnOnce(Outcome) + Send>) {
     let failed = |error: flow::FlowError| error.to_string();
-    match Opcode::from_code(command.opcode) {
+    // A batch's typed-map body runs as its Flow command, as it does alone
+    // (audit gap G58).
+    let opcode = match Opcode::from_code(command.opcode) {
+        Some(Opcode::FlowCompleteMany) => Some(Opcode::Flow("FLOW.COMPLETE_MANY")),
+        Some(Opcode::FlowCreateMany) => Some(Opcode::Flow("FLOW.CREATE_MANY")),
+        other => other,
+    };
+    match opcode {
+        Some(Opcode::Ping) => done(Ok(pong(&command.body))),
         Some(Opcode::Flow(name)) => match flow::parse(name, &context.clock(command.body.clone())) {
             Ok(parsed) => context.service.execute(
                 parsed,
@@ -132,6 +155,7 @@ pub(super) fn pipeline(context: &Context, flags: u8, body: &[u8], reply: ReplyTo
         remaining: commands.len(),
         reply: Some(reply),
         commands: commands.clone(),
+        pairs: request::pipeline_pairs(body),
     }));
     for (position, command) in commands.iter().enumerate() {
         let part = Arc::clone(&pending);
