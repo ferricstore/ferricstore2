@@ -1,7 +1,8 @@
 //! Ports of the Elixir Flow business tests for ADR-014 steps 1 to 10 (the
 //! audit after step 15). Each test names its Elixir source file and test;
 //! the map of every Elixir test and its status is
-//! `docs/reviews/workflow-flow-test-audit.md`.
+//! `docs/reviews/workflow-flow-test-audit.md`; ports from the rest of the
+//! Elixir suite are mapped in `docs/reviews/workflow-flow-test-audit-rest.md`.
 //!
 //! Errors are compared by their reply text, which is what a client sees.
 
@@ -39,6 +40,7 @@ mod many_items;
 mod metadata_shapes;
 mod multi_state_claims;
 mod named_values;
+mod native_contract;
 mod partition_scopes;
 mod payload_refs;
 mod plain_values;

@@ -8,6 +8,7 @@
 mod compact;
 mod compact_create;
 mod compact_many;
+mod handshake;
 mod term;
 mod typed;
 
@@ -16,19 +17,30 @@ use std::fmt;
 pub use compact::{claim_due, complete_many};
 pub use compact_create::compact_create_many;
 pub use compact_many::{is_compact, many_options};
-pub use term::{PipelineCommand, options, pipeline, pipeline_pairs};
-pub use typed::{complete, create, create_many, startup};
+pub use handshake::handshake;
+pub use term::{Pipeline, PipelineCommand, options, pipeline};
+pub use typed::{complete, create, create_many};
 
 /// A refused request body. The message is the reply text.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RequestError {
     message: String,
+    bad_request: bool,
 }
 
 impl RequestError {
     fn new(message: impl Into<String>) -> Self {
         Self {
             message: message.into(),
+            bad_request: false,
+        }
+    }
+
+    /// A refusal Elixir answers with status `bad_request`.
+    fn bad(message: impl Into<String>) -> Self {
+        Self {
+            message: message.into(),
+            bad_request: true,
         }
     }
 
@@ -36,6 +48,13 @@ impl RequestError {
     #[must_use]
     pub fn message(&self) -> &str {
         &self.message
+    }
+
+    /// Whether Elixir answers it with status `bad_request` rather than
+    /// `error`.
+    #[must_use]
+    pub const fn is_bad_request(&self) -> bool {
+        self.bad_request
     }
 }
 
@@ -198,7 +217,8 @@ pub struct CompleteItem {
     pub fencing_token: i64,
 }
 
-/// What a client asked for in `STARTUP`. Other keys are accepted and unused.
+/// What a client asked for in `HELLO` or `STARTUP`. Other keys are
+/// accepted and unused.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Startup {
     /// The client accepts compact Flow replies.

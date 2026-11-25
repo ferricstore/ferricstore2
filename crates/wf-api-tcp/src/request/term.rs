@@ -43,18 +43,20 @@ pub fn options(name: &str, body: &[u8]) -> Result<Term, RequestError> {
     term(value)
 }
 
-/// Whether a typed `PIPELINE` body asks for `[status, value]` pairs:
-/// `return` `pairs`, or `compact`, whose compact codec this server does not
-/// offer, so it answers Elixir's fallback (audit gap G59).
-#[must_use]
-pub fn pipeline_pairs(body: &[u8]) -> bool {
-    let Ok(Term::Map(entries)) = options("PIPELINE", body) else {
-        return false;
-    };
-    entries.iter().any(|(key, value)| {
-        key == b"return"
-            && matches!(value, Term::Bin(mode) if mode.as_slice() == b"pairs" || mode.as_slice() == b"compact")
-    })
+/// A decoded typed `PIPELINE` body.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Pipeline {
+    /// The commands, in order.
+    pub commands: Vec<PipelineCommand>,
+    /// Atomicity `same_shard`: the client asks the server to check that
+    /// every command routes to one shard, which a Flow command,
+    /// coordinated across shards, never does (audit gap G64). `none`, the
+    /// default, and `per_shard` run each command as it runs alone.
+    pub same_shard: bool,
+    /// Whether the reply lists `[status, value]` pairs: `return` `pairs`,
+    /// or `compact`, whose compact codec this server does not offer, so it
+    /// answers Elixir's fallback (audit gap G59).
+    pub pairs: bool,
 }
 
 /// One command of a typed `PIPELINE` body.
@@ -74,16 +76,45 @@ pub struct PipelineCommand {
 /// each command is `{opcode, lane_id, request_id, body}`.
 ///
 /// # Errors
-/// Refuses a body that is not that shape.
-pub fn pipeline(body: &[u8]) -> Result<Vec<PipelineCommand>, RequestError> {
+/// Refuses a body that is not that shape, and, as a bad request, an
+/// atomicity Elixir does not take.
+pub fn pipeline(body: &[u8]) -> Result<Pipeline, RequestError> {
     let invalid = || RequestError::new("ERR native PIPELINE payload is invalid");
     let Term::Map(entries) = options("PIPELINE", body)? else {
         return Err(invalid());
     };
-    let Some((_, Term::List(commands))) = entries.iter().find(|(key, _)| key == b"commands") else {
+    let field = |name: &[u8]| {
+        entries
+            .iter()
+            .find(|(key, _)| key.as_slice() == name)
+            .map(|(_, value)| value)
+    };
+    let same_shard = match field(b"atomicity") {
+        None => false,
+        Some(Term::Bin(mode)) => match mode.as_slice() {
+            b"none" | b"per_shard" => false,
+            b"same_shard" => true,
+            other => {
+                return Err(RequestError::bad(format!(
+                    "ERR native unsupported pipeline atomicity {}",
+                    String::from_utf8_lossy(other)
+                )));
+            }
+        },
+        Some(_) => {
+            return Err(RequestError::bad(
+                "ERR native field atomicity must be binary",
+            ));
+        }
+    };
+    let pairs = matches!(
+        field(b"return"),
+        Some(Term::Bin(mode)) if mode.as_slice() == b"pairs" || mode.as_slice() == b"compact"
+    );
+    let Some(Term::List(commands)) = field(b"commands") else {
         return Err(invalid());
     };
-    commands
+    let commands = commands
         .iter()
         .map(|command| {
             let number = |key: &[u8]| match command.get(key) {
@@ -101,5 +132,10 @@ pub fn pipeline(body: &[u8]) -> Result<Vec<PipelineCommand>, RequestError> {
             })
         })
         .collect::<Option<Vec<_>>>()
-        .ok_or_else(invalid)
+        .ok_or_else(invalid)?;
+    Ok(Pipeline {
+        commands,
+        same_shard,
+        pairs,
+    })
 }

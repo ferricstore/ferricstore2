@@ -3,10 +3,10 @@
 use std::sync::Arc;
 
 use wf_application::commands::flow::{self, NodeService, Term};
-use wf_application::commands::queue::Cancellation;
+use wf_application::commands::queue::{Cancellation, ServiceError};
 
 use crate::frame::{FLAG_COMPRESSED, FLAG_CUSTOM_PAYLOAD, FLAG_MORE_CHUNKS, Header, Opcode};
-use crate::request::{self, Startup};
+use crate::request::{self, RequestError, Startup};
 use crate::response::{self, COMPACT_CODECS, Handshake, STATUS_ERROR};
 
 use super::ServerInfo;
@@ -87,6 +87,16 @@ pub(super) fn refuse(reply: ReplyTo, message: &str) {
     );
 }
 
+/// Sends a refused request's reply: a bad request's map with status 6,
+/// or the `ERR ...` map.
+pub(super) fn refuse_request(reply: ReplyTo, error: &RequestError) {
+    if error.is_bad_request() {
+        generic::failed(reply, &ServiceError::BadRequest(error.message().to_owned()));
+    } else {
+        refuse(reply, error.message());
+    }
+}
+
 fn handshake_reply(context: &Context, negotiated: Negotiated, reply: ReplyTo) {
     let selected = negotiated.selected();
     let body = response::handshake(&Handshake {
@@ -159,14 +169,22 @@ pub(super) fn handle(
         return Next::Continue;
     }
     match Opcode::from_code(header.opcode) {
-        Some(Opcode::Hello | Opcode::Options) => handshake_reply(context, *negotiated, reply),
-        Some(Opcode::Startup) => match request::startup(body) {
-            Ok(startup) => {
-                *negotiated = Negotiated::from_startup(&startup);
-                handshake_reply(context, *negotiated, reply);
+        Some(Opcode::Options) => handshake_reply(context, *negotiated, reply),
+        // HELLO negotiates as STARTUP does (audit gap G63).
+        Some(opcode @ (Opcode::Hello | Opcode::Startup)) => {
+            let command = if opcode == Opcode::Hello {
+                "HELLO"
+            } else {
+                "STARTUP"
+            };
+            match request::handshake(command, body) {
+                Ok(startup) => {
+                    *negotiated = Negotiated::from_startup(&startup);
+                    handshake_reply(context, *negotiated, reply);
+                }
+                Err(error) => refuse_request(reply, &error),
             }
-            Err(error) => refuse(reply, error.message()),
-        },
+        }
         Some(Opcode::Shards) => shards_reply(context, reply),
         Some(Opcode::Ping) => {
             let message = crate::request::options("PING", body)

@@ -7,6 +7,7 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use wf_application::commands::flow::Term;
+use wf_application::commands::queue::ServiceError;
 
 use crate::response::{self, STATUS_BAD_REQUEST, STATUS_ERROR};
 
@@ -32,6 +33,15 @@ impl Late {
         match self {
             Self::Exceeded => "ERR native request deadline exceeded",
             Self::Invalid => "ERR native request deadline must be a non-negative integer",
+        }
+    }
+
+    /// The refusal as a service error, for a command inside a pipeline:
+    /// a malformed deadline is a bad request (audit gap G65).
+    pub(super) fn error(self) -> ServiceError {
+        match self {
+            Self::Exceeded => ServiceError::rejected(self.message().to_owned()),
+            Self::Invalid => ServiceError::BadRequest(self.message().to_owned()),
         }
     }
 

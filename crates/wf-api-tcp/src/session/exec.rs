@@ -5,29 +5,35 @@
 
 use wf_application::commands::flow::text::{self, Parsed};
 use wf_application::commands::flow::{Term, claim};
+use wf_application::commands::queue::ServiceError;
 
 use crate::request;
-use crate::response;
 
 use super::connection::ReplyTo;
 use super::deadline;
-use super::dispatch::{Context, refuse};
+use super::dispatch::{Context, refuse_request};
+use super::generic;
 
-/// Where a command's outcome goes: its reply, or its refusal text.
-pub(super) type Done = Box<dyn FnOnce(Result<Term, String>) + Send>;
+/// Where a command's outcome goes: its reply, or its refusal, which keeps
+/// its status and, for a query failure, its diagnostic (audit gap G65).
+pub(super) type Done = Box<dyn FnOnce(Result<Term, ServiceError>) + Send>;
+
+fn rejected(text: impl Into<String>) -> ServiceError {
+    ServiceError::rejected(text.into())
+}
 
 /// Runs one text command from its `{command, args}` map.
 pub(super) fn run(context: &Context, payload: &Term, done: Done) {
     if let Err(late) = deadline::check(payload) {
-        return done(Err(late.message().to_owned()));
+        return done(Err(late.error()));
     }
     let Some(Term::Bin(name)) = payload.get(b"command") else {
-        return done(Err("ERR native field command must be binary".to_owned()));
+        return done(Err(rejected("ERR native field command must be binary")));
     };
     let args = match payload.get(b"args") {
         None | Some(Term::Nil) => &[][..],
         Some(Term::List(args)) => args.as_slice(),
-        Some(_) => return done(Err("ERR native COMMAND_EXEC args must be a list".to_owned())),
+        Some(_) => return done(Err(rejected("ERR native COMMAND_EXEC args must be a list"))),
     };
     let upper = name.to_ascii_uppercase();
     // PING answers here as its own opcode does; SDKs send it as text to
@@ -36,24 +42,21 @@ pub(super) fn run(context: &Context, payload: &Term, done: Done) {
         return done(match args {
             [] => Ok(Term::text("PONG")),
             [message] => Ok(message.clone()),
-            _ => Err("ERR wrong number of arguments for 'ping' command".to_owned()),
+            _ => Err(rejected("ERR wrong number of arguments for 'ping' command")),
         });
     }
     if !upper.starts_with(b"FLOW.") {
-        return done(Err(format!(
+        return done(Err(rejected(format!(
             "ERR command {} is not supported by this server",
             String::from_utf8_lossy(name)
-        )));
+        ))));
     }
     match text::parse_with_clock(name, args, context.info.client_clock) {
-        Ok(Parsed::Command(command)) => context.service.execute(
-            command,
-            Box::new(move |result| done(result.map_err(|error| error.to_string()))),
-        ),
+        Ok(Parsed::Command(command)) => context.service.execute(command, done),
         Ok(Parsed::Claim(typed, map)) => {
             let mut parsed = match claim::parse(typed, &map) {
                 Ok(parsed) => parsed,
-                Err(error) => return done(Err(error.to_string())),
+                Err(error) => return done(Err(error)),
             };
             if parsed.request.block_ms.is_some() {
                 parsed.request.cancellation = Some(context.closed.clone());
@@ -61,16 +64,10 @@ pub(super) fn run(context: &Context, payload: &Term, done: Done) {
             let shape = parsed.shape;
             context.service.claim(
                 parsed.request,
-                Box::new(move |result| {
-                    done(
-                        result
-                            .map(|claimed| claim::reply(shape, claimed))
-                            .map_err(|error| error.to_string()),
-                    );
-                }),
+                Box::new(move |result| done(result.map(|claimed| claim::reply(shape, claimed)))),
             );
         }
-        Err(error) => done(Err(error.to_string())),
+        Err(error) => done(Err(error)),
     }
 }
 
@@ -78,7 +75,7 @@ pub(super) fn run(context: &Context, payload: &Term, done: Done) {
 pub(super) fn exec(context: &Context, body: &[u8], reply: ReplyTo) {
     let payload = match request::options("COMMAND_EXEC", body) {
         Ok(payload) => payload,
-        Err(error) => return refuse(reply, error.message()),
+        Err(error) => return refuse_request(reply, &error),
     };
     if let Err(late) = deadline::check(&payload) {
         return late.refuse(reply);
@@ -87,11 +84,8 @@ pub(super) fn exec(context: &Context, body: &[u8], reply: ReplyTo) {
         context,
         &payload,
         Box::new(move |outcome| match outcome {
-            Ok(term) => match response::term(&term) {
-                Ok(body) => reply.send(0, &body),
-                Err(_) => refuse(reply, "ERR reply exceeds the frame limit"),
-            },
-            Err(message) => refuse(reply, &message),
+            Ok(term) => generic::send(reply, &term),
+            Err(error) => generic::failed(reply, &error),
         }),
     );
 }

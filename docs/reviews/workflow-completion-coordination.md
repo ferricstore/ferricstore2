@@ -67589,3 +67589,71 @@ mutants there: 5 caught, 1 unviable). The panic ratchet then refused
 `held.len() + 1` in the asking loop; it now checks that every other
 member answered (6 mutants: 4 caught, 2 unviable). Each catch was checked
 against the test that failed.
+
+### The rest of the Elixir suite; G63-G65 (25 Nov)
+
+The two Flow test audits covered the Elixir tests of the Flow commands.
+This audit maps every other Elixir test file on `main` 31994beda (39
+commits past their pin) that can hold a guarantee the node owes clients:
+`docs/reviews/workflow-flow-test-audit-rest.md`. Of 377 files that test
+Flows or the native protocol, 189 test Elixir internals (LMDB, the
+history projector, hibernation, wa_raft) and 113 surfaces the node does
+not serve (KV, ACL and AUTH, TLS, MULTI, PubSub, the dashboard); the 998
+tests of the other 75 are audited one by one. Rows are checked against
+the node's tests and, for the native protocol, by sending the same frames
+to an Elixir reference (`ferricstore-slice-baseline`) and the node (rig
+`parity/scenario_transport.py`, `scenario_query_native.py`).
+
+`native/commands_test.exs` and `native/codec_test.exs` are done. Gaps:
+- G63: HELLO negotiated nothing, and STARTUP took any codec list. Both
+  now negotiate alike, as Elixir's `do_execute(@op_hello)` and
+  `(@op_startup)` do: `compact_flow_responses` takes `true`, `"true"`,
+  `"1"` or `1`; `compact_response_codecs` must be a list of at most 32
+  distinct UTF-8 names of 1 to 128 bytes, each a codec the protocol
+  defines (the server still selects only those it writes); compression
+  other than none is refused (`zlib` as disabled, as Elixir's default);
+  client and driver names must be UTF-8 text of at most 1024 bytes. Each
+  refusal is a bad request and keeps the earlier choice; a HELLO that
+  asks for nothing turns compact replies off, as in Elixir. The node
+  writes unquoted values in refusals where Elixir writes `inspect` forms.
+- G64: a typed `PIPELINE` ignored `atomicity`. It now takes only `none`,
+  `per_shard` and `same_shard`, refuses other text and non-text values
+  as bad requests, and refuses `same_shard` around any Flow command
+  (typed, or a `FLOW.*` text command) as Elixir does: Flow commands are
+  coordinated, so `same_shard` cannot promise one shard for them.
+- G65: through `COMMAND_EXEC` a refusal lost its status and structure:
+  a query failure answered status 1 with its message only, where the
+  typed `FLOW.QUERY` answers status 6 with its diagnostic (code, detail,
+  hint, position, context). Pipeline items reported every refusal as
+  `error` with text. Both now keep the service error: `COMMAND_EXEC`
+  answers as the typed form does, and an item carries Elixir's status
+  (`bad_request`, `busy`, `reroute` or `error`) with the diagnostic or
+  governance map, or the message.
+
+Recorded, not changed: Elixir refuses control opcodes (PING, HELLO, ...)
+inside a pipeline; the node answers PING there (G58 said Elixir runs it,
+which holds for text `PING` only). The compact query result, Flow record
+and pipeline codecs are not offered, so STARTUP never selects them and
+SDKs send and read the typed forms.
+
+RED: `negotiation::{hello_negotiates_compact_replies_as_startup_does,
+compact_replies_take_elixir_s_spellings_of_true,
+a_malformed_codec_request_is_a_bad_request_that_keeps_the_earlier_choice,
+compression_and_client_names_are_checked_as_elixir_checks_them}` and
+`pipeline_rules::{a_pipeline_takes_only_elixir_s_atomicity_modes,
+command_exec_keeps_a_query_failure_s_status_and_diagnostic,
+pipeline_items_keep_their_refusal_s_status_and_value}` failed before
+(7 failed, 37 passed). Ported rows with no earlier test:
+`audit::native_contract::every_create_path_keeps_its_own_active_time_limit`,
+`request::compact_many::tests` (the compact retry, fail, cancel and
+transition batches, the independence and local-only markers, and the
+compact `FLOW.VALUE.MGET` body had no test) and
+`fsnp::frame::a_reply_longer_than_a_frame_is_refused_whole`. After the
+change the differential probes match Elixir except where recorded above.
+
+cargo-mutants on the diff (wf-api-tcp): 63 mutants, 52 caught, 8
+unviable, 3 missed: no test kept a malformed `PIPELINE` at status 1
+(`is_bad_request` -> true), none sent exactly 32 codecs (`>` -> `>=`),
+and none checked that a handshake refusal names its command (`==` ->
+`!=`). Tests now cover each; the rerun caught 55, 8 unviable, none
+missed.

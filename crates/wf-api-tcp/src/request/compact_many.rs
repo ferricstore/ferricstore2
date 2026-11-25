@@ -11,6 +11,9 @@
 //! cancel) and its fence; a transition item has its fence, then an optional
 //! lease token.
 
+#[cfg(test)]
+mod tests;
+
 use wf_application::commands::flow::Term;
 
 use crate::codec::Reader;

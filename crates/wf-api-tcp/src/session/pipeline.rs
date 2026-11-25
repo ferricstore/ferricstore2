@@ -1,20 +1,23 @@
 //! Typed `PIPELINE` frames (ADR-014): every Flow command in the frame runs
 //! as it would alone, and one reply lists each command's outcome in order as
 //! Elixir's typed pipeline reply does: `{lane_id, opcode, request_id,
-//! status, value}`, with `ok` and the reply, or `error` and its message.
+//! status, value}`, with `ok` and the reply, or the refusal's status and
+//! its map or message (audit gap G65).
 
 use std::sync::{Arc, Mutex, PoisonError};
 
 use wf_application::commands::flow::{self, Term, claim};
+use wf_application::commands::queue::ServiceError;
 
 use crate::frame::{FLAG_CUSTOM_PAYLOAD, Opcode};
-use crate::request::{self, PipelineCommand};
+use crate::request::{self, Pipeline, PipelineCommand};
 use crate::response;
 
 use super::connection::ReplyTo;
-use super::dispatch::{Context, refuse};
+use super::dispatch::{Context, refuse, refuse_request};
+use super::generic;
 
-type Outcome = Result<Term, String>;
+type Outcome = Result<Term, ServiceError>;
 
 struct Pending {
     outcomes: Vec<Option<Outcome>>,
@@ -25,10 +28,25 @@ struct Pending {
     pairs: bool,
 }
 
+/// A refused command's item status and value, as Elixir's
+/// `pipeline_result` lists them: the refusal's status, and its map or text.
+fn refused(error: ServiceError) -> (&'static str, Term) {
+    let text = |error: &ServiceError| Term::Bin(error.to_string().into_bytes());
+    match error {
+        // Every query failure is a bad request (`Failure::status`).
+        ServiceError::Query(failure) => ("bad_request", failure.payload()),
+        ServiceError::Governance(denial) => ("error", denial.payload()),
+        ServiceError::BadRequest(message) => ("bad_request", Term::Bin(message.into_bytes())),
+        ServiceError::Busy => ("busy", text(&error)),
+        ServiceError::Reroute => ("reroute", text(&error)),
+        other => ("error", text(&other)),
+    }
+}
+
 fn item(command: &PipelineCommand, outcome: Outcome, pairs: bool) -> Term {
     let (status, value) = match outcome {
         Ok(value) => ("ok", value),
-        Err(message) => ("error", Term::Bin(message.into_bytes())),
+        Err(error) => refused(error),
     };
     if pairs {
         return Term::List(vec![Term::text(status), value]);
@@ -63,7 +81,7 @@ fn settle(pending: &Mutex<Pending>, position: usize, outcome: Outcome) {
         .map(|(command, outcome)| {
             item(
                 command,
-                outcome.unwrap_or_else(|| Err("ERR flow store unavailable".to_owned())),
+                outcome.unwrap_or(Err(ServiceError::Unavailable)),
                 pairs,
             )
         })
@@ -84,7 +102,6 @@ pub(super) fn pong(body: &Term) -> Term {
 }
 
 fn run(context: &Context, command: &PipelineCommand, done: Box<dyn FnOnce(Outcome) + Send>) {
-    let failed = |error: flow::FlowError| error.to_string();
     // A batch's typed-map body runs as its Flow command, as it does alone
     // (audit gap G58).
     let opcode = match Opcode::from_code(command.opcode) {
@@ -96,13 +113,10 @@ fn run(context: &Context, command: &PipelineCommand, done: Box<dyn FnOnce(Outcom
         Some(Opcode::Ping) => done(Ok(pong(&command.body))),
         Some(Opcode::Flow(name)) => match context.admit(command.body.clone()) {
             Ok(args) => match flow::parse(name, &args) {
-                Ok(parsed) => context.service.execute(
-                    parsed,
-                    Box::new(move |result| done(result.map_err(|error| error.to_string()))),
-                ),
-                Err(error) => done(Err(failed(error))),
+                Ok(parsed) => context.service.execute(parsed, done),
+                Err(error) => done(Err(error)),
             },
-            Err(late) => done(Err(late.message().to_owned())),
+            Err(late) => done(Err(late.error())),
         },
         Some(opcode @ (Opcode::FlowClaimDue | Opcode::FlowReclaim)) => {
             let name = if opcode == Opcode::FlowReclaim {
@@ -112,7 +126,7 @@ fn run(context: &Context, command: &PipelineCommand, done: Box<dyn FnOnce(Outcom
             };
             let args = match context.admit(command.body.clone()) {
                 Ok(args) => args,
-                Err(late) => return done(Err(late.message().to_owned())),
+                Err(late) => return done(Err(late.error())),
             };
             match claim::parse(name, &args) {
                 Ok(parsed) => {
@@ -120,22 +134,37 @@ fn run(context: &Context, command: &PipelineCommand, done: Box<dyn FnOnce(Outcom
                     context.service.claim(
                         parsed.request,
                         Box::new(move |result| {
-                            done(
-                                result
-                                    .map(|claimed| claim::reply(shape, claimed))
-                                    .map_err(|error| error.to_string()),
-                            );
+                            done(result.map(|claimed| claim::reply(shape, claimed)));
                         }),
                     );
                 }
-                Err(error) => done(Err(failed(error))),
+                Err(error) => done(Err(error)),
             }
         }
         Some(Opcode::CommandExec) => super::exec::run(context, &command.body, done),
-        _ => done(Err(format!(
+        _ => done(Err(ServiceError::rejected(format!(
             "ERR FSNP opcode {:#06x} is not supported in a pipeline by this server",
             command.opcode
-        ))),
+        )))),
+    }
+}
+
+/// Whether a command is a Flow command, which Elixir coordinates across
+/// shards, so a `same_shard` pipeline refuses it (audit gap G64).
+fn coordinated(command: &PipelineCommand) -> bool {
+    match Opcode::from_code(command.opcode) {
+        Some(Opcode::CommandExec) => matches!(
+            command.body.get(b"command"),
+            Some(Term::Bin(name)) if name.get(..5).is_some_and(|prefix| prefix.eq_ignore_ascii_case(b"FLOW."))
+        ),
+        Some(
+            Opcode::Flow(_)
+            | Opcode::FlowClaimDue
+            | Opcode::FlowReclaim
+            | Opcode::FlowCreateMany
+            | Opcode::FlowCompleteMany,
+        ) => true,
+        _ => false,
     }
 }
 
@@ -147,10 +176,22 @@ pub(super) fn pipeline(context: &Context, flags: u8, body: &[u8], reply: ReplyTo
             "ERR compact PIPELINE requests are not supported by this server",
         );
     }
-    let commands = match request::pipeline(body) {
-        Ok(commands) => commands,
-        Err(error) => return refuse(reply, error.message()),
+    let Pipeline {
+        commands,
+        same_shard,
+        pairs,
+    } = match request::pipeline(body) {
+        Ok(pipeline) => pipeline,
+        Err(error) => return refuse_request(reply, &error),
     };
+    if same_shard && commands.iter().any(coordinated) {
+        return generic::failed(
+            reply,
+            &ServiceError::BadRequest(
+                "ERR native same_shard pipeline contains coordinated command".to_owned(),
+            ),
+        );
+    }
     if commands.is_empty() {
         return match response::term(&Term::List(Vec::new())) {
             Ok(body) => reply.send(0, &body),
@@ -162,7 +203,7 @@ pub(super) fn pipeline(context: &Context, flags: u8, body: &[u8], reply: ReplyTo
         remaining: commands.len(),
         reply: Some(reply),
         commands: commands.clone(),
-        pairs: request::pipeline_pairs(body),
+        pairs,
     }));
     for (position, command) in commands.iter().enumerate() {
         let part = Arc::clone(&pending);

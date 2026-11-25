@@ -63,6 +63,25 @@ fn refuses_bad_magic_version_and_oversized_bodies() {
 }
 
 #[test]
+fn a_reply_longer_than_a_frame_is_refused_whole() -> TestResult {
+    // Elixir: "successful responses over their byte budget become bounded
+    // errors": the frame writer refuses the body, appends nothing, and the
+    // connection sends `ERR reply exceeds the frame limit` instead.
+    let header = Header::parse_request(request_header(0x0202, 0))?;
+    let limit = usize::try_from(MAX_BODY_BYTES)?;
+    let mut out = Vec::new();
+    header.encode_response(0, &vec![0; limit], &mut out)?;
+    assert_eq!(out.len(), HEADER_LEN + limit);
+    let mut out = Vec::new();
+    assert_eq!(
+        header.encode_response(0, &vec![0; limit + 1], &mut out),
+        Err(FrameError::TooLarge(u64::from(MAX_BODY_BYTES) + 1))
+    );
+    assert_eq!(out, []);
+    Ok(())
+}
+
+#[test]
 fn opcode_codes_match_the_native_protocol() {
     for (opcode, code) in [
         (Opcode::Hello, 0x0001),

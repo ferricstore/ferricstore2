@@ -3,7 +3,7 @@
 
 use crate::codec::Value;
 
-use super::{Complete, Create, CreateItem, CreateMany, RequestError, Startup};
+use super::{Complete, Create, CreateItem, CreateMany, RequestError};
 
 const CREATE_MANY_KEYS: &[&[u8]] = &[
     b"type",
@@ -232,39 +232,4 @@ pub fn complete(body: &[u8]) -> Result<Complete, RequestError> {
             .ok_or_else(|| RequestError::new("ERR FLOW.COMPLETE requires fencing_token"))?,
         now_ms: fields.integer(b"now_ms")?,
     })
-}
-
-/// Parses a `STARTUP` body: a typed map whose `compact_flow_responses` and
-/// `compact_response_codecs` keys are read when present.
-///
-/// # Errors
-/// Refuses a malformed body or a body that is not a map.
-pub fn startup(body: &[u8]) -> Result<Startup, RequestError> {
-    let value = Value::decode_exact(body).map_err(|error| {
-        RequestError::new(format!("ERR native STARTUP payload is invalid: {error}"))
-    })?;
-    let Value::Map(entries) = value else {
-        return Err(RequestError::new(
-            "ERR native STARTUP payload must be a map",
-        ));
-    };
-    let mut startup = Startup::default();
-    for (key, value) in entries {
-        match (key.as_slice(), value) {
-            (b"compact_flow_responses", Value::Bool(compact)) => {
-                startup.compact_flow_responses = compact;
-            }
-            (b"compact_response_codecs", Value::Arr(codecs)) => {
-                startup.codecs = codecs
-                    .into_iter()
-                    .filter_map(|codec| match codec {
-                        Value::Bin(name) => Some(name),
-                        _ => None,
-                    })
-                    .collect();
-            }
-            _ => {}
-        }
-    }
-    Ok(startup)
 }

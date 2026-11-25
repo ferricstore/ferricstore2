@@ -47,7 +47,7 @@ pub(super) fn failed(reply: ReplyTo, error: &ServiceError) {
     }
 }
 
-fn send(reply: ReplyTo, term: &flow::Term) {
+pub(super) fn send(reply: ReplyTo, term: &flow::Term) {
     match response::term(term) {
         Ok(body) => reply.send(0, &body),
         Err(_) => refuse(reply, "ERR reply exceeds the frame limit"),
