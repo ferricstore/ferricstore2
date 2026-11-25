@@ -2,7 +2,8 @@
 //!
 //! The Python SDK refuses a server whose handshake lacks its 0.11.4 contract:
 //! limits, compact codec opcodes, the `FLOW.POLICY.SET` and `FLOW.QUERY`
-//! schemas and the Flow query manifest. This server declares that contract so
+//! schemas and the Flow query manifest; the Go SDK also needs the protocol
+//! versions. This server declares that contract so
 //! the SDK connects, but implements only the queue commands; every other
 //! command, including the declared query and policy commands, is refused
 //! with an explicit error. Compact codecs are declared only for the replies
@@ -95,6 +96,18 @@ fn capabilities(handshake: &Handshake<'_>) -> Value {
     let mut supported = vec!["typed_value"];
     supported.extend(COMPACT_CODECS.iter().map(|(name, _)| *name));
     map(vec![
+        // The native protocol versions this server speaks; the Go SDK
+        // refuses a server that does not list its own (audit gap G60).
+        ("protocol_versions", Value::Arr(vec![int(1)])),
+        // Requests may carry a deadline on the server's clock (audit gap
+        // G62).
+        (
+            "deadlines",
+            map(vec![
+                ("clock", text("server_unix_ms")),
+                ("field", text("deadline_ms")),
+            ]),
+        ),
         (
             "limits",
             map(vec![

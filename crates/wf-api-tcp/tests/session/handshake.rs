@@ -1,4 +1,5 @@
-//! HELLO and STARTUP declare what the Python SDK checks before it connects.
+//! HELLO and STARTUP declare what the Python and Go SDKs check before they
+//! connect.
 
 use super::typed::{Typed, at, bin, encode, map, reply, texts};
 use super::{Client, TestResult, start};
@@ -75,6 +76,30 @@ fn hello_declares_the_fields_the_sdk_requires() -> TestResult {
     Ok(())
 }
 
+/// The Go SDK refuses a HELLO without the protocol versions it speaks
+/// (`validateNativeProtocolVersions`), as Elixir's `capabilities_payload`
+/// declares them.
+#[test]
+fn hello_declares_the_protocol_versions_the_go_sdk_requires() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let (status, value) = reply(&client.call(HELLO, 0, 0, &hello_body()?)?.body)?;
+    assert_eq!(status, 0);
+    assert_eq!(
+        at(&value, &["capabilities", "protocol_versions"])?,
+        &Typed::List(vec![Typed::Int(1)])
+    );
+    // And where a request's deadline goes, as Elixir declares it (G62).
+    assert_eq!(
+        at(&value, &["capabilities", "deadlines"])?,
+        &map(&[
+            ("clock", bin("server_unix_ms")),
+            ("field", bin("deadline_ms")),
+        ])
+    );
+    Ok(())
+}
+
 #[test]
 fn startup_selects_only_the_compact_codecs_this_server_writes() -> TestResult {
     let running = start()?;
@@ -107,5 +132,41 @@ pub(crate) fn negotiate(client: &mut Client) -> TestResult {
         0,
         &startup_body(&["flow_claim_jobs_v1", "ok_list_v1"])?,
     )?;
+    Ok(())
+}
+
+/// The Java SDK's `ping()` sends `PING` as a `COMMAND_EXEC` text command;
+/// Elixir answers it there as its own opcode does (`Server.handle("PING",
+/// ...)`): `PONG`, the one message given, or a refusal for more.
+#[test]
+fn a_ping_sent_as_a_text_command_answers_as_the_ping_opcode() -> TestResult {
+    const COMMAND_EXEC: u16 = 0x0100;
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let exec = |name: &str, args: &[&str]| {
+        encode(&map(&[
+            ("command", bin(name)),
+            (
+                "args",
+                Typed::List(args.iter().map(|arg| bin(arg)).collect()),
+            ),
+        ]))
+    };
+    let (status, pong) = reply(&client.call(COMMAND_EXEC, 0, 0, &exec("PING", &[])?)?.body)?;
+    assert_eq!((status, pong), (0, bin("PONG")));
+    let (status, echo) = reply(
+        &client
+            .call(COMMAND_EXEC, 0, 0, &exec("ping", &["hi"])?)?
+            .body,
+    )?;
+    assert_eq!((status, echo), (0, bin("hi")));
+    let refused = client.call(COMMAND_EXEC, 0, 0, &exec("PING", &["a", "b"])?)?;
+    assert_eq!(
+        refused.body,
+        wf_api_tcp::response::error(
+            wf_api_tcp::response::STATUS_ERROR,
+            "ERR wrong number of arguments for 'ping' command"
+        )?
+    );
     Ok(())
 }

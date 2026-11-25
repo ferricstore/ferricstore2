@@ -11,6 +11,7 @@ use crate::response::{self, COMPACT_CODECS, Handshake, STATUS_ERROR};
 
 use super::ServerInfo;
 use super::connection::ReplyTo;
+use super::deadline::{self, Late};
 use super::{exec, generic, pipeline, translate};
 
 /// What every request of a connection shares.
@@ -23,9 +24,14 @@ pub(super) struct Context {
 }
 
 impl Context {
-    /// A command's options as the node may read them: without the client's
-    /// `now_ms` unless the server trusts client clocks (ADR-015).
-    pub(super) fn clock(&self, args: Term) -> Term {
+    /// A command's options as the node may read them: refused once their
+    /// `deadline_ms` passed, and without it (audit gap G62); without the
+    /// client's `now_ms` unless the server trusts client clocks (ADR-015).
+    pub(super) fn admit(&self, args: Term) -> Result<Term, Late> {
+        deadline::admit(args).map(|args| self.clock(args))
+    }
+
+    fn clock(&self, args: Term) -> Term {
         if self.info.client_clock {
             args
         } else {

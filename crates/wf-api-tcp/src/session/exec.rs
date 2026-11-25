@@ -1,6 +1,7 @@
 //! `COMMAND_EXEC` frames (ADR-014 step 9c): a FLOW command sent as text, with
 //! its arguments, runs exactly as its typed form would; the reply is the
-//! same term. Other commands are not part of this workflow server.
+//! same term. `PING` answers as its own opcode does; other commands are not
+//! part of this workflow server.
 
 use wf_application::commands::flow::text::{self, Parsed};
 use wf_application::commands::flow::{Term, claim};
@@ -9,6 +10,7 @@ use crate::request;
 use crate::response;
 
 use super::connection::ReplyTo;
+use super::deadline;
 use super::dispatch::{Context, refuse};
 
 /// Where a command's outcome goes: its reply, or its refusal text.
@@ -16,6 +18,9 @@ pub(super) type Done = Box<dyn FnOnce(Result<Term, String>) + Send>;
 
 /// Runs one text command from its `{command, args}` map.
 pub(super) fn run(context: &Context, payload: &Term, done: Done) {
+    if let Err(late) = deadline::check(payload) {
+        return done(Err(late.message().to_owned()));
+    }
     let Some(Term::Bin(name)) = payload.get(b"command") else {
         return done(Err("ERR native field command must be binary".to_owned()));
     };
@@ -24,7 +29,17 @@ pub(super) fn run(context: &Context, payload: &Term, done: Done) {
         Some(Term::List(args)) => args.as_slice(),
         Some(_) => return done(Err("ERR native COMMAND_EXEC args must be a list".to_owned())),
     };
-    if !name.to_ascii_uppercase().starts_with(b"FLOW.") {
+    let upper = name.to_ascii_uppercase();
+    // PING answers here as its own opcode does; SDKs send it as text to
+    // check a connection (audit gap G61).
+    if upper == b"PING" {
+        return done(match args {
+            [] => Ok(Term::text("PONG")),
+            [message] => Ok(message.clone()),
+            _ => Err("ERR wrong number of arguments for 'ping' command".to_owned()),
+        });
+    }
+    if !upper.starts_with(b"FLOW.") {
         return done(Err(format!(
             "ERR command {} is not supported by this server",
             String::from_utf8_lossy(name)
@@ -65,6 +80,9 @@ pub(super) fn exec(context: &Context, body: &[u8], reply: ReplyTo) {
         Ok(payload) => payload,
         Err(error) => return refuse(reply, error.message()),
     };
+    if let Err(late) = deadline::check(&payload) {
+        return late.refuse(reply);
+    }
     run(
         context,
         &payload,

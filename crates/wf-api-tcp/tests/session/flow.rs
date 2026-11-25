@@ -364,3 +364,133 @@ fn a_pipeline_runs_batches_and_pings_as_alone() -> TestResult {
     assert_eq!(echoed.body, ok(&bin("one"))?);
     Ok(())
 }
+
+/// A refusal reply with its status and code, as Elixir's native errors.
+fn refusal(status: u16, code: &str, message: &str) -> TestResult<Vec<u8>> {
+    let mut body = status.to_be_bytes().to_vec();
+    body.extend(encode(&map(&[
+        ("code", bin(code)),
+        ("message", bin(message)),
+        ("retry_after_ms", Typed::Int(0)),
+        ("retryable", Typed::Bool(false)),
+        ("safe_to_retry", Typed::Bool(false)),
+    ]))?);
+    Ok(body)
+}
+
+/// Every request may carry `deadline_ms`, a time on the server's clock
+/// after which it must not run (Elixir's `check_deadline`; the Elixir SDK
+/// sends it with every command, audit gap G62): zero or a time not yet
+/// passed runs the command, a passed one is refused before it runs, and
+/// anything but a non-negative integer is a bad request.
+#[test]
+fn a_request_runs_before_its_deadline_and_is_refused_after_it() -> TestResult {
+    const COMMAND_EXEC: u16 = 0x0100;
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let now = i64::try_from(
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)?
+            .as_millis(),
+    )?;
+    let get = |deadline: Typed| {
+        encode(&map(&[
+            ("id", bin("f1")),
+            ("partition_key", bin("p1")),
+            ("deadline_ms", deadline),
+        ]))
+    };
+    let found = ok(&map(&[("id", bin("f1")), ("partition_key", bin("p1"))]))?;
+    for deadline in [Typed::Int(now + 60_000), Typed::Int(0)] {
+        assert_eq!(client.call(GET, 1, 0, &get(deadline)?)?.body, found);
+    }
+    let late = refusal(
+        1,
+        "deadline_exceeded",
+        "ERR native request deadline exceeded",
+    )?;
+    assert_eq!(client.call(GET, 1, 0, &get(Typed::Int(1))?)?.body, late);
+    let invalid = refusal(
+        6,
+        "invalid_deadline",
+        "ERR native request deadline must be a non-negative integer",
+    )?;
+    for deadline in [Typed::Int(-5), bin("soon")] {
+        assert_eq!(client.call(GET, 1, 0, &get(deadline)?)?.body, invalid);
+    }
+    let claim = encode(&map(&[
+        ("type", bin("jobs")),
+        ("worker", bin("w")),
+        ("deadline_ms", Typed::Int(1)),
+    ]))?;
+    assert_eq!(client.call(CLAIM_DUE, 1, 0, &claim)?.body, late);
+    let text = encode(&map(&[
+        ("command", bin("FLOW.GET")),
+        ("args", Typed::List(vec![bin("f1")])),
+        ("deadline_ms", Typed::Int(1)),
+    ]))?;
+    assert_eq!(client.call(COMMAND_EXEC, 1, 0, &text)?.body, late);
+    Ok(())
+}
+
+/// A claim or reclaim in a typed pipeline answers as it does alone, and
+/// each of a pipeline's commands is held to its own deadline (G62).
+#[test]
+fn a_pipeline_claims_as_alone_and_holds_each_command_to_its_deadline() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let claim = |deadline: i64| {
+        map(&[
+            ("type", bin("jobs")),
+            ("worker", bin("w")),
+            ("deadline_ms", Typed::Int(deadline)),
+        ])
+    };
+    let alone = |opcode: u16, client: &mut Client| -> TestResult<Typed> {
+        Ok(reply(&client.call(opcode, 1, 0, &encode(&claim(0))?)?.body)?.1)
+    };
+    let claimed = alone(CLAIM_DUE, &mut client)?;
+    let reclaimed = alone(RECLAIM, &mut client)?;
+    let command = |opcode: i64, request: i64, body: Typed| {
+        map(&[
+            ("opcode", Typed::Int(opcode)),
+            ("lane_id", Typed::Int(1)),
+            ("request_id", Typed::Int(request)),
+            ("body", body),
+        ])
+    };
+    let request = encode(&map(&[
+        ("atomicity", bin("none")),
+        ("return", bin("pairs")),
+        (
+            "commands",
+            Typed::List(vec![
+                command(i64::from(CLAIM_DUE), 1, claim(0)),
+                command(i64::from(RECLAIM), 2, claim(0)),
+                command(i64::from(CLAIM_DUE), 3, claim(1)),
+                command(
+                    i64::from(GET),
+                    4,
+                    map(&[("id", bin("f1")), ("deadline_ms", Typed::Int(1))]),
+                ),
+            ]),
+        ),
+    ]))?;
+    let late = Typed::List(vec![
+        bin("error"),
+        bin("ERR native request deadline exceeded"),
+    ]);
+    assert_eq!(
+        reply(&client.call(0x000E, 1, 0, &request)?.body)?,
+        (
+            0,
+            Typed::List(vec![
+                Typed::List(vec![bin("ok"), claimed]),
+                Typed::List(vec![bin("ok"), reclaimed]),
+                late.clone(),
+                late,
+            ])
+        )
+    );
+    Ok(())
+}

@@ -7,6 +7,7 @@
 //! decision is durable, from any thread.
 
 mod connection;
+mod deadline;
 mod dispatch;
 mod exec;
 mod generic;

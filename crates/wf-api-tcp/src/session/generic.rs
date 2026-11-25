@@ -15,8 +15,9 @@ use super::dispatch::{Context, refuse};
 /// shape go through the multi-shard claim, and the reply is built from the
 /// claimed records.
 pub(super) fn claim(context: &Context, name: &str, body: &[u8], reply: ReplyTo) {
-    let args = match request::options(name, body) {
-        Ok(args) => context.clock(args),
+    let args = match request::options(name, body).map(|args| context.admit(args)) {
+        Ok(Ok(args)) => args,
+        Ok(Err(late)) => return late.refuse(reply),
         Err(error) => return refuse(reply, error.message()),
     };
     let mut parsed = match claim::parse(name, &args) {
@@ -69,7 +70,10 @@ pub(super) fn flow(context: &Context, name: &str, flags: u8, body: &[u8], reply:
 
 /// Runs command `name` with its options.
 pub(super) fn run(context: &Context, name: &str, args: flow::Term, reply: ReplyTo) {
-    let args = context.clock(args);
+    let args = match context.admit(args) {
+        Ok(args) => args,
+        Err(late) => return late.refuse(reply),
+    };
     let command = match flow::parse(name, &args) {
         Ok(command) => command,
         Err(error) => return failed(reply, &error),

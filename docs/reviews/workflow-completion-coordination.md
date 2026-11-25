@@ -67397,3 +67397,68 @@ folder; they were deleted. The nine helpers (`queue_node`, `recovery`,
 `workflow_query`, `checkpoint_join`, and wf-storage's `snapshot_files`,
 `cold_files`, `group_log`, `state_store`, `durable_log`) now add the time
 in nanoseconds to the process id. Leaving directories behind is unchanged.
+
+### Go, Java and Elixir SDK suites against the node; G60-G62 (25 Nov)
+
+After Python and TypeScript (22 Nov), the other three SDKs' integration
+suites ran against a fresh node with client clocks: Go (origin/main
+2826c33), Java (e102772) and Elixir (e804441).
+
+- G60: the Go SDK refused the node at connect, so every Go test failed
+  first with `HELLO protocol_versions must be an array`: HELLO did not
+  list the native protocol versions, which Elixir's `capabilities_payload`
+  declares (`protocol_versions: [1]`). RED:
+  `handshake::hello_declares_the_protocol_versions_the_go_sdk_requires`.
+  Go went from 15 passing to 36 of 46 run (6 skipped: TLS, ACL, cluster).
+- G61: the Java SDK's `ping()` sends `PING` as a `COMMAND_EXEC` text
+  command, which the node refused (only `FLOW.*` were taken as text); all
+  seven durable-step tests stopped there. It answers as Elixir's
+  `Server.handle("PING", ...)`: `PONG`, the one message given, or `ERR
+  wrong number of arguments for 'ping' command`. RED:
+  `handshake::a_ping_sent_as_a_text_command_answers_as_the_ping_opcode`.
+  Java went from 15 to 22 of 37, and its fan-out example passes.
+- G62: every request may carry `deadline_ms`, a time on the server's
+  clock after which it must not run (Elixir's `check_deadline`); the
+  Elixir SDK sends it with every command, and the node refused it as an
+  unknown Flow option. Now zero or a time not yet passed runs the command,
+  a passed one is refused before it runs (status 1, code
+  `deadline_exceeded`, `ERR native request deadline exceeded`), and
+  anything but a non-negative integer is a bad request (status 6, code
+  `invalid_deadline`), on typed Flow commands, claims, `COMMAND_EXEC`, and
+  each of a pipeline's commands; the option is taken off before the
+  command reads its options. HELLO declares `deadlines: {field:
+  deadline_ms, clock: server_unix_ms}` as Elixir does. RED:
+  `flow::a_request_runs_before_its_deadline_and_is_refused_after_it`; the
+  parity probe (`scenario_deadline.py`: future, zero, past, text and
+  negative deadlines on create, get and claim) now matches Elixir in all
+  nine steps but the timestamps.
+
+Every remaining Go and Java failure is a surface a workflow-only node does
+not serve (key-value, Bloom filters, pub/sub, streams, `MULTI`/`WATCH`,
+`BLPOP`, `KEYS`, `ECHO`, the compact `PIPELINE` of `SET`/`GET`). The Flow
+half of Go's key-value-and-Flow round trip, run alone, passes.
+
+Not changed: the Elixir SDK does not connect. Its contract check requires
+HELLO to declare request schemas for about 70 commands (key-value, locks,
+rate limits, cluster and admin among them) and the full opcode table, and
+it subscribes to `TOPOLOGY_CHANGED` events (`SUBSCRIBE_EVENTS`, which the
+node does not serve) on every connection. With both bypassed in a scratch
+checkout, 17 of its 32 tests pass (1 before G62); the rest are the same
+non-Flow surfaces plus the planner's `order: sort` (see 22 Nov). Whether
+the node should declare surfaces it refuses or the SDK should accept a
+workflow-only server is open.
+
+Earlier suites after these changes: TypeScript 24 passing, as on 22 Nov;
+Go and Java as above on the final build.
+
+cargo-mutants on the change (wf-api-tcp, 38 then 41 mutants, 15 and 2
+minutes): three missed at first. The deadline's two edges (`> 0` to `>=
+0`, `<` to `<=`) could not be told apart against the real clock: the
+check now takes the clock (`check_at`) and unit tests pin a deadline
+equal to the clock (not passed), one before it (passed), zero and the
+invalid values. No test ran a claim in a typed pipeline (deleting that
+arm passed):
+`flow::a_pipeline_claims_as_alone_and_holds_each_command_to_its_deadline`
+runs a claim and a reclaim in one and compares each with its reply alone,
+and holds a pipelined claim and get to their deadlines. After: 38 caught,
+3 unviable, none missed.

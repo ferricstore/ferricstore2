@@ -94,12 +94,15 @@ fn run(context: &Context, command: &PipelineCommand, done: Box<dyn FnOnce(Outcom
     };
     match opcode {
         Some(Opcode::Ping) => done(Ok(pong(&command.body))),
-        Some(Opcode::Flow(name)) => match flow::parse(name, &context.clock(command.body.clone())) {
-            Ok(parsed) => context.service.execute(
-                parsed,
-                Box::new(move |result| done(result.map_err(|error| error.to_string()))),
-            ),
-            Err(error) => done(Err(failed(error))),
+        Some(Opcode::Flow(name)) => match context.admit(command.body.clone()) {
+            Ok(args) => match flow::parse(name, &args) {
+                Ok(parsed) => context.service.execute(
+                    parsed,
+                    Box::new(move |result| done(result.map_err(|error| error.to_string()))),
+                ),
+                Err(error) => done(Err(failed(error))),
+            },
+            Err(late) => done(Err(late.message().to_owned())),
         },
         Some(opcode @ (Opcode::FlowClaimDue | Opcode::FlowReclaim)) => {
             let name = if opcode == Opcode::FlowReclaim {
@@ -107,7 +110,11 @@ fn run(context: &Context, command: &PipelineCommand, done: Box<dyn FnOnce(Outcom
             } else {
                 "FLOW.CLAIM_DUE"
             };
-            match claim::parse(name, &context.clock(command.body.clone())) {
+            let args = match context.admit(command.body.clone()) {
+                Ok(args) => args,
+                Err(late) => return done(Err(late.message().to_owned())),
+            };
+            match claim::parse(name, &args) {
                 Ok(parsed) => {
                     let shape = parsed.shape;
                     context.service.claim(

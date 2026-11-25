@@ -150,8 +150,17 @@ pub fn ok_text(bytes: &[u8]) -> Result<Vec<u8>, ReplyTooLong> {
 /// # Errors
 /// Refuses a message longer than `u32::MAX` bytes.
 pub fn error(status: u16, message: &str) -> Result<Vec<u8>, ReplyTooLong> {
+    refusal(status, "error", message)
+}
+
+/// A non-retryable refusal reply with its own `code`, as Elixir's
+/// `deadline_exceeded` and `invalid_deadline`.
+///
+/// # Errors
+/// Refuses a message longer than `u32::MAX` bytes.
+pub fn refusal(status: u16, code: &str, message: &str) -> Result<Vec<u8>, ReplyTooLong> {
     let map = Value::Map(vec![
-        (b"code".to_vec(), text(b"error")),
+        (b"code".to_vec(), text(code.as_bytes())),
         (b"message".to_vec(), text(message.as_bytes())),
         (b"retry_after_ms".to_vec(), Value::Int(0)),
         (b"retryable".to_vec(), Value::Bool(false)),
