@@ -67323,3 +67323,77 @@ all (the RED). Two survive, both for a Flow removed and created again
 under the same id before the writer answers, which no test can time:
 swapping without the same-bytes check (it would name the old Flow's
 bytes) and not giving back the hold of a version that changed (a leak).
+
+### Phase D under cargo-mutants (25 Nov)
+
+The user asked for cargo-mutants on every change's diff, from now on, in
+place of hand-picked mutants only. `cargo mutants --in-diff` on phase D's
+diff (4ec5a0f..cd145eb; rig script `mutants-diff.sh`, nextest, wf-node's
+tests for wf-node code, wf-node's and the crate's own for wf-application
+and wf-storage code) made 139 mutants in 68 minutes on a loaded machine:
+111 caught, 9 missed, 19 unviable, none timed out. Reading which test
+failed for each caught mutant showed ten catches by a test unrelated to
+the mutated code: seven by a test that could not create its directory
+(next entry) and three by timing tests under load (retention, replica
+rejoin). Those were run again, with the missed ones, after the fixes
+below. Missed mutants and what now fails for each:
+
+- The default budget (`16 * 1024` to `16 + 1024` or `16 / 1024`): no test
+  used the default. `kept_versions_stay_in_memory_up_to_the_default_budget`
+  (was `..._within_the_budget_...` at 64 KiB): 19 kept 832-byte payloads
+  (15,808 bytes) stay in memory, the 20th (16,640) sends them to disk.
+- `settle_kept` doing nothing: versions written to disk stayed in memory
+  too and every read still worked, so nothing saw that memory was never
+  freed. The restart test now checks that a snapshot carries none of the
+  replaced payloads' bytes.
+- Replay not noting Flows whose logged image kept versions (`!` deleted
+  in `put_logged`): the restart test's "went to disk again" was met by the
+  first run's files, and a replayed create image (no kept versions) notes
+  the Flow under the mutant anyway. The test now waits for new files after
+  the first restart (the restart drops the files no snapshot names and
+  writes the versions again), and after the second, which replays only a
+  change made after the snapshot, for its one kept version.
+- `answered_kept` doing nothing (its first catch was a directory
+  collision): versions stayed "on their way" forever. A Flow created again
+  under a removed Flow's id keeps versions under the same names and never
+  spilled them;
+  `a_flow_created_again_under_a_removed_one_s_id_moves_its_versions_to_disk`.
+- `StoredValue` equality (three) and `Debug`: no test compared two kept
+  versions on disk. wf-application `kept_on_disk`: equal when they name
+  the same place whatever file handle each holds, unequal on another file,
+  offset or length; `Debug` shows the place; the last copy of one releases
+  its file once.
+- `checksum` returning 1: `the_checksum_is_the_crc32_a_record_carries`
+  (the CRC-32 check value, and the CRC a written record carries).
+
+Rechecked with `-F '^<name>$'`: the 9 missed and the 9 caught only by a
+collision or a timing test, then the 5 still open (20 and 15 minutes).
+All are now caught by the tests named above, except swapping a version
+without the same-bytes check (`same(version)` to `true`), which the
+hand-picked run already left open: it needs a Flow created again under
+the same id before the writer answers, which no test can time. Its
+"catches" were the retention test's timing and, twice, the replica rejoin
+test below.
+
+Found on the way, not fixed here: in 6 of the runs
+`replica::the_lowest_member_that_lost_its_data_rejoins_instead_of_forming_a_group`
+failed with openraft panicking in the group thread (`assertion failed:
+Some(log_id.to_ref()) <= self.committed().to_ref()`, `log_state_reader.rs`)
+and the rejoined member missing a Flow (`k0` nil). It failed under mutants
+of unrelated code too, so it is a race in the replica path that load
+brings out; it needs its own investigation.
+
+### Test directories unique per process (25 Nov)
+
+The test helpers named a test's directory by process id and a counter
+that starts at 0 in every process, and most node tests leave their
+directory behind. Under `cargo test` one process runs a whole binary, so
+names did not repeat; under nextest (cargo-mutants) every test runs in a
+process of its own, and once process ids came round again a test met an
+earlier run's directory and failed with `File exists`
+(`audit::reclaim_batches::a_running_claim_reclaims_only_its_partition` in
+the recheck's baseline). 79,590 such directories had piled up in the temp
+folder; they were deleted. The nine helpers (`queue_node`, `recovery`,
+`workflow_query`, `checkpoint_join`, and wf-storage's `snapshot_files`,
+`cold_files`, `group_log`, `state_store`, `durable_log`) now add the time
+in nanoseconds to the process id. Leaving directories behind is unchanged.

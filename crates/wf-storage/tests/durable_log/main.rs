@@ -33,10 +33,19 @@ fn directory(tag: &str) -> TestResult<PathBuf> {
     let suffix = NEXT_PATH.fetch_add(1, Ordering::SeqCst);
     let path = std::env::temp_dir().join(format!(
         "wf-durable-log-{}-{suffix}-{tag}",
-        std::process::id()
+        unique_process()
     ));
     std::fs::create_dir(&path)?;
     Ok(path)
+}
+
+/// The process id and the time: ids repeat, and nextest runs each test in a
+/// process of its own, so a reused id met an earlier run's directory.
+fn unique_process() -> String {
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |since| since.as_nanos());
+    format!("{}-{nanos}", std::process::id())
 }
 
 fn id(term: u64, node: u64, index: u64) -> LogIdentity {

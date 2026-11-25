@@ -337,11 +337,20 @@ static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0)
 pub(super) fn directory(label: &str) -> TestResult<std::path::PathBuf> {
     let path = std::env::temp_dir().join(format!(
         "wf-query-{}-{}-{label}",
-        std::process::id(),
+        unique_process(),
         NEXT.fetch_add(1, std::sync::atomic::Ordering::SeqCst)
     ));
     std::fs::create_dir(&path)?;
     Ok(path)
+}
+
+/// The process id and the time: ids repeat, and nextest runs each test in a
+/// process of its own, so a reused id met an earlier run's directory.
+fn unique_process() -> String {
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |since| since.as_nanos());
+    format!("{}-{nanos}", std::process::id())
 }
 pub(super) fn scope() -> TestResult<RequestScope> {
     scope_for(b"t", b"g", b"z")

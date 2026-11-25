@@ -14,6 +14,8 @@ mod credit_cleanup;
 mod independent_mutation;
 #[path = "intent_comparison.rs"]
 mod intent_comparison;
+#[path = "kept_on_disk.rs"]
+mod kept_on_disk;
 #[path = "policy_intent.rs"]
 mod policy_intent;
 #[path = "public_claim/main.rs"]

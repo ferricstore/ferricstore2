@@ -6,7 +6,7 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 
-use wf_storage::cold::{ColdBatch, ColdError, ColdQueue, ColdStore, Location};
+use wf_storage::cold::{ColdBatch, ColdError, ColdQueue, ColdStore, Location, checksum};
 
 type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
@@ -15,11 +15,20 @@ static NEXT: AtomicU64 = AtomicU64::new(0);
 fn directory(tag: &str) -> TestResult<PathBuf> {
     let path = std::env::temp_dir().join(format!(
         "wf-cold-{}-{}-{tag}",
-        std::process::id(),
+        unique_process(),
         NEXT.fetch_add(1, Ordering::SeqCst)
     ));
     std::fs::create_dir_all(&path)?;
     Ok(path.join("cold"))
+}
+
+/// The process id and the time: ids repeat, and nextest runs each test in a
+/// process of its own, so a reused id met an earlier run's directory.
+fn unique_process() -> String {
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |since| since.as_nanos());
+    format!("{}-{nanos}", std::process::id())
 }
 
 #[test]
@@ -38,6 +47,23 @@ fn images_read_back_by_location_from_any_writer() -> TestResult {
     assert_eq!(store.read(b)?, b"image-b");
     assert_eq!(store.read(c)?, b"");
     assert_eq!(c.offset, 15, "the second record follows the first");
+    Ok(())
+}
+
+/// `checksum` is the CRC32 a record carries for its image (the shard
+/// matches a version written to disk by it, ADR-016 phase D).
+#[test]
+fn the_checksum_is_the_crc32_a_record_carries() -> TestResult {
+    assert_eq!(checksum(b"123456789"), 0xCBF4_3926, "CRC-32 check value");
+    let path = directory("checksum")?;
+    let store = ColdStore::open(&path)?;
+    let mut writer = store.writer()?;
+    let location = writer.append(b"payload-bytes")?;
+    writer.sync()?;
+    let bytes = std::fs::read(path.join(format!("{:020}.cold", location.file)))?;
+    let start = usize::try_from(location.offset)? + 4;
+    let carried = bytes.get(start..start + 4).ok_or("no record header")?;
+    assert_eq!(carried, checksum(b"payload-bytes").to_be_bytes());
     Ok(())
 }
 
