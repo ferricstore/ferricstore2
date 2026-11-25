@@ -38,6 +38,27 @@ and answers `GET /health/live` and `GET /health/ready` on
   to. This keeps a member that lost its data, with a member list that
   changed meanwhile, from writing a different membership under the first
   entry's log id.
+- **A member that lost its data does not vote until it caught up:** Raft's
+  safety rests on a voter keeping its log and its vote, so a member that
+  starts without a log gives no vote until every other member has answered
+  it once (`Status` answers the last log index and the term; the answers
+  need not come together, since a term only grows). If none holds a log
+  past a forming group's first entry, the group is new. Otherwise it waits
+  to apply a commit point that a leader at or above every term it heard
+  set in its own term (the first such point it heard, from the newest such
+  leader, kept from its start): that leader holds every committed entry,
+  so this member then holds every entry its lost log had taken. Without this, its vote could elect a member lacking entries that
+  only it and a stopped member held (25 Nov). It may stand for election
+  meanwhile, since each voter checks a candidate's log against its own. A
+  group with one member down and another that lost its data has no
+  majority until one of them is back.
+- **A leader takes back a follower that lost its data:** the leader had
+  recorded how far that follower's log matched, and OpenRaft stops it when
+  the follower's log goes back (a panic in debug builds; in release builds
+  it stops replicating to that follower). Members allow log reversion, so
+  the leader starts that follower's progress over. OpenRaft warns that such
+  a member may vote unsafely; the rule above keeps it from voting, and the
+  leader never lowers its commit point.
 - **Health:** `GET /health/live` (200) and `GET /health/ready` (200 once
   the member knows its leader and no lost round stopped it, else 503) on
   `FERRICSTORE_HEALTH_PORT`.

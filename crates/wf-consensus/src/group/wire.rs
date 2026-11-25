@@ -5,11 +5,15 @@
 //! and its bytes); a response with its outcome (`0` an append accepted up to
 //! an optional log id, `1` an append conflict at a log id, `2` a higher vote,
 //! `3` a vote response, `4` a failure with its text, `5` a snapshot taken,
-//! with the receiver's vote). Kind `6` asks whether a member holds any log
-//! (ADR-019); its answer is `6` and a byte. A vote is its term, node
+//! with the receiver's vote). Kind `6` asks what a member holds (ADR-019);
+//! its answer is `6`, its last log index as a presence byte and the index,
+//! and the term it knows. A vote is its term, node
 //! and committed byte; an optional log id is a presence byte and the id's
 //! term, node and index; an entry is its id, its payload length and payload
 //! (`codec::encode`). Conflict hints are not sent; they are optional.
+
+#[cfg(test)]
+mod tests;
 
 use std::io;
 
@@ -32,8 +36,18 @@ pub(crate) enum Request {
     PreVote(VoteRequest<Config>),
     /// A snapshot for a member the log no longer reaches.
     Snapshot(VoteOf<Config>, SnapshotOf<Config, Vec<u8>>),
-    /// Whether the member holds any log, before a group is formed.
+    /// What the member holds, asked by a member that starts without a log
+    /// (ADR-019).
     Status,
+}
+
+/// What a member holds: its last log index and the term it knows.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct Held {
+    /// Its last log index, if it holds any log.
+    pub(crate) last_log: Option<u64>,
+    /// The highest term it knows.
+    pub(crate) term: u64,
 }
 
 /// The answer to a [`Request`].
@@ -46,8 +60,8 @@ pub(crate) enum Response {
     Failed(String),
     /// To a snapshot.
     Snapshot(SnapshotResponse<Config>),
-    /// To a status request: whether the member holds any log.
-    Status(bool),
+    /// To a status request.
+    Status(Held),
 }
 
 fn invalid() -> io::Error {
@@ -158,7 +172,14 @@ pub(crate) fn encode_response(response: &Response) -> io::Result<Vec<u8>> {
         }
         Response::Status(held) => {
             out.push(6);
-            out.push(u8::from(*held));
+            match held.last_log {
+                None => out.push(0),
+                Some(index) => {
+                    out.push(1);
+                    put_u64(&mut out, index);
+                }
+            }
+            put_u64(&mut out, held.term);
         }
     }
     Ok(out)
@@ -296,102 +317,18 @@ pub(crate) fn decode_response(bytes: &[u8]) -> io::Result<Response> {
         }
         4 => Response::Failed(String::from_utf8_lossy(reader.bytes()?).into_owned()),
         5 => Response::Snapshot(SnapshotResponse::new(reader.vote()?)),
-        6 => Response::Status(reader.u8()? == 1),
+        6 => {
+            let last_log = match reader.u8()? {
+                0 => None,
+                1 => Some(reader.u64()?),
+                _ => return Err(invalid()),
+            };
+            Response::Status(Held {
+                last_log,
+                term: reader.u64()?,
+            })
+        }
         _ => return Err(invalid()),
     };
     reader.done(response)
-}
-
-#[cfg(test)]
-mod tests {
-    use std::collections::BTreeSet;
-
-    use openraft::impls::{Entry, EntryPayload, Membership, Vote};
-    use openraft::raft::{AppendEntriesRequest, AppendError, VoteRequest, VoteResponse};
-    use wf_ports::consensus::log::EntryId;
-
-    use super::super::{Proposal, codec};
-    use super::{
-        Request, Response, decode_request, decode_response, encode_request, encode_response,
-    };
-
-    fn id(term: u64, index: u64) -> EntryId {
-        EntryId {
-            term,
-            node: 2,
-            index,
-        }
-    }
-
-    #[test]
-    fn requests_read_back_as_sent() {
-        let membership = Membership::new_with_defaults(
-            vec![BTreeSet::from([1, 2, 3])],
-            BTreeSet::from([1, 2, 3, 4]),
-        );
-        let append = AppendEntriesRequest {
-            vote: Vote::new_committed(3, 2),
-            prev_log_id: Some(codec::log_id(id(2, 4))),
-            entries: vec![
-                Entry {
-                    log_id: codec::log_id(id(3, 5)),
-                    payload: EntryPayload::Blank,
-                },
-                Entry {
-                    log_id: codec::log_id(id(3, 6)),
-                    payload: EntryPayload::Normal(Proposal(b"round".to_vec())),
-                },
-                Entry {
-                    log_id: codec::log_id(id(3, 7)),
-                    payload: EntryPayload::Membership(membership),
-                },
-            ],
-            leader_commit: None,
-        };
-        let vote = VoteRequest::new(Vote::new(4, 1), Some(codec::log_id(id(3, 7))));
-        for request in [
-            Request::Append(append),
-            Request::Vote(vote.clone()),
-            Request::PreVote(vote),
-        ] {
-            let bytes = encode_request(&request).unwrap_or_default();
-            let read = decode_request(&bytes).ok();
-            let same = match (&request, &read) {
-                (Request::Append(sent), Some(Request::Append(read))) => {
-                    format!("{sent:?}") == format!("{read:?}")
-                }
-                (Request::Vote(sent), Some(Request::Vote(read)))
-                | (Request::PreVote(sent), Some(Request::PreVote(read))) => sent == read,
-                _ => false,
-            };
-            assert!(same, "{bytes:?}");
-        }
-        assert!(decode_request(&[9]).is_err());
-    }
-
-    #[test]
-    fn responses_read_back_as_sent() {
-        let responses = [
-            Response::Append(Ok(Some(codec::log_id(id(3, 7))))),
-            Response::Append(Ok(None)),
-            Response::Append(Err(AppendError::Conflict {
-                log_id: codec::log_id(id(3, 7)),
-                hint: None,
-            })),
-            Response::Append(Err(AppendError::HigherVote(Vote::new(5, 3)))),
-            Response::Vote(VoteResponse::new(Vote::new(5, 3), None, true)),
-            Response::Failed("stopped".to_owned()),
-        ];
-        for response in responses {
-            let bytes = encode_response(&response).unwrap_or_default();
-            let read = decode_response(&bytes).ok();
-            let same = match (&response, &read) {
-                (Response::Append(sent), Some(Response::Append(read))) => sent == read,
-                (Response::Vote(sent), Some(Response::Vote(read))) => sent == read,
-                (Response::Failed(sent), Some(Response::Failed(read))) => sent == read,
-                _ => false,
-            };
-            assert!(same, "{bytes:?}");
-        }
-    }
 }

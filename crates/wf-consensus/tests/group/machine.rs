@@ -5,7 +5,9 @@
 use std::collections::BTreeSet;
 use std::future::{Future, ready};
 use std::io;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
+use std::time::Duration;
 
 use futures_util::TryStreamExt;
 use futures_util::stream::Stream;
@@ -142,6 +144,8 @@ fn decode(bytes: &[u8]) -> Option<Image> {
 pub(super) struct Machine {
     state: Arc<Mutex<Image>>,
     snapshot: Arc<Mutex<Current>>,
+    /// While set, applying waits.
+    paused: Arc<AtomicBool>,
 }
 
 /// Applies one entry to `image`.
@@ -162,6 +166,15 @@ impl Machine {
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
             .clone()
+    }
+
+    /// Holds back applying until [`Machine::resume`].
+    pub(super) fn pause(&self) {
+        self.paused.store(true, Ordering::SeqCst);
+    }
+
+    pub(super) fn resume(&self) {
+        self.paused.store(false, Ordering::SeqCst);
     }
 
     fn keep(&self, current: Current) {
@@ -208,6 +221,9 @@ impl RaftStateMachine<Config> for Machine {
         Strm: Stream<Item = Result<EntryResponder<Config>, io::Error>> + Unpin + OptionalSend,
     {
         while let Some((entry, responder)) = entries.try_next().await? {
+            while self.paused.load(Ordering::SeqCst) {
+                tokio::time::sleep(Duration::from_millis(10)).await;
+            }
             record(
                 &mut self.state.lock().unwrap_or_else(PoisonError::into_inner),
                 entry,

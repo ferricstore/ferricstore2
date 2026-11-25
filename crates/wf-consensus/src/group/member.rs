@@ -1,13 +1,14 @@
 //! One member of a replicated group (ADR-018), on the node's Tokio runtime:
 //! its Raft over the consensus log, the peer listener, the proposer and a
-//! watcher that demotes the machine when this member stops leading. A fresh
-//! group is formed by its lowest-numbered member once every other member
-//! reports an empty log.
+//! watcher that demotes the machine when this member stops leading. A
+//! member that starts without a log asks the others what they hold before
+//! it votes, and a fresh group is formed by its lowest-numbered member once
+//! every other member reports an empty log (`join`).
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use std::fmt;
 use std::sync::Arc;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use openraft::type_config::async_runtime::watch::WatchReceiver;
 use openraft::{Raft, SnapshotPolicy};
@@ -15,9 +16,10 @@ use tokio::runtime::Handle;
 use tokio::task::JoinHandle;
 use wf_ports::consensus::log::{ConsensusLog, ReplicatedMachine, SnapshotStore};
 
+use super::join::serve_member;
 use super::machine::Bridge;
 use super::proposer::{self, Proposer};
-use super::{Config, LogStore, Peers, peer, serve};
+use super::{Config, LogStore, Peers};
 
 /// How a member reaches the others.
 pub struct MemberConfig {
@@ -85,44 +87,6 @@ async fn watch(raft: Raft<Config, Bridge>, id: u64, machine: Arc<dyn ReplicatedM
     }
 }
 
-/// Forms the group from this member, its lowest, once every other member
-/// answers that it holds no log; while one is unreachable it waits, and once
-/// one holds a log (the group exists; this member lost its own) it leaves
-/// forming to that group, which replicates to it (ADR-019).
-async fn form(raft: Raft<Config, Bridge>, peers: BTreeMap<u64, String>, id: u64) {
-    loop {
-        if raft.metrics().borrow_watched().current_leader.is_some() {
-            return;
-        }
-        match others_empty(&peers, id).await {
-            Some(true) => {
-                let members: BTreeSet<u64> = peers.keys().copied().collect();
-                // Another start of the same member may have formed it.
-                let _formed = raft.initialize(members).await;
-                return;
-            }
-            Some(false) => return,
-            None => tokio::time::sleep(std::time::Duration::from_millis(500)).await,
-        }
-    }
-}
-
-/// Whether every other member holds no log; `None` while one cannot be
-/// asked.
-async fn others_empty(peers: &BTreeMap<u64, String>, id: u64) -> Option<bool> {
-    for (member, address) in peers {
-        if *member == id {
-            continue;
-        }
-        match peer::status(address).await {
-            Ok(true) => return Some(false),
-            Ok(false) => {}
-            Err(_) => return None,
-        }
-    }
-    Some(true)
-}
-
 /// Takes a snapshot on this member while it follows, once `every` entries
 /// were applied since the last one; a leader's shards are ahead of the log.
 async fn snapshots(raft: Raft<Config, Bridge>, id: u64, every: u64) {
@@ -130,7 +94,7 @@ async fn snapshots(raft: Raft<Config, Bridge>, id: u64, every: u64) {
         return;
     }
     loop {
-        tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+        tokio::time::sleep(Duration::from_millis(200)).await;
         let due = {
             let metrics = raft.metrics();
             let metrics = metrics.borrow_watched();
@@ -164,6 +128,7 @@ impl Member {
             snapshot_every,
             keep_logs,
         } = config;
+        let fresh = log.bounds() == (None, None);
         let raft_config = openraft::Config {
             heartbeat_interval: 100,
             election_timeout_min: 500,
@@ -171,11 +136,16 @@ impl Member {
             // Followers take snapshots themselves (`snapshots`).
             snapshot_policy: SnapshotPolicy::Never,
             max_in_snapshot_log_to_keep: keep_logs,
+            // A member that lost its data comes back with an empty log; the
+            // leader then starts its progress for it over instead of
+            // stopping. OpenRaft warns that such a member may vote unsafely:
+            // `ballot` keeps it from voting until it caught up, and the
+            // leader never lowers its commit point (ADR-019).
+            allow_log_reversion: Some(true),
             ..openraft::Config::default()
         }
         .validate()
         .map_err(|error| failed(&error))?;
-        let fresh = log.bounds() == (None, None);
         let bridge = Bridge::new(Arc::clone(&machine), (id, epoch()), store);
         runtime
             .block_on(bridge.restore())
@@ -199,15 +169,12 @@ impl Member {
             tokio::net::TcpListener::from_std(listener).map_err(|error| failed(&error))?
         };
         let (proposer, proposing) = proposer::start(raft.clone(), bridge.epoch());
-        let mut tasks = vec![
-            runtime.spawn(serve(listener, raft.clone())),
+        let tasks = vec![
+            runtime.spawn(serve_member(listener, raft.clone(), peers, id, fresh)),
             runtime.spawn(proposing),
             runtime.spawn(watch(raft.clone(), id, machine)),
             runtime.spawn(snapshots(raft.clone(), id, snapshot_every)),
         ];
-        if fresh && peers.keys().next() == Some(&id) {
-            tasks.push(runtime.spawn(form(raft.clone(), peers, id)));
-        }
         Ok((
             Self {
                 id,

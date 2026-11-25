@@ -391,3 +391,92 @@ fn the_lowest_member_that_lost_its_data_rejoins_instead_of_forming_a_group() -> 
     }
     Ok(())
 }
+
+/// A member that lost its data votes only once it caught up: Raft's safety
+/// rests on a voter keeping its log, and here its vote would elect a member
+/// that lacks entries only the leader and it held, which would be lost.
+#[test]
+fn a_member_that_lost_its_data_does_not_vote_until_it_caught_up() -> TestResult {
+    let path = directory("replica-amnesia")?;
+    let peers = peers()?;
+    let mut nodes = BTreeMap::new();
+    for id in MEMBERS {
+        nodes.insert(id, open(&path, id, &peers)?);
+    }
+    let leader = serving(&nodes, "probe-1")?;
+    let mut followers = MEMBERS.iter().copied().filter(|id| *id != leader);
+    let lagging = followers.next().ok_or("no follower")?;
+    let holder = followers.next().ok_or("no second follower")?;
+    // Without `lagging`, the writes commit on the leader and `holder` only.
+    drop(nodes.remove(&lagging));
+    create(nodes.get(&leader).ok_or("no leader")?, &ids("k", 10))??;
+    drop(nodes.remove(&leader));
+    drop(nodes.remove(&holder));
+    std::fs::remove_dir_all(path.join(format!("n{holder}")))?;
+    nodes.insert(lagging, open(&path, lagging, &peers)?);
+    nodes.insert(holder, open(&path, holder, &peers)?);
+    // Only the stopped leader holds the entries now: no one may lead.
+    let until = Instant::now() + Duration::from_secs(3);
+    while Instant::now() < until {
+        for (id, node) in &nodes {
+            assert_ne!(
+                node.leader(),
+                Some(*id),
+                "member {id} led without the entries"
+            );
+        }
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    nodes.insert(leader, open(&path, leader, &peers)?);
+    let next = serving(&nodes, "probe-2")?;
+    let node = nodes.get(&next).ok_or("no leader")?;
+    for id in ids("k", 10) {
+        assert_eq!(state_of(node, &id)?, Term::text("queued"), "{id}");
+    }
+    Ok(())
+}
+
+/// A follower that lost its data while the same member leads catches up
+/// from that leader: the leader starts over the progress it had recorded
+/// for the follower, and the group keeps committing through it.
+#[test]
+fn a_follower_that_lost_its_data_catches_up_under_the_same_leader() -> TestResult {
+    let path = directory("replica-wiped-follower")?;
+    let peers = peers()?;
+    let mut nodes = BTreeMap::new();
+    for id in MEMBERS {
+        nodes.insert(id, open(&path, id, &peers)?);
+    }
+    let leader = serving(&nodes, "probe-1")?;
+    create(nodes.get(&leader).ok_or("no leader")?, &ids("k", 10))??;
+    let mut followers = MEMBERS.iter().copied().filter(|id| *id != leader);
+    let wiped = followers.next().ok_or("no follower")?;
+    let other = followers.next().ok_or("no second follower")?;
+    drop(nodes.remove(&wiped));
+    std::fs::remove_dir_all(path.join(format!("n{wiped}")))?;
+    nodes.insert(wiped, open(&path, wiped, &peers)?);
+    // Without the other follower, a write commits only through the wiped
+    // one.
+    drop(nodes.remove(&other));
+    let until = Instant::now() + Duration::from_secs(20);
+    loop {
+        let node = nodes.get(&leader).ok_or("no leader")?;
+        if create(node, &ids("m", 1))?.is_ok() {
+            break;
+        }
+        if Instant::now() > until {
+            return Err("no write committed through the wiped follower".into());
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    // The wiped follower now holds every Flow: with the leader gone, it and
+    // the other follower lead with all of them.
+    drop(nodes.remove(&leader));
+    nodes.insert(other, open(&path, other, &peers)?);
+    let next = serving(&nodes, "probe-2")?;
+    let node = nodes.get(&next).ok_or("no leader")?;
+    for id in ids("k", 10).into_iter().chain(ids("m", 1)) {
+        assert_eq!(state_of(node, &id)?, Term::text("queued"), "{id}");
+    }
+    Ok(())
+}

@@ -67496,3 +67496,96 @@ cargo-mutants on the change: its one mutant (`capabilities` to
 `Default::default()`) is unviable, because a list of names gives it nothing
 to mutate. By hand, dropping `governance` or the required list fails the
 new test.
+
+### A member that lost its data voted the group into losing entries (25 Nov)
+
+`replica::the_lowest_member_that_lost_its_data_rejoins_instead_of_forming_a_group`
+failed about one run in sixteen with twelve runs at once (3 of 48), in
+two ways at once: openraft's `Some(log_id) <= committed` assertion in a
+follower's append (`log_state_reader.rs:25`, from
+`first_conflicting_index`), and Flow `k0` read as nil. Logging every vote
+showed why. Member 1 led and was wiped. Member 3, whose log ended at
+index 1, stood for term 2. Member 2 held the Flows to index 6, committed
+by member 1 and itself, and refused. Wiped member 1 had no log and no
+memory of its vote, and granted. Member 3 led without the committed
+entries, and member 2 then panicked on its appends. Raft's safety rests
+on a voter keeping its log and its vote; ADR-019 only kept such a member
+from forming a second group.
+
+Now a member that starts without a log gives no vote until `join`
+settles it: vote and pre-vote requests get no answer, which the candidate
+counts as unreachable (`ballot`). It asks every other member what it
+holds, every half second until each has answered once; the status answer
+now carries the last log index and the term instead of a flag. If none
+holds a log past a forming group's first entry, the group is new
+(`settle`): it votes, and the lowest member forms the group once no other
+member holds any log, as before. Otherwise it waits to apply a commit
+point that a leader at or above every term it heard set in its own term
+(an append's `leader_commit`). That leader holds every committed entry,
+so the member then holds every entry its lost log had taken. The term
+bound keeps a stale leader's lower commit point from counting. It keeps
+the first point of the newest such leader from its start, so writes under
+one leader do not move the target. A first version asked every member in
+one round and noted points only after settling; under stress (2 of 96
+runs) a follower that lost its data never voted again. The other follower
+was down while the leader caught it up, and the leader was down once that
+follower was back, so no round reached both, and the point it had already
+applied was not noted. Answers now count from any round, since a member's
+term only grows. A group with one member down and another that
+lost its data now has no majority until one of them is back; before, it
+could lose committed entries instead. The member may still stand for
+election, since each voter checks a candidate's log against its own; a
+first version also turned its elections off, but cargo-mutants showed no
+test could tell, and it adds no safety.
+
+Testing that showed a second gap: a follower that lost its data while the
+same member kept leading stopped the leader. The leader had recorded how
+far that follower's log matched; OpenRaft panics on the lower match in
+debug builds (`progress/entry/update.rs:106`, "follower log reversion is
+not allowed") and in release builds keeps sending from the old match, so
+the follower never catches up and the group cannot commit through it.
+Members now allow log reversion, so the leader starts that follower's
+progress over. OpenRaft warns that such a member may vote unsafely, which
+the ballot prevents, and the leader never lowers its commit point.
+ADR-019 records both rules. A peer server's connections now stop with it
+(a `JoinSet` instead of detached tasks), so a member that still holds a
+connection to a stopped member reconnects to its next start.
+
+RED tests, each deterministic:
+- `replica::a_member_that_lost_its_data_does_not_vote_until_it_caught_up`:
+  with one follower stopped, ten Flows commit on the leader and the other
+  follower. Both then stop, and that follower loses its data. Before, the
+  lagging member led within two seconds with the wiped member's vote. Now
+  no member leads until the leader is back, and then every Flow is there.
+- `replica::a_follower_that_lost_its_data_catches_up_under_the_same_leader`:
+  before, the leader panicked and no write committed through the wiped
+  follower; now one does, and that follower and the other one lead with
+  every Flow once the leader stops.
+- `group peer::a_member_that_lost_its_log_answers_votes_only_once_it_caught_up`
+  (wf-consensus, a member started through the new public
+  `serve_member`): a member whose log was lost, with its state machine
+  paused, takes the leader's entries but answers no pre-vote for two
+  seconds; once it applies them, it answers.
+- `group peer::a_member_that_lost_its_log_settles_from_answers_given_at_different_times`:
+  the other follower is down while the leader catches the member up, and
+  the leader is down once that follower is back; before, the member never
+  answered a vote again, now it does.
+Unit tests pin the gate (`group::ballot::tests`: which appends set the
+point, that a leader's first point holds until a later leader's replaces
+it, that a point heard before every member answered counts, that applying
+short of it does not open voting), `settle` (`group::join::tests`,
+including that only the lowest member forms a new group), and status
+answers on the wire. Under stress (16 runs at once) the three node tests
+passed 160 of 160 each and the two consensus tests 96 of 96 each.
+
+cargo-mutants (wf-consensus with the node's replica tests): a first
+round, 50 mutants, missed 4: no test reached the catching-up path with
+every member reachable (`index > 0` to `== 0` or `>= 0`), none needed the
+member to vote after catching up (`caught_up` emptied), and turning
+elections off was untested and adds no safety, so it was dropped. The
+second round, 60 mutants: 44 caught, 15 unviable, 1 missed, the
+lowest-member check, which now lives in `settle` with unit tests (6 more
+mutants there: 5 caught, 1 unviable). The panic ratchet then refused
+`held.len() + 1` in the asking loop; it now checks that every other
+member answered (6 mutants: 4 caught, 2 unviable). Each catch was checked
+against the test that failed.

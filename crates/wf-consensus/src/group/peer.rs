@@ -28,7 +28,8 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 
 use super::Config;
-use super::wire::{self, Request, Response};
+use super::ballot::Ballot;
+use super::wire::{self, Held, Request, Response};
 
 /// Largest frame a member accepts.
 const MAX_FRAME_BYTES: u32 = 256 * 1024 * 1024;
@@ -36,6 +37,8 @@ const MAX_FRAME_BYTES: u32 = 256 * 1024 * 1024;
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(1);
 /// How long sending and installing a snapshot may take.
 const SNAPSHOT_TIMEOUT: Duration = Duration::from_secs(120);
+/// The answer to a vote request while this member may not vote.
+const NOT_VOTING: &str = "member catching up: no vote";
 
 fn unreachable(error: &impl std::fmt::Display) -> Unreachable<Config> {
     Unreachable::new(&AnyError::error(error.to_string()))
@@ -62,27 +65,39 @@ async fn write_frame(stream: &mut TcpStream, body: &[u8]) -> io::Result<()> {
     stream.write_all(&frame).await
 }
 
-/// Serves Raft requests from other members to `raft` until the listener
-/// fails.
+/// Serves Raft requests from other members to `raft`, a member that votes,
+/// until the listener fails.
 pub async fn serve<SM>(listener: TcpListener, raft: Raft<Config, SM>)
 where
     SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
+    serving(listener, raft, Arc::new(Ballot::new(false))).await;
+}
+
+/// Serves Raft requests to `raft`, which votes as `ballot` allows.
+pub(super) async fn serving<SM>(listener: TcpListener, raft: Raft<Config, SM>, ballot: Arc<Ballot>)
+where
+    SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
+{
+    // The connections stop with the server, so a peer that still holds one
+    // to a stopped member reconnects to the next.
+    let mut connections = tokio::task::JoinSet::new();
     while let Ok((stream, _peer)) = listener.accept().await {
+        while connections.try_join_next().is_some() {}
         if stream.set_nodelay(true).is_err() {
             continue;
         }
-        tokio::spawn(connection(stream, raft.clone()));
+        connections.spawn(connection(stream, raft.clone(), Arc::clone(&ballot)));
     }
 }
 
-async fn connection<SM>(mut stream: TcpStream, raft: Raft<Config, SM>)
+async fn connection<SM>(mut stream: TcpStream, raft: Raft<Config, SM>, ballot: Arc<Ballot>)
 where
     SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
     while let Ok(body) = read_frame(&mut stream).await {
         let response = match wire::decode_request(&body) {
-            Ok(request) => handle(&raft, request).await,
+            Ok(request) => handle(&raft, &ballot, request).await,
             Err(error) => Response::Failed(error.to_string()),
         };
         let Ok(bytes) = wire::encode_response(&response) else {
@@ -94,16 +109,23 @@ where
     }
 }
 
-async fn handle<SM>(raft: &Raft<Config, SM>, request: Request) -> Response
+async fn handle<SM>(raft: &Raft<Config, SM>, ballot: &Ballot, request: Request) -> Response
 where
     SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
     let failed = |error: &dyn std::fmt::Display| Response::Failed(error.to_string());
     match request {
-        Request::Append(append) => raft
-            .append_entries(append)
-            .await
-            .map_or_else(|error| failed(&error), Response::Append),
+        Request::Append(append) => {
+            ballot.hear(&append);
+            raft.append_entries(append)
+                .await
+                .map_or_else(|error| failed(&error), Response::Append)
+        }
+        // A member that may have lost its log gives no vote (ADR-019): the
+        // candidate counts it as unreachable.
+        Request::Vote(_) | Request::PreVote(_) if !ballot.votes() => {
+            Response::Failed(NOT_VOTING.to_owned())
+        }
         Request::Vote(vote) => raft
             .vote(vote)
             .await
@@ -113,7 +135,12 @@ where
             .await
             .map_or_else(|error| failed(&error), Response::Vote),
         Request::Status => {
-            Response::Status(raft.metrics().borrow_watched().last_log_index.is_some())
+            let metrics = raft.metrics();
+            let metrics = metrics.borrow_watched();
+            Response::Status(Held {
+                last_log: metrics.last_log_index,
+                term: metrics.current_term,
+            })
         }
         Request::Snapshot(vote, snapshot) => raft
             .install_full_snapshot(vote, snapshot)
@@ -203,11 +230,11 @@ impl Link {
     }
 }
 
-/// Whether the member at `address` holds any log (ADR-019).
+/// What the member at `address` holds (ADR-019).
 ///
 /// # Errors
 /// The member cannot be reached or answers something else.
-pub(super) async fn status(address: &str) -> io::Result<bool> {
+pub(super) async fn status(address: &str) -> io::Result<Held> {
     let mut link = Link {
         address: Some(address.to_owned()),
         stream: None,

@@ -3,7 +3,9 @@
 //! store.
 //! `OpenRaft`'s types stay inside this crate.
 
+mod ballot;
 mod codec;
+mod join;
 mod log_store;
 mod machine;
 mod member;
@@ -17,6 +19,7 @@ use std::fmt;
 use openraft::vote::RaftLeaderId;
 use openraft::{OptionalSend, impls};
 
+pub use join::serve_member;
 pub use log_store::LogStore;
 pub use member::{Member, MemberConfig, MemberError};
 pub use peer::{Link, Peers, serve};
