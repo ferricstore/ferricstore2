@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use std::collections::BTreeMap;
 
-use wf_api_tcp::session::{Endpoint, InFlight, ServerInfo, serve};
+use wf_api_tcp::session::{Connections, Endpoint, InFlight, ServerInfo, serve};
 use wf_application::commands::flow::effect::denial::Denial;
 use wf_application::commands::flow::{FlowCommand, FlowService, NodeService, Term};
 use wf_application::commands::queue::{
@@ -21,11 +21,15 @@ use wf_application::commands::queue::{
 use wf_domain::value::DomainError;
 
 mod backpressure;
+mod capabilities;
 mod clock;
 mod compact_create;
+mod connection_guards;
 mod flow;
 mod handshake;
+mod lanes;
 mod negotiation;
+mod no_reply;
 mod options;
 mod pipeline_rules;
 mod queue;
@@ -41,6 +45,9 @@ type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 /// A claim by worker `probe` echoes its options as the run state; a claim by
 /// worker `park` keeps its cancellation in [`PARKED`] and never replies.
 struct Scripted;
+
+/// Ids of creates starting `record` the scripted service was given.
+static RECORDED: Mutex<Vec<Vec<u8>>> = Mutex::new(Vec::new());
 
 /// Cancellations of claims by worker `park`.
 static PARKED: Mutex<Vec<Cancellation>> = Mutex::new(Vec::new());
@@ -164,6 +171,13 @@ impl FlowService for Scripted {
             FlowCommand::Create(create) if create.id.starts_with(b"reroute") => {
                 reply(Err(ServiceError::Reroute));
             }
+            FlowCommand::Create(create) if create.id.starts_with(b"record") => {
+                RECORDED
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner)
+                    .push(create.id);
+                reply(Ok(Term::text("OK")));
+            }
             FlowCommand::Create(create) if create.id.starts_with(b"dup") => reply(Err(
                 ServiceError::rejected("ERR flow already exists".to_owned()),
             )),
@@ -254,6 +268,17 @@ fn serving(client_clock: bool, in_flight: InFlight) -> TestResult<Running> {
     serving_with(client_clock, in_flight, Arc::new(Scripted), BTreeMap::new())
 }
 
+/// A listener with these connection guards (audit gaps G66, G67).
+fn serving_connections(connections: Connections) -> TestResult<Running> {
+    listening(
+        false,
+        InFlight::default(),
+        Arc::new(Scripted),
+        BTreeMap::new(),
+        connections,
+    )
+}
+
 /// A listener for a replicated node's `service`, with two group members.
 fn serving_service(service: Arc<dyn NodeService>) -> TestResult<Running> {
     let members = BTreeMap::from([
@@ -283,9 +308,26 @@ fn serving_with(
     service: Arc<dyn NodeService>,
     members: BTreeMap<u64, Endpoint>,
 ) -> TestResult<Running> {
+    listening(
+        client_clock,
+        in_flight,
+        service,
+        members,
+        Connections::default(),
+    )
+}
+
+fn listening(
+    client_clock: bool,
+    in_flight: InFlight,
+    service: Arc<dyn NodeService>,
+    members: BTreeMap<u64, Endpoint>,
+    connections: Connections,
+) -> TestResult<Running> {
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)
         .enable_io()
+        .enable_time()
         .build()?;
     let listener = runtime.block_on(tokio::net::TcpListener::bind("127.0.0.1:0"))?;
     let address = listener.local_addr()?;
@@ -297,6 +339,8 @@ fn serving_with(
         client_clock,
         in_flight,
         members,
+        connections,
+        health: false,
     };
     runtime.spawn(serve(listener, service, Arc::new(info)));
     Ok(Running {

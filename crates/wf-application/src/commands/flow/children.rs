@@ -93,6 +93,28 @@ fn bounded_state(state: &[u8]) -> Result<(), FlowError> {
     Ok(())
 }
 
+/// The create options a spawn gives each child that sets none, as Elixir
+/// builds children with `create_many_attrs(children, opts, ...)` (audit
+/// gap G74); `values` merge by name instead.
+const CHILD_DEFAULTS: [&str; 16] = [
+    "type",
+    "state",
+    "payload",
+    "payload_ref",
+    "correlation_id",
+    "run_at_ms",
+    "priority",
+    "idempotent",
+    "retention_ttl_ms",
+    "ttl_ms",
+    "max_active_ms",
+    "history_hot_max_events",
+    "history_max_events",
+    "attributes",
+    "state_meta",
+    "value_refs",
+];
+
 fn child(item: &Term, opts: &Opts<'_>, parent_partition: &[u8]) -> Result<CreateFlow, FlowError> {
     let Term::Map(entries) = item else {
         return Err(FlowError::rejected(
@@ -110,6 +132,13 @@ fn child(item: &Term, opts: &Opts<'_>, parent_partition: &[u8]) -> Result<Create
         }
         entries.retain(|(key, _)| key != b"values");
         entries.push((b"values".to_vec(), Term::Map(merged)));
+    }
+    for key in CHILD_DEFAULTS {
+        if !entries.iter().any(|(name, _)| name == key.as_bytes())
+            && let Some(value) = opts.get(key)
+        {
+            entries.push((key.as_bytes().to_vec(), value.clone()));
+        }
     }
     if !entries.iter().any(|(key, _)| key == b"partition_key") {
         entries.push((
@@ -262,8 +291,23 @@ pub fn parse(args: &Term) -> Result<SpawnChildren, FlowError> {
             "lease_token",
             "fencing_token",
             "now_ms",
-            "max_active_ms",
             "values",
+            "type",
+            "state",
+            "payload",
+            "payload_ref",
+            "correlation_id",
+            "run_at_ms",
+            "priority",
+            "idempotent",
+            "retention_ttl_ms",
+            "ttl_ms",
+            "max_active_ms",
+            "history_hot_max_events",
+            "history_max_events",
+            "attributes",
+            "state_meta",
+            "value_refs",
         ],
     )?;
     let parent_id = match opts.get("id") {

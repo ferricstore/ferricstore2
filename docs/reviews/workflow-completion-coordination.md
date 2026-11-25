@@ -67657,3 +67657,109 @@ unviable, 3 missed: no test kept a malformed `PIPELINE` at status 1
 and none checked that a handshake refusal names its command (`==` ->
 `!=`). Tests now cover each; the rerun caught 55, 8 unviable, none
 missed.
+
+### Rest-of-suite audit, transport and text rows; G66-G77 (25 Nov); the audit is complete
+
+Audited next: the native lane, budget and connection files, the Flow
+business files that were left (`invariant_test.exs`, claim waiters,
+pipelines, history, info, values, policy generations) and the text
+command dispatch sections, each against the node's tests and, where the
+wire shows it, a differential probe against the Elixir reference (rig
+`parity/scenario_{fifo_invariants,policy_patches,misc_rows,text_dispatch,
+text_dispatch2,text_dispatch3,text_parser}.py`). Gaps:
+- G66: a frame started and never finished kept its connection, and its
+  body buffer of up to 16 MiB, for ever. A frame's header must now
+  arrive within the frame deadline (15 s, Elixir's
+  `native_frame_assembly_timeout_ms`) of its first byte, and its body
+  within the deadline once the connection admits it; otherwise the
+  connection closes. The body is read as it arrives instead of into a
+  buffer allocated for its declared length. An idle connection is not a
+  late frame.
+- G67: the listener took any number of connections. It now holds at most
+  `--max-connections` (`FERRICSTORE_MAX_CONNECTIONS`, 10,000, Elixir's
+  `maxclients`) and takes the next only when one closes, as Ranch does.
+- G68: a claim naming `ANY` with other states (`states: ["ANY",
+  "queued"]`, or repeated `STATE` words) read `ANY` as a state name.
+  It is refused as in Elixir: "ERR flow STATE ANY cannot be mixed with
+  explicit states".
+- G69: `FLOW.VALUE.PUT` with an empty `owner_flow_id` or `name` answered
+  "flow not found"; each is checked first ("must be a non-empty
+  string"), and a shared put echoes the `owner_flow_id` it was given.
+- G71: a text `FLOW.SIGNAL` with repeated `IF_STATE` used the first only;
+  it now takes every one, as the typed list does.
+- G72: an unknown text command answered status 1; it is a bad request
+  (status 6), as Elixir answers it.
+- G73: `FERRICSTORE.CAPABILITIES`, which every SDK's `capabilities()`
+  sends, was refused. It answers the management map with what this node
+  serves: Flow observability and the SDK contract, no ACL, quota,
+  namespace or telemetry management, and health only when a health port
+  is served.
+- G74: a spawn's create options (`retention_ttl_ms`, the history limits,
+  `max_active_ms`, `priority`, `run_at_ms`, attributes and the rest) never
+  reached its children, typed or text; Elixir builds children with
+  `create_many_attrs(children, opts, ...)`, so each child that sets none
+  takes the spawn's, and its own wins.
+- G75: a claim on a FIFO state failed overdue Flows only at a lane's
+  head; a follower past its `max_active_ms` waited for the ten-minute
+  sweep. A claim now fails the overdue Flows behind each head in its scope
+  (up to 64 per lane, as Elixir's bounded scan), and a Flow timed out by a
+  claim starts its retention no earlier than the node's clock (the claim
+  path had used the client's `now_ms` for both).
+- G76: `FLOW.START_AND_CLAIM` into a FIFO state was taken; it is refused
+  as direct running entry, as STEP_CONTINUE already was.
+- G77: lanes ordered members by entry only, so after a state turned FIFO
+  a waiting Flow could be claimed while one leased under the parallel mode
+  still ran. Running members now rank first, as Elixir's lane scores do,
+  and hold the lane until they leave it.
+
+Recorded, not changed: Elixir's text `CREATE_MANY INDEPENDENT` answers
+item `OK` where its typed form, and the node, answer `ok`; Elixir breaks
+ties between equally due Flows by id (sorted-set member order) where the
+node takes entry order within a shard; Elixir's `EXTEND_LEASE` reply
+carries its internal `incarnation`; a child group's `request_hash` is the
+node's own digest, as `policy_hash` is (62c3a4f).
+
+The map is complete: of 998 rows, 53 ported, 19 fixed (G63-G77), 168
+covered, 5 decided, 468 Elixir-internal, 285 on surfaces the node does
+not serve.
+
+Ported with no change needed (the node already matched Elixir):
+`NO_REPLY`, lane independence and session frames on data lanes, a frame
+read in pieces, the waiter cap of 65,536 parked claims, the FIFO
+invariants of `invariant_test.exs` (`audit::fifo_invariants`,
+`audit::fifo_activation`), policy patch merging and concurrent patches
+(`audit::policy_patches`), an id reused after retention and a restart,
+and a due schedule firing once after its leader is lost (`replica`).
+
+RED, before the changes (tests and the new `ServerInfo` fields only):
+`connection_guards::{a_frame_unfinished_at_its_deadline_closes_the_connection,
+the_listener_takes_no_connection_past_its_limit_until_one_closes}`,
+`capabilities::capabilities_name_what_this_node_serves`,
+`audit::claim_value_rules::{a_claim_takes_any_state_alone_or_named_states_but_not_both,
+a_value_s_owner_and_name_must_not_be_empty}`,
+`flow_text::{a_text_signal_takes_every_if_state_it_names,
+an_unknown_text_command_is_a_bad_request}`,
+`audit::spawn_defaults::a_spawn_s_create_options_reach_every_child_that_sets_none`,
+`audit::fifo_invariants::{an_overdue_follower_times_out_while_its_head_holds_the_lane,
+fifo_entries_need_a_partition_and_no_priority_or_running_entry}` and
+`audit::fifo_activation::turning_fifo_on_waits_for_leased_members_to_finish`
+failed; G75 to G77 surfaced as ports that failed, and each was then
+checked against the Elixir reference over the wire. Three other ports
+failed on mistakes in the tests themselves (a scripted service that was
+not slow on that path, a transition without a fence, a claim helper that
+put its default limit ahead of the test's) and were corrected.
+
+cargo-mutants on the source diff (tests: queue_node, wf-api-tcp,
+wf-application): 54 mutants, 31 caught, 16 unviable, 1 timeout, 6
+missed. The follower check in `time_out_followers` also tested
+`queue.priority == 0`, which a FIFO state always has, so `&&` -> `||`
+changed nothing; the check is gone. The `ServerInfo` the binary builds
+from its options was reachable only through `run`; it is now
+`server_info`, unit-tested for `--max-connections` and the health flag.
+A second round then missed `mode == Mode::Due` in `take`: a default claim
+also reclaims, so followers were timed out in either step; the follower
+timeout now runs once per claim that is not reclaim-only. The last round
+(claim.rs, 10 mutants: 8 caught, 1 timeout) leaves only equivalent
+mutants: `room > 0` -> `>=` before a claim step (a step with no room takes
+nothing), the read-ahead capacity `64 * 1024` (a capacity hint), and
+`run` -> `Ok(())` in the binary, which no test starts.

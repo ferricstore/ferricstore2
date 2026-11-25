@@ -222,13 +222,17 @@ impl ShardState {
             put.value.clone(),
             expires_at,
         );
-        let reply = map(vec![
+        let mut entries = vec![
             ("ref", Term::Bin(reference.clone())),
             (
                 "partition_key",
                 Term::optional_bin(put.partition_key.as_deref()),
             ),
-        ]);
+        ];
+        if let Some(owner) = &put.shared_owner {
+            entries.push(("owner_flow_id", Term::Bin(owner.clone())));
+        }
+        let reply = map(entries);
         let logged = Logged::Shared {
             partition: partition.clone(),
             reference,

@@ -4,7 +4,9 @@
 //! partition, oldest first. A lane is a type, a logical state (a running
 //! Flow's is the state it was claimed from) and a partition; its Flows are
 //! ordered by when they entered that state (`Entry::sequence`, stamped on
-//! every change of logical state). A claim may take only a lane's head, and
+//! every change of logical state), running Flows first, as Elixir's lane
+//! scores rank them: a Flow already running when its state turned FIFO
+//! holds the lane (audit gap G77). A claim may take only a lane's head, and
 //! only while the head waits and is due: a running head, or one not due yet,
 //! blocks its lane. Lanes are kept only for types whose policy has a FIFO
 //! state and rebuilt when such a policy is installed; when a head leaves its
@@ -24,8 +26,21 @@ use super::super::super::waiters::Arrival;
 use super::cold::Slot;
 use super::{Entry, Key, Queue, RUNNING, ShardState};
 
-/// Lanes by type and logical state, then partition: `(sequence, id)`.
-pub(super) type Lanes = Map<(Vec<u8>, Vec<u8>), Map<Partition, BTreeSet<(u64, Key)>>>;
+/// Lanes by type and logical state, then partition: members as
+/// [`member`] orders them.
+pub(super) type Lanes = Map<(Vec<u8>, Vec<u8>), Map<Partition, BTreeSet<Member>>>;
+
+/// A lane member: `0` for a running Flow, `1` for a waiting one, then its
+/// entry sequence and key.
+pub(super) type Member = (u8, u64, Key);
+
+fn member(record: &WorkflowRecord, sequence: u64, key: &Key) -> Member {
+    (u8::from(record.state() != RUNNING), sequence, key.clone())
+}
+
+/// How many Flows behind a lane's head a claim checks for an overdue
+/// active-time limit (audit gap G75).
+const FOLLOWER_SCAN: usize = 64;
 
 fn terminal(state: &[u8]) -> bool {
     matches!(state, b"completed" | b"failed" | b"cancelled")
@@ -125,7 +140,7 @@ impl ShardState {
             .or_default()
             .entry(key.0.clone())
             .or_default()
-            .insert((entry.sequence, key.clone()));
+            .insert(member(record, entry.sequence, key));
     }
 
     /// Removes a Flow from its lane; a removed head frees the lane.
@@ -141,7 +156,7 @@ impl ShardState {
         let Some(members) = partitions.get_mut(&key.0) else {
             return;
         };
-        let member = (entry.sequence, key.clone());
+        let member = member(record, entry.sequence, key);
         let head = members.first() == Some(&member);
         if !members.remove(&member) {
             return;
@@ -171,7 +186,7 @@ impl ShardState {
             return;
         }
         // Lanes hold live Flows, which are always in memory (ADR-016).
-        let members: Vec<(Key, (Vec<u8>, u64))> = self
+        let members: Vec<(Key, (Vec<u8>, Member))> = self
             .records
             .iter()
             .filter_map(|(key, slot)| match slot {
@@ -184,18 +199,41 @@ impl ShardState {
             .map(|(key, entry)| {
                 (
                     key.clone(),
-                    (logical_state(&entry.record).to_vec(), entry.sequence),
+                    (
+                        logical_state(&entry.record).to_vec(),
+                        member(&entry.record, entry.sequence, key),
+                    ),
                 )
             })
             .collect();
-        for (key, (state, sequence)) in members {
+        for (key, (state, member)) in members {
             self.lanes
                 .entry((flow_type.to_vec(), state))
                 .or_default()
                 .entry(key.0.clone())
                 .or_default()
-                .insert((sequence, key));
+                .insert(member);
         }
+    }
+
+    /// Up to [`FOLLOWER_SCAN`] Flows behind each head of `queue`'s lanes
+    /// the request may claim from, as Elixir's bounded follower scan.
+    pub(super) fn lane_followers(
+        &self,
+        queue: &Queue,
+        request: &ClaimFlows,
+        partitions: Option<&[Partition]>,
+    ) -> Vec<Key> {
+        let lanes = self
+            .lanes
+            .get(&(queue.flow_type.clone(), queue.state.clone()));
+        lanes
+            .into_iter()
+            .flatten()
+            .filter(|(partition, _)| request.allows(partitions, partition))
+            .flat_map(|(_, members)| members.iter().skip(1).take(FOLLOWER_SCAN))
+            .map(|(_, _, key)| key.clone())
+            .collect()
     }
 
     /// Queues of lanes freed since the last call, for parked claims.
@@ -223,7 +261,7 @@ impl ShardState {
             if !request.allows(partitions, partition) {
                 continue;
             }
-            let Some((_, head)) = members.first() else {
+            let Some((_, _, head)) = members.first() else {
                 continue;
             };
             let Some((key, entry)) = self.hot_kv(head) else {

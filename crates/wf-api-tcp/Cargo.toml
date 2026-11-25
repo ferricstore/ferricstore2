@@ -11,7 +11,7 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-tokio.workspace = true
+tokio = { workspace = true, features = ["time"] }
 wf-types.workspace = true
 wf-domain.workspace = true
 wf-wire.workspace = true

@@ -175,3 +175,28 @@ fn stopping_the_node_fails_a_parked_claim() -> TestResult {
     std::fs::remove_dir_all(directory)?;
     Ok(())
 }
+
+#[test]
+fn the_node_parks_at_most_its_waiter_limit() -> TestResult {
+    // Elixir: "blocking workers share a server-wide waiter budget"
+    // (rest-of-suite audit): past 65,536 parked claims the next is refused
+    // at once and the parked ones keep waiting.
+    let node = open(&directory("blocking-waiter-limit")?, 4)?;
+    let (sender, receiver) = mpsc::channel();
+    for _ in 0..=65_536 {
+        let sender = sender.clone();
+        node.claim(
+            blocking(1, 60_000),
+            Box::new(move |result| {
+                let _delivered = sender.send(result);
+            }),
+        );
+    }
+    let first = receiver.recv_timeout(Duration::from_secs(60))?;
+    assert!(
+        matches!(first, Err(ServiceError::TooManyWaiting)),
+        "{first:?}"
+    );
+    assert!(receiver.recv_timeout(Duration::from_millis(300)).is_err());
+    Ok(())
+}

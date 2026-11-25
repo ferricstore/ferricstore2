@@ -100,7 +100,7 @@ normal = ["wf-types", "wf-domain", "wf-wire", "wf-application"]
 dev = ["wf-test-support"]
 modules = { frame = true, request = true, response = true, session = true, codec = false, listener = false }
 external_normal = [
-  { name = "tokio", version = "=1.54.1", features = ["io-util", "net", "rt-multi-thread", "sync"], default_features = false },
+  { name = "tokio", version = "=1.54.1", features = ["io-util", "net", "rt-multi-thread", "sync", "time"], default_features = false },
 ]
 
 [packages.wf-worker]

@@ -277,6 +277,12 @@ pub(super) fn signal(args: &[Term]) -> Result<Options, FlowError> {
                 options.append("override_values", key.clone());
                 more
             }
+            // Every `IF_STATE` counts, as the typed list does (audit gap
+            // G71).
+            ("IF_STATE", [state, more @ ..]) => {
+                options.append("if_state", state.clone());
+                more
+            }
             (_, [value, more @ ..]) => {
                 spec_option(&mut options, super::specs::SIGNAL, name, value)?;
                 more

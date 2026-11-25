@@ -132,7 +132,8 @@ commands follow their existing milestones.
   and policies, in ADR-013.
 - Step 3, TCP listener: `wf_api_tcp::session::serve` runs FSNP sessions on
   Tokio 1.54.1 (`io-util`, `net`, `rt-multi-thread`, `sync`; no macros),
-  newly allowed for `wf-api-tcp` and `wf-node`. A reader loop dispatches each
+  newly allowed for `wf-api-tcp` and `wf-node`; `wf-api-tcp` also takes
+  `time` for the frame deadline (audit gap G66, 25 Nov). A reader loop dispatches each
   frame to the queue service without waiting; a writer task keeps each lane's
   replies in request order. The handshake declares the 0.11.4 contract the
   Python SDK checks before it connects, including the `FLOW.QUERY` and

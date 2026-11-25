@@ -31,6 +31,8 @@ pub struct ValuePut {
     /// The new reference of a shared value, chosen by the node before
     /// routing.
     pub shared_ref: Option<Vec<u8>>,
+    /// The `owner_flow_id` a shared put was given, echoed in its reply.
+    pub shared_owner: Option<Vec<u8>>,
 }
 
 /// A value read.
@@ -145,6 +147,10 @@ pub fn parse_put(args: &Term) -> Result<ValuePut, FlowError> {
     let owner = opts.binary_or_nil("owner_flow_id")?;
     let name = opts.binary_or_nil("name")?;
     for (key, value) in [("owner_flow_id", &owner), ("name", &name)] {
+        // Each part of a value's identity names something (audit gap G69).
+        if value.as_ref().is_some_and(Vec::is_empty) {
+            return Err(FlowError::flow(key, "must be a non-empty string"));
+        }
         if value.as_ref().is_some_and(|value| value.len() > 256) {
             return Err(FlowError::rejected(format!(
                 "ERR flow {key} too large (max 256 bytes)"
@@ -154,6 +160,8 @@ pub fn parse_put(args: &Term) -> Result<ValuePut, FlowError> {
     let override_value = opts.boolean("override", false)?;
     let now_ms = opts.non_neg_integer("now_ms")?;
     let ttl_ms = opts.positive_integer("ttl_ms")?;
+    // A shared put echoes the owner it was given (audit gap G69).
+    let shared_owner = if name.is_none() { owner.clone() } else { None };
     let named = owner.zip(name);
     if named.is_some() && ttl_ms.is_some() {
         return Err(FlowError::rejected(
@@ -168,6 +176,7 @@ pub fn parse_put(args: &Term) -> Result<ValuePut, FlowError> {
         now_ms,
         ttl_ms,
         shared_ref: None,
+        shared_owner,
     })
 }
 

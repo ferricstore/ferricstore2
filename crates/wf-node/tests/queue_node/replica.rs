@@ -480,3 +480,57 @@ fn a_follower_that_lost_its_data_catches_up_under_the_same_leader() -> TestResul
     }
     Ok(())
 }
+
+#[test]
+fn a_due_schedule_fires_once_after_its_leader_is_lost() -> TestResult {
+    // Elixir: `cluster/flow_schedule_cluster_test.exs` "due schedule can
+    // fire once after Raft leader failover" and "overdue interval catch-up
+    // fires once after Raft leader failover" (rest-of-suite audit).
+    let path = directory("replica-schedule-failover")?;
+    let peers = peers()?;
+    let mut nodes = BTreeMap::new();
+    for id in MEMBERS {
+        nodes.insert(id, open(&path, id, &peers)?);
+    }
+    let first = serving(&nodes, "probe-1")?;
+    let target = Term::Map(vec![
+        (b"id_prefix".to_vec(), Term::text("fired")),
+        (b"type".to_vec(), Term::text("scheduled")),
+    ]);
+    run(
+        nodes.get(&first).ok_or("leader missing")?,
+        "FLOW.SCHEDULE.CREATE",
+        &[
+            ("id", Term::text("every")),
+            ("kind", Term::text("interval")),
+            ("start_at_ms", Term::Int(1_000)),
+            ("every_ms", Term::Int(100)),
+            ("catchup_policy", Term::text("fire_once")),
+            ("now_ms", Term::Int(999)),
+            ("target", target),
+        ],
+    )?;
+    drop(nodes.remove(&first));
+    let second = serving(&nodes, "probe-2")?;
+    let leader = nodes.get(&second).ok_or("leader missing")?;
+    let fire = || {
+        run(
+            leader,
+            "FLOW.SCHEDULE.FIRE_DUE",
+            &[
+                ("now_ms", Term::Int(2_050)),
+                ("worker", Term::text("scheduler")),
+            ],
+        )
+    };
+    let fired = fire()?;
+    let count = |key: &str| fired.get(key.as_bytes()).cloned();
+    assert_eq!(
+        (count("claimed"), count("fired"), count("coalesced")),
+        (Some(Term::Int(1)), Some(Term::Int(1)), Some(Term::Int(10))),
+        "{fired:?}"
+    );
+    let again = fire()?;
+    assert_eq!(again.get(b"fired"), Some(&Term::Int(0)), "{again:?}");
+    Ok(())
+}

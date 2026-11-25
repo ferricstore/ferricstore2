@@ -96,6 +96,14 @@ impl ShardState {
         if self.records.contains_key(&key) {
             return Err(ServiceError::rejected("ERR flow already exists".to_owned()));
         }
+        // A start enters its state running, which a FIFO state refuses as
+        // Elixir's `flow_require_fifo_entry/4` does (audit gap G76).
+        self.fifo_guard(
+            (&create.flow_type, &create.state),
+            true,
+            create.priority,
+            None,
+        )?;
         let meta = self.new_meta(create)?;
         let record = decide(
             None,

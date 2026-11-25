@@ -22,6 +22,20 @@ fn rejected(text: impl Into<String>) -> ServiceError {
     ServiceError::rejected(text.into())
 }
 
+/// `FERRICSTORE.CAPABILITIES`: the management map the SDKs'
+/// `capabilities()` reads, naming what this node serves (audit gap G73).
+fn capabilities(context: &Context) -> Term {
+    wf_application::commands::flow::term::map(vec![
+        ("acl_management", Term::Bool(false)),
+        ("flow_observability", Term::Bool(true)),
+        ("health", Term::Bool(context.info.health)),
+        ("namespace_management", Term::Bool(false)),
+        ("quota_management", Term::Bool(false)),
+        ("sdk", Term::Bool(true)),
+        ("telemetry", Term::Bool(false)),
+    ])
+}
+
 /// Runs one text command from its `{command, args}` map.
 pub(super) fn run(context: &Context, payload: &Term, done: Done) {
     if let Err(late) = deadline::check(payload) {
@@ -43,6 +57,15 @@ pub(super) fn run(context: &Context, payload: &Term, done: Done) {
             [] => Ok(Term::text("PONG")),
             [message] => Ok(message.clone()),
             _ => Err(rejected("ERR wrong number of arguments for 'ping' command")),
+        });
+    }
+    if upper == b"FERRICSTORE.CAPABILITIES" {
+        return done(if args.is_empty() {
+            Ok(capabilities(context))
+        } else {
+            Err(rejected(
+                "ERR wrong number of arguments for 'ferricstore.capabilities' command",
+            ))
         });
     }
     if !upper.starts_with(b"FLOW.") {

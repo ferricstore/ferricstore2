@@ -17,6 +17,7 @@
 //! | `--retention-ms` | `FERRICSTORE_RETENTION_MS` | 7 days |
 //! | `--client-clock` | `FERRICSTORE_CLIENT_CLOCK` | `false` (tests and parity probes only; ADR-015) |
 //! | `--max-new-backlog`, `--max-backlog` | `FERRICSTORE_MAX_NEW_BACKLOG`, `FERRICSTORE_MAX_BACKLOG` | ADR-017 |
+//! | `--max-connections` | `FERRICSTORE_MAX_CONNECTIONS` | `10000` (Elixir's `maxclients`) |
 //! | `--discovery` | `FERRICSTORE_DISCOVERY` | `none`; `static`, `dns` (see `configuration`) |
 //! | `--cluster-nodes` | `FERRICSTORE_CLUSTER_NODES` | for `static` |
 //! | `--node-id` | `FERRICSTORE_NODE_ID` | from the advertised host |
@@ -35,7 +36,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::Arc;
 
-use wf_api_tcp::session::{Endpoint, InFlight, ServerInfo, serve};
+use wf_api_tcp::session::{Connections, Endpoint, InFlight, ServerInfo, serve};
 use wf_application::commands::flow::NodeService;
 use wf_node::composition::{Admission, QueueNode, QueueNodeConfig, Replica};
 use wf_node::configuration::{self, Cluster, Local};
@@ -47,7 +48,7 @@ use wf_node::supervision::health;
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 /// Each flag and the variable it overrides.
-const FLAGS: [(&str, &str); 20] = [
+const FLAGS: [(&str, &str); 21] = [
     ("--data-dir", "FERRICSTORE_DATA_DIR"),
     ("--host", "FERRICSTORE_BIND_HOST"),
     ("--port", "FERRICSTORE_NATIVE_PORT"),
@@ -60,6 +61,7 @@ const FLAGS: [(&str, &str); 20] = [
     ("--client-clock", "FERRICSTORE_CLIENT_CLOCK"),
     ("--max-new-backlog", "FERRICSTORE_MAX_NEW_BACKLOG"),
     ("--max-backlog", "FERRICSTORE_MAX_BACKLOG"),
+    ("--max-connections", "FERRICSTORE_MAX_CONNECTIONS"),
     ("--discovery", "FERRICSTORE_DISCOVERY"),
     ("--cluster-nodes", "FERRICSTORE_CLUSTER_NODES"),
     ("--node-id", "FERRICSTORE_NODE_ID"),
@@ -98,6 +100,7 @@ struct Options {
     health_port: Option<u16>,
     threads: Option<usize>,
     client_clock: bool,
+    max_connections: Option<u32>,
     config: QueueNodeConfig,
     snapshot_every: u64,
     keep_logs: u64,
@@ -167,6 +170,7 @@ fn options(settings: &BTreeMap<String, String>) -> Result<Options, String> {
         health_port: number(settings, "FERRICSTORE_HEALTH_PORT")?,
         threads: number(settings, "FERRICSTORE_THREADS")?,
         client_clock,
+        max_connections: number(settings, "FERRICSTORE_MAX_CONNECTIONS")?,
         config,
         snapshot_every: number(settings, "FERRICSTORE_SNAPSHOT_EVERY")?.unwrap_or(100_000),
         keep_logs: number(settings, "FERRICSTORE_KEEP_LOGS")?.unwrap_or(1_000),
@@ -192,6 +196,30 @@ fn endpoints(cluster: Option<&Cluster>) -> BTreeMap<u64, Endpoint> {
                 .collect()
         })
         .unwrap_or_default()
+}
+
+/// What the handshake and the listener take from the options.
+fn server_info(options: &Options, port: u16) -> ServerInfo {
+    ServerInfo {
+        node: options.cluster.as_ref().map_or_else(
+            || "ferricstore2".to_owned(),
+            |cluster| format!("ferricstore2-{}", cluster.id),
+        ),
+        host: options.advertise_host.clone(),
+        port,
+        shard_count: options.config.shards,
+        client_clock: options.client_clock,
+        in_flight: InFlight::default(),
+        members: endpoints(options.cluster.as_ref()),
+        // At most `--max-connections` at once (audit gap G67).
+        connections: Connections {
+            max: options
+                .max_connections
+                .unwrap_or(Connections::default().max),
+            ..Connections::default()
+        },
+        health: options.health_port.is_some(),
+    }
 }
 
 fn run(options: Options) -> Result<(), String> {
@@ -222,18 +250,7 @@ fn run(options: Options) -> Result<(), String> {
             let probed = Arc::clone(&node);
             tokio::spawn(health::serve(health, Arc::new(move || probed.ready())));
         }
-        let info = ServerInfo {
-            node: options.cluster.as_ref().map_or_else(
-                || "ferricstore2".to_owned(),
-                |cluster| format!("ferricstore2-{}", cluster.id),
-            ),
-            host: options.advertise_host.clone(),
-            port,
-            shard_count: options.config.shards,
-            client_clock: options.client_clock,
-            in_flight: InFlight::default(),
-            members: endpoints(options.cluster.as_ref()),
-        };
+        let info = server_info(&options, port);
         let mut stdout = std::io::stdout();
         write!(stdout, "READY port={port} shards={}", options.config.shards)
             .and_then(|()| stdout.write_all(b"\n"))
@@ -304,5 +321,35 @@ fn main() -> ExitCode {
                 write!(stderr, "ferricstore2: {message}").and_then(|()| stderr.write_all(b"\n"));
             status
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
+
+    use super::{options, server_info};
+
+    fn settings(pairs: &[(&str, &str)]) -> BTreeMap<String, String> {
+        pairs
+            .iter()
+            .map(|(key, value)| ((*key).to_owned(), (*value).to_owned()))
+            .collect()
+    }
+
+    #[test]
+    fn the_listener_takes_the_connection_limit_and_health_port_given() -> Result<(), String> {
+        let base = [("FERRICSTORE_DATA_DIR", "/tmp/unused")];
+        let plain = options(&settings(&base))?;
+        let info = server_info(&plain, 6388);
+        assert_eq!((info.connections.max, info.health), (10_000, false));
+        let mut given = base.to_vec();
+        given.extend([
+            ("FERRICSTORE_MAX_CONNECTIONS", "7"),
+            ("FERRICSTORE_HEALTH_PORT", "6389"),
+        ]);
+        let info = server_info(&options(&settings(&given))?, 6388);
+        assert_eq!((info.connections.max, info.health), (7, true));
+        Ok(())
     }
 }

@@ -5,7 +5,8 @@
 //! the same lane have gone, then writes everything ready in one call. A bad
 //! frame header closes the connection, since the stream cannot be resynced.
 //! Each request holds permits for itself and its body's bytes until its
-//! reply is written; with none left, the reader waits (ADR-017).
+//! reply is written; with none left, the reader waits (ADR-017). A frame
+//! must finish within the frame deadline once it started (audit gap G66).
 
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
@@ -15,10 +16,14 @@ use tokio::net::TcpStream;
 use tokio::net::tcp::OwnedWriteHalf;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 use tokio::sync::{OwnedSemaphorePermit, Semaphore};
+use tokio::time::timeout;
 
 use crate::frame::{FLAG_NO_REPLY, HEADER_LEN, Header};
 
 use super::InFlight;
+
+/// The most of a body read ahead of its bytes arriving.
+const BODY_CHUNK: usize = 64 * 1024;
 use super::dispatch::{self, Context, Negotiated, Next};
 
 /// A request's share of its connection's in-flight limits, given back when
@@ -155,9 +160,25 @@ pub(super) async fn run(stream: TcpStream, context: Context) {
     let mut orders: HashMap<u32, u64> = HashMap::new();
     let mut negotiated = Negotiated::default();
     let limits = Limits::new(context.info.in_flight);
+    let frame_timeout = context.info.connections.frame_timeout;
     loop {
         let mut header = [0_u8; HEADER_LEN];
-        if reader.read_exact(&mut header).await.is_err() {
+        // The first byte may take as long as the client likes; the rest of
+        // the header must follow within the frame deadline.
+        let Some((first, rest)) = header.split_first_mut() else {
+            break;
+        };
+        if reader
+            .read_exact(std::slice::from_mut(first))
+            .await
+            .is_err()
+        {
+            break;
+        }
+        if !matches!(
+            timeout(frame_timeout, reader.read_exact(rest)).await,
+            Ok(Ok(_))
+        ) {
             break;
         }
         let Ok(header) = Header::parse_request(header) else {
@@ -169,8 +190,12 @@ pub(super) async fn run(stream: TcpStream, context: Context) {
         let Some(permits) = limits.admit(length).await else {
             break;
         };
-        let mut body = vec![0_u8; length];
-        if reader.read_exact(&mut body).await.is_err() {
+        // Once admitted, the body must arrive within the deadline; it is
+        // read as it comes, not into a buffer of its declared length.
+        let mut body = Vec::with_capacity(length.min(BODY_CHUNK));
+        let mut taken = (&mut reader).take(u64::from(header.body_len));
+        let read = timeout(frame_timeout, taken.read_to_end(&mut body)).await;
+        if !matches!(read, Ok(Ok(read)) if read == length) {
             break;
         }
         let next = orders.entry(header.lane).or_insert(0);

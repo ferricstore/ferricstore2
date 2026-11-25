@@ -208,9 +208,12 @@ fn a_retry_limit_and_target_given_as_text_override_the_policy() -> TestResult {
         exec(&node, "FLOW.TRANSITION", &[text("x1")])?,
         refused("ERR wrong number of arguments for 'flow.transition' command")
     );
+    // An unknown command is a bad request (audit gap G72).
     assert_eq!(
         exec(&node, "FLOW.NOPE", &[text("x1")])?,
-        refused("ERR unknown command 'flow.nope', with args beginning with: ")
+        Err(ServiceError::BadRequest(
+            "ERR unknown command 'flow.nope', with args beginning with: ".to_owned()
+        ))
     );
     Ok(())
 }
@@ -260,4 +263,78 @@ fn a_text_query_decodes_its_parameters_by_field_type() -> TestResult {
         .collect();
     assert_eq!(ids, [text("early")]);
     Ok(())
+}
+
+#[test]
+fn a_text_signal_takes_every_if_state_it_names() -> TestResult {
+    // Elixir: `flow_signal_command_test.exs` "dispatches Flow signal through
+    // Rust AST": repeated `IF_STATE` options name every state the signal
+    // may fire in (audit gap G71).
+    let node = open(&directory("text-signal-if-states")?, 4)?;
+    let words = |values: &[&str]| -> Vec<Term> { values.iter().map(|value| text(value)).collect() };
+    for id in ["s1", "s2"] {
+        exec(
+            &node,
+            "FLOW.CREATE",
+            &words(&[
+                id,
+                "TYPE",
+                "sd",
+                "STATE",
+                "waiting_payment",
+                "PARTITION",
+                "tenant-a",
+            ]),
+        )??;
+    }
+    let signal = |id: &str, states: &[&str]| {
+        let mut args = words(&[id, "PARTITION", "tenant-a", "SIGNAL", "paid"]);
+        for state in states {
+            args.extend(words(&["IF_STATE", state]));
+        }
+        args.extend(words(&[
+            "TRANSITION_TO",
+            "verify",
+            "VALUE",
+            "payment_event",
+            "payment-bytes",
+        ]));
+        exec(&node, "FLOW.SIGNAL", &args)
+    };
+    assert_eq!(
+        signal("s1", &["manual_review", "waiting_payment"])??,
+        text("OK")
+    );
+    let read = exec(
+        &node,
+        "FLOW.GET",
+        &words(&["s1", "PARTITION", "tenant-a", "VALUE", "payment_event"]),
+    )??;
+    assert_eq!(read.get(b"state"), Some(&text("verify")));
+    let values = read.get(b"values").ok_or("values expected")?;
+    assert_eq!(values.get(b"payment_event"), Some(&text("payment-bytes")));
+    let refused = signal("s2", &["manual_review", "closed"])?;
+    assert_eq!(
+        refused.map_err(|error| error.to_string()),
+        Err("ERR flow state mismatch".to_owned())
+    );
+    Ok(())
+}
+
+#[test]
+fn an_unknown_text_command_is_a_bad_request() {
+    // Elixir: `native_ast_parser_test.exs` "removed Flow collection
+    // commands have no parser route", answered with status `bad_request`
+    // (audit gap G72).
+    for name in ["FLOW.LIST", "flow.search", "FLOW.NOPE"] {
+        let refused = text::parse(name.as_bytes(), &[text("job")]);
+        let expected = format!(
+            "ERR unknown command '{}', with args beginning with: ",
+            name.to_ascii_lowercase()
+        );
+        assert!(
+            matches!(&refused, Err(ServiceError::BadRequest(message)) if *message == expected),
+            "{name}"
+        );
+    }
 }

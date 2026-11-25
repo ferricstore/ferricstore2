@@ -19,6 +19,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use tokio::net::TcpListener;
+use tokio::sync::Semaphore;
 use wf_application::commands::flow::NodeService;
 use wf_application::commands::queue::Cancellation;
 
@@ -43,6 +44,35 @@ pub struct ServerInfo {
     /// A replicated node's group members by id, for `SHARDS` (ADR-018);
     /// empty for a node that is not replicated.
     pub members: BTreeMap<u64, Endpoint>,
+    /// How many connections the listener holds and how long a started
+    /// frame may take (audit gaps G66, G67).
+    pub connections: Connections,
+    /// Whether the node serves a health port, as
+    /// `FERRICSTORE.CAPABILITIES` tells (audit gap G73).
+    pub health: bool,
+}
+
+/// The listener's guards, as Elixir's `maxclients` and
+/// `native_frame_assembly_timeout_ms`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Connections {
+    /// Connections held at once; the listener takes the next one only when
+    /// one closes, as Ranch does past `max_connections`.
+    pub max: u32,
+    /// How long a frame may take once its first byte arrived: the rest of
+    /// its header, and its body once the connection admits it. A frame
+    /// not finished in time closes the connection, since the stream
+    /// cannot be resynced.
+    pub frame_timeout: std::time::Duration,
+}
+
+impl Default for Connections {
+    fn default() -> Self {
+        Self {
+            max: 10_000,
+            frame_timeout: std::time::Duration::from_secs(15),
+        }
+    }
 }
 
 /// Where clients reach one member (ADR-018).
@@ -81,7 +111,18 @@ impl Default for InFlight {
 /// as its own task on the current Tokio runtime.
 pub async fn serve(listener: TcpListener, service: Arc<dyn NodeService>, info: Arc<ServerInfo>) {
     let clients = AtomicU64::new(0);
-    while let Ok((stream, _peer)) = listener.accept().await {
+    let slots = Arc::new(Semaphore::new(
+        usize::try_from(info.connections.max.max(1)).unwrap_or(1),
+    ));
+    loop {
+        // At the limit the listener waits for a connection to close before
+        // it takes the next (audit gap G67).
+        let Ok(slot) = Arc::clone(&slots).acquire_owned().await else {
+            return;
+        };
+        let Ok((stream, _peer)) = listener.accept().await else {
+            return;
+        };
         // Small request and reply frames should leave at once.
         if stream.set_nodelay(true).is_err() {
             continue;
@@ -93,6 +134,9 @@ pub async fn serve(listener: TcpListener, service: Arc<dyn NodeService>, info: A
             client_id,
             closed: Cancellation::new(),
         };
-        tokio::spawn(connection::run(stream, context));
+        tokio::spawn(async move {
+            connection::run(stream, context).await;
+            drop(slot);
+        });
     }
 }

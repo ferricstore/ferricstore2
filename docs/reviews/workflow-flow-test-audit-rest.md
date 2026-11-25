@@ -10,6 +10,12 @@ the 6a5f2bc34 pin of the earlier audits). Files with fewer mentions and
 outside the native protocol test KV, Redis or storage behaviour the node
 does not have, and are not listed.
 
+Status (25 Nov): complete. 998 rows: 53 ported, 19 fixed by node
+changes (gaps G63-G77), 168 covered by existing node tests or a
+differential probe against the Elixir reference (rig `parity/scenario_*`),
+5 decided, 468 Elixir-internal and 285 on surfaces the node does not
+serve. No row is open.
+
 Statuses are those of the earlier audits, plus **surface**: the test
 checks a surface the node does not serve (KV and Redis commands, ACL and
 AUTH, TLS, MULTI, PubSub, chunked frames, the dashboard and HTTP
@@ -340,847 +346,866 @@ for the whole file:
   only Elixir's modes and refuses `same_shard` around a Flow command.
 - G65 (closed): `COMMAND_EXEC` and pipeline items lost a refusal's
   status and structure (a query failure's diagnostic among them).
+- G66 (closed): a frame started and never finished held its connection
+  for ever; a frame now has the frame deadline (15 s).
+- G67 (closed): the listener took any number of connections; it holds at
+  most `--max-connections` (10,000).
+- G68 (closed): a claim naming `ANY` with other states read `ANY` as a
+  state; it is refused.
+- G69 (closed): an empty `owner_flow_id` or `name` answered "flow not
+  found"; a shared put now also echoes its `owner_flow_id`.
+- G70: none (an Elixir quirk recorded instead; see the review).
+- G71 (closed): a text `FLOW.SIGNAL` read only its first `IF_STATE`.
+- G72 (closed): an unknown text command answered status 1, not 6.
+- G73 (closed): `FERRICSTORE.CAPABILITIES`, which the SDKs' `capabilities()`
+  sends, was refused.
+- G74 (closed): a spawn's create options never reached its children.
+- G75 (closed): an overdue FIFO follower was not failed while its head held
+  the lane.
+- G76 (closed): `FLOW.START_AND_CLAIM` could enter a FIFO state running.
+- G77 (closed): a Flow leased while its state was parallel did not hold
+  its lane once the state turned FIFO.
 
 ## `ferricstore/test/ferricstore/cluster/cross_node_decide_write_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 37 | EXPIRE NX from every node has one winner | open |
-| 57 | DEL and UNLINK from every node count a key once | open |
-| 77 | TDIGEST.ADD from every node keeps every value | open |
-| 101 | TDIGEST.CREATE from every node has one winner | open |
-| 112 | a list push wakes list waiters on every node | open |
-| 140 | a sorted-set write wakes BZPOPMIN waiters on every node | open |
-| 162 | a blocked claim takes a flow created through another node | open |
+| 37 | EXPIRE NX from every node has one winner | surface: KV commands across nodes |
+| 57 | DEL and UNLINK from every node count a key once | surface: KV commands across nodes |
+| 77 | TDIGEST.ADD from every node keeps every value | surface: KV commands across nodes |
+| 101 | TDIGEST.CREATE from every node has one winner | surface: KV commands across nodes |
+| 112 | a list push wakes list waiters on every node | surface: KV commands across nodes |
+| 140 | a sorted-set write wakes BZPOPMIN waiters on every node | surface: KV commands across nodes |
+| 162 | a blocked claim takes a flow created through another node | covered: blocking::a_blocking_claim_wakes_for_a_create (every write of a group goes through its leader, whose waiters it wakes; a follower answers reroute, session::topology::a_member_that_does_not_lead_answers_reroute) |
 
 ## `ferricstore/test/ferricstore/cluster/flow_hibernation_claim_cluster_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 37 | every node claims the same Flow while one node's writer is behind | open |
-| 109 | a node that crashes after level 8 is raised keeps the Flows it restored | open |
+| 37 | every node claims the same Flow while one node's writer is behind | internal: hibernation and feature levels |
+| 109 | a node that crashes after level 8 is raised keeps the Flows it restored | internal: hibernation and feature levels |
 
 ## `ferricstore/test/ferricstore/cluster/flow_replay_after_restart_cluster_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 27 | a restarted node replays Flow writes its LMDB mirror already holds | open |
+| 27 | a restarted node replays Flow writes its LMDB mirror already holds | covered: replica::a_group_keeps_its_flows_through_leader_loss_and_a_member_s_return |
 
 ## `ferricstore/test/ferricstore/cluster/flow_retention_mirror_lag_cluster_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 30 | a re-create after cleanup applies on every node, with one writer behind | open |
+| 30 | a re-create after cleanup applies on every node, with one writer behind | internal: Elixir's per-node LMDB writers; the node replicates the removal record as it logs it (retention::a_restart_replays_removals) |
 
 ## `ferricstore/test/ferricstore/cluster/flow_schedule_cluster_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 20 | due schedule can fire once after Raft leader failover | open |
-| 86 | overdue interval catch-up fires once after Raft leader failover | open |
+| 20 | due schedule can fire once after Raft leader failover | ported: replica::a_due_schedule_fires_once_after_its_leader_is_lost |
+| 86 | overdue interval catch-up fires once after Raft leader failover | ported: replica::a_due_schedule_fires_once_after_its_leader_is_lost (an overdue interval catches up once with fire_once) |
 
 ## `ferricstore/test/ferricstore/cluster/flow_state_meta_retention_cluster_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 20 | retention cleanup removes indexed state_meta projections after leader failover | open |
+| 20 | retention cleanup removes indexed state_meta projections after leader failover | internal: Elixir's per-node state_meta projections; the node replicates results, indexes included (ADR-018) |
 
 ## `ferricstore/test/ferricstore/commands/flow_command_boundary_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 6 | Flow dispatch preserves the supplied instance context | open |
-| 36 | structured Flow opcodes are rejected explicitly by scalar COMMAND_EXEC preparation | open |
-| 59 | Flow response normalization converts keys recursively inside lists | open |
+| 6 | Flow dispatch preserves the supplied instance context | internal: Elixir's instance context |
+| 36 | structured Flow opcodes are rejected explicitly by scalar COMMAND_EXEC preparation | covered: parity probe (typed opcodes are not text commands) |
+| 59 | Flow response normalization converts keys recursively inside lists | internal: Elixir's response key normalization |
 
 ## `ferricstore/test/ferricstore/commands/flow_signal_command_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 21 | dispatches Flow signal through Rust AST | open |
-| 79 | FLOW.GET returns every value its VALUE options name | open |
+| 21 | dispatches Flow signal through Rust AST | fixed G71 (flow_text::a_text_signal_takes_every_if_state_it_names) |
+| 79 | FLOW.GET returns every value its VALUE options name | covered: parity probe scenario_text_dispatch3.py (VALUE reads) equal to Elixir |
 
 ## `ferricstore/test/ferricstore/commands/flow_test/sections/dispatches_flow_create_many_through_rust_ast.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 9 | dispatches Flow create_many through Rust AST | open |
-| 56 | dispatches cold auto-bucket create_many claim_due through Rust AST | open |
-| 118 | dispatches idempotent Flow create_many retry through Rust AST | open |
-| 146 | dispatches mixed-partition Flow create_many through Rust AST | open |
-| 176 | dispatches Flow claim and complete through Rust AST | open |
-| 231 | dispatches Flow complete_many through Rust AST | open |
-| 309 | rejects terminal Flow TTL zero through Rust AST | open |
-| 360 | dispatches Flow cancel inline reason through Rust AST | open |
-| 400 | dispatches Flow fail_many through Rust AST | open |
-| 478 | dispatches Flow retry_many through Rust AST | open |
-| 562 | dispatches Flow retry policy override through Rust AST | open |
-| 612 | dispatches Flow claim_due with job-only return through Rust AST | open |
-| 656 | dispatches Flow claim_due with compact job-only return through Rust AST | open |
-| 705 | dispatches Flow claim_due with compact job-state return through Rust AST | open |
-| 752 | dispatches Flow claim_due with any partition and repeated states through Rust AST | open |
-| 828 | dispatches Flow cancel_many through Rust AST | open |
+| 9 | dispatches Flow create_many through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 56 | dispatches cold auto-bucket create_many claim_due through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir except item OK case (recorded); flow_text_batches.rs |
+| 118 | dispatches idempotent Flow create_many retry through Rust AST | covered: parity probe scenario_text_dispatch4.py equal to Elixir; audit::create_many (idempotent retry) |
+| 146 | dispatches mixed-partition Flow create_many through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 176 | dispatches Flow claim and complete through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 231 | dispatches Flow complete_many through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 309 | rejects terminal Flow TTL zero through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 360 | dispatches Flow cancel inline reason through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 400 | dispatches Flow fail_many through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 478 | dispatches Flow retry_many through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 562 | dispatches Flow retry policy override through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 612 | dispatches Flow claim_due with job-only return through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 656 | dispatches Flow claim_due with compact job-only return through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 705 | dispatches Flow claim_due with compact job-state return through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
+| 752 | dispatches Flow claim_due with any partition and repeated states through Rust AST | covered: parity probe (same Flows claimed; tie order among equally due Flows recorded); flow_text_batches::a_text_claim_takes_every_repeated_state |
+| 828 | dispatches Flow cancel_many through Rust AST | covered: parity probe scenario_text_dispatch.py equal to Elixir; flow_text.rs, flow_text_batches.rs |
 
 ## `ferricstore/test/ferricstore/commands/flow_test/sections/dispatches_flow_rewind_through_rust_ast.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 9 | dispatches Flow rewind through Rust AST | open |
-| 67 | dispatches Flow AST parse errors without calling embedded API | open |
-| 89 | dispatches Flow policy AST through embedded API | open |
-| 147 | dispatches Flow policy commands through Rust AST | open |
-| 250 | dispatches FIFO policy and claims through Rust AST command path | open |
-| 326 | Flow commands are visible in COMMAND catalog | open |
+| 9 | dispatches Flow rewind through Rust AST | covered: parity probe scenario_text_dispatch2.py equal to Elixir; flow_text.rs |
+| 67 | dispatches Flow AST parse errors without calling embedded API | covered: parity probe scenario_text_dispatch2.py equal to Elixir; flow_text.rs |
+| 89 | dispatches Flow policy AST through embedded API | internal: Elixir's embedded policy API |
+| 147 | dispatches Flow policy commands through Rust AST | covered: parity probe scenario_text_dispatch2.py equal to Elixir; flow_text.rs |
+| 250 | dispatches FIFO policy and claims through Rust AST command path | covered: parity probe scenario_text_dispatch2.py equal to Elixir; flow_text.rs |
+| 326 | Flow commands are visible in COMMAND catalog | surface: COMMAND catalog |
 
 ## `ferricstore/test/ferricstore/commands/flow_test/sections/dispatches_flow_state_meta_through_rust_ast.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 9 | dispatches Flow state_meta and indexed_state_meta through Rust AST | open |
+| 9 | dispatches Flow state_meta and indexed_state_meta through Rust AST | covered: parity probe scenario_text_dispatch2.py equal to Elixir; flow_text.rs |
 
 ## `ferricstore/test/ferricstore/commands/flow_test/sections/dispatches_flow_value_put_payload_refs_through_rust_ast.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 67 | dispatches Flow value put and payload refs through Rust AST | open |
-| 143 | rejects unsupported Flow value ref inputs through Rust AST | open |
-| 166 | dispatches Flow create/get/history through Rust AST | open |
-| 244 | dispatches Flow failures through Rust AST | open |
-| 339 | dispatches Flow retention cleanup through Rust AST | open |
-| 355 | dispatches Flow full values through Rust AST | open |
-| 435 | dispatches Flow spawn children through Rust AST | open |
-| 545 | dispatches Flow mutation values through Rust AST | open |
-| 712 | dispatches Flow lineage queries through Rust AST | open |
-| 820 | dispatches Flow reclaim through Rust AST | open |
-| 852 | dispatches Flow claim_due reclaim controls through Rust AST | open |
-| 898 | dispatches Flow extend_lease through Rust AST | open |
-| 933 | dispatches Flow extend_lease with an OK-only response | open |
+| 67 | dispatches Flow value put and payload refs through Rust AST | covered: parity probe scenario_text_dispatch3.py and scenario_text_dispatch4.py equal to Elixir |
+| 143 | rejects unsupported Flow value ref inputs through Rust AST | covered: parity probe scenario_text_dispatch3.py equal to Elixir; flow_text.rs |
+| 166 | dispatches Flow create/get/history through Rust AST | covered: parity probe scenario_text_dispatch3.py equal to Elixir; flow_text.rs |
+| 244 | dispatches Flow failures through Rust AST | covered: parity probe scenario_text_dispatch3.py equal to Elixir; flow_text.rs |
+| 339 | dispatches Flow retention cleanup through Rust AST | covered: parity probe scenario_text_dispatch3.py equal to Elixir; flow_text.rs |
+| 355 | dispatches Flow full values through Rust AST | covered: parity probe scenario_text_dispatch3.py equal to Elixir; flow_text.rs |
+| 435 | dispatches Flow spawn children through Rust AST | fixed G74 (audit::spawn_defaults::a_spawn_s_create_options_reach_every_child_that_sets_none); otherwise equal to Elixir (scenario_text_dispatch4.py) |
+| 545 | dispatches Flow mutation values through Rust AST | covered: parity probe scenario_text_dispatch3.py equal to Elixir; flow_text.rs |
+| 712 | dispatches Flow lineage queries through Rust AST | covered: parity probe scenario_text_dispatch4.py equal to Elixir |
+| 820 | dispatches Flow reclaim through Rust AST | covered: parity probe scenario_text_dispatch3.py equal to Elixir; flow_text.rs |
+| 852 | dispatches Flow claim_due reclaim controls through Rust AST | covered: parity probe scenario_text_dispatch3.py equal to Elixir; flow_text.rs |
+| 898 | dispatches Flow extend_lease through Rust AST | covered: parity probe scenario_text_dispatch3.py equal to Elixir; flow_text.rs |
+| 933 | dispatches Flow extend_lease with an OK-only response | covered: parity probe scenario_text_dispatch3.py equal to Elixir; flow_text.rs |
 
 ## `ferricstore/test/ferricstore/commands/native_ast_parser_contract_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 6 | prepared SCAN families produce typed, bounded options | open |
-| 27 | prepared COPY rejects every unsupported or duplicate option | open |
-| 40 | prepared command keywords are case-insensitive | open |
-| 67 | lowercase XREADGROUP grammar still exposes every stream ACL key | open |
-| 81 | prepared integer and blocking-timeout values are bounded | open |
-| 104 | Flow special grammar is case-insensitive and counted operands are exact | open |
-| 161 | FLOW.REWIND retains binary reasons and rejects unsupported reason forms | open |
-| 184 | repeated Flow list options preserve order without append-based quadratic accumulation | open |
+| 6 | prepared SCAN families produce typed, bounded options | surface: KV and Stream command grammar |
+| 27 | prepared COPY rejects every unsupported or duplicate option | surface: KV and Stream command grammar |
+| 40 | prepared command keywords are case-insensitive | surface: KV and Stream command grammar |
+| 67 | lowercase XREADGROUP grammar still exposes every stream ACL key | surface: KV and Stream command grammar |
+| 81 | prepared integer and blocking-timeout values are bounded | surface: KV and Stream command grammar |
+| 104 | Flow special grammar is case-insensitive and counted operands are exact | covered: parity probe scenario_text_parser.py equal to Elixir |
+| 161 | FLOW.REWIND retains binary reasons and rejects unsupported reason forms | covered: parity probe scenario_text_parser.py equal to Elixir |
+| 184 | repeated Flow list options preserve order without append-based quadratic accumulation | covered: parity probe scenario_text_parser.py equal to Elixir |
 
 ## `ferricstore/test/ferricstore/commands/native_ast_parser_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 19 | rejects nonconvertible command arguments without raising | open |
-| 25 | rejects float arguments outside the VM float range without raising | open |
-| 42 | generic or structured native parsing covers every ACL-visible command family | open |
-| 57 | parses every built-in ACL-visible command family without unknown AST fallback | open |
-| 78 | collection scan cursors decode to seek boundaries | open |
-| 92 | every built-in Flow data command has a non-empty ACL scope | open |
-| 120 | Flow ACL extraction uses parsed options rather than matching option values | open |
-| 133 | XREADGROUP ACL extraction ignores STREAMS in group and consumer operands | open |
-| 147 | Flow batch ACL extraction preserves mixed item partitions | open |
-| 161 | Flow item commands read an option value spelled ITEMS as a value | open |
-| 198 | malformed Flow item commands return the parser's error | open |
-| 220 | generic Flow command families expose their effective ACL scopes | open |
-| 246 | FLOW.QUERY keeps FQL version, query text, and named parameters distinct | open |
-| 275 | removed Flow collection commands have no parser route | open |
-| 282 | parses hot string command ASTs directly | open |
-| 292 | parses collection and probabilistic command families | open |
-| 339 | TDigest quantile domains are validated while preparing commands | open |
-| 354 | merge commands expose destination and every source key | open |
-| 380 | counted and variadic commands expose every data key | open |
-| 391 | SINTERCARD validates its counted key list and LIMIT in the prepared parser | open |
-| 407 | subcommand operations expose the data key instead of the subcommand | open |
-| 419 | extra native operations expose their first key | open |
-| 437 | parses Flow create claim terminal and query ASTs | open |
-| 523 | Flow reads keep every VALUE option | open |
-| 552 | extracts namespace ACL keys from direct Flow metadata commands | open |
-| 589 | TOPK.RESERVE omits the unsupported decay field | open |
-| 599 | parses Flow policy indexed attributes through native AST | open |
-| 630 | parses Flow policy max active timeout through native AST | open |
-| 650 | parses Flow policy compare-and-swap and replacement controls through native AST | open |
-| 664 | rejects state-level Flow policy indexed attributes through native AST | open |
-| 688 | parses Flow many and newer workflow/governance command names | open |
+| 19 | rejects nonconvertible command arguments without raising | internal: Elixir term conversion |
+| 25 | rejects float arguments outside the VM float range without raising | internal: Elixir float range |
+| 42 | generic or structured native parsing covers every ACL-visible command family | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 57 | parses every built-in ACL-visible command family without unknown AST fallback | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 78 | collection scan cursors decode to seek boundaries | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 92 | every built-in Flow data command has a non-empty ACL scope | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 120 | Flow ACL extraction uses parsed options rather than matching option values | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 133 | XREADGROUP ACL extraction ignores STREAMS in group and consumer operands | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 147 | Flow batch ACL extraction preserves mixed item partitions | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 161 | Flow item commands read an option value spelled ITEMS as a value | covered: parity probe scenario_text_parser.py equal to Elixir |
+| 198 | malformed Flow item commands return the parser's error | covered: parity probe scenario_text_parser.py equal to Elixir |
+| 220 | generic Flow command families expose their effective ACL scopes | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 246 | FLOW.QUERY keeps FQL version, query text, and named parameters distinct | covered: query/text_tests.rs (G39) |
+| 275 | removed Flow collection commands have no parser route | fixed G72 (flow_text::an_unknown_text_command_is_a_bad_request) |
+| 282 | parses hot string command ASTs directly | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 292 | parses collection and probabilistic command families | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 339 | TDigest quantile domains are validated while preparing commands | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 354 | merge commands expose destination and every source key | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 380 | counted and variadic commands expose every data key | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 391 | SINTERCARD validates its counted key list and LIMIT in the prepared parser | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 407 | subcommand operations expose the data key instead of the subcommand | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 419 | extra native operations expose their first key | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 437 | parses Flow create claim terminal and query ASTs | covered: flow_text::text_commands_decide_as_their_typed_forms |
+| 523 | Flow reads keep every VALUE option | covered: parity probe scenario_text_dispatch3.py (VALUE reads) |
+| 552 | extracts namespace ACL keys from direct Flow metadata commands | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 589 | TOPK.RESERVE omits the unsupported decay field | surface: KV, Stream and probabilistic command parsing, or ACL scopes |
+| 599 | parses Flow policy indexed attributes through native AST | covered: parity probe scenario_text_parser.py equal to Elixir |
+| 630 | parses Flow policy max active timeout through native AST | covered: parity probe scenario_text_parser.py equal to Elixir |
+| 650 | parses Flow policy compare-and-swap and replacement controls through native AST | covered: parity probe scenario_text_parser.py equal to Elixir |
+| 664 | rejects state-level Flow policy indexed attributes through native AST | covered: parity probe scenario_text_parser.py equal to Elixir |
+| 688 | parses Flow many and newer workflow/governance command names | covered: flow_text.rs and the step 11-15 text forms (schedules, effects, governance) |
 
 ## `ferricstore/test/ferricstore/commands/prepared_command_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 10 | unknown commands are rejected before ACL and routing metadata are constructed | open |
-| 19 | KeyDiscovery prepares parsing, ACL, routing, and mutation metadata together | open |
-| 34 | Flow preparation separates COMMAND GETKEYS data keys from conservative ACL scope | open |
-| 46 | structured schedule creation shares ACL, routing, and mutation key discovery | open |
-| 68 | structured schedule creation fails closed for an unbounded generated target | open |
-| 82 | structured schedule discovery does not let nested options shadow native fields | open |
-| 100 | FLOW.QUERY preparation binds once and shares tenant ACL, routing, and read scope | open |
-| 133 | FLOW.QUERY text preparation decodes declared integer parameters and rejects bad input | open |
-| 180 | FLOW.QUERY raw preparation formats positioned parser guidance | open |
-| 189 | KeyDiscovery describe keeps the command key contract | open |
-| 197 | PreparedCommand has one canonical preparation boundary | open |
-| 209 | dynamic merge keys share one ACL, routing, and mutation footprint | open |
-| 235 | counted and variadic dynamic commands keep read-only footprints | open |
-| 256 | MEMORY USAGE keeps its dynamically discovered key read-only | open |
-| 265 | source and destination commands describe asymmetric access | open |
-| 293 | conditional writes retain the keys whose prior state controls the result | open |
-| 307 | read-modify-write commands and SET GET retain read access | open |
-| 329 | key access normalization accepts lowercase names and classifies pipelines | open |
-| 336 | routing derives cross-shard status from prepared routing keys | open |
-| 348 | no-key commands do not invent ACL, routing, or mutation keys | open |
-| 362 | Pub/Sub preparation separates channel ACLs from data-key ACLs | open |
-| 374 | prepared commands identify deterministic transaction-local execution | open |
-| 388 | transaction-local multi-key ASTs namespace every prepared routing key | open |
-| 448 | prepared commands fail closed when replicated apply would escape the local store | open |
-| 468 | native mutations remain request-scoped until their apply contract is admitted | open |
-| 482 | transaction execution entries retain only the compact validated apply plan | open |
-| 527 | compound work preflight stops at the replicated boundary | open |
-| 541 | a literal wildcard data key remains routable | open |
-| 548 | Flow commands expose coordinated routing instead of logical ACL keys | open |
-| 576 | global data mutations expose coordinated routing | open |
-| 585 | global keyspace reads expose coordinated routing | open |
-| 600 | tuple projection APIs are not part of the prepared-command contract | open |
-| 605 | raw transaction queue tuples are not part of the execution contract | open |
+| 10 | unknown commands are rejected before ACL and routing metadata are constructed | internal: Elixir's prepared-command, ACL and routing metadata |
+| 19 | KeyDiscovery prepares parsing, ACL, routing, and mutation metadata together | internal: Elixir's prepared-command, ACL and routing metadata |
+| 34 | Flow preparation separates COMMAND GETKEYS data keys from conservative ACL scope | internal: Elixir's prepared-command, ACL and routing metadata |
+| 46 | structured schedule creation shares ACL, routing, and mutation key discovery | internal: Elixir's prepared-command, ACL and routing metadata |
+| 68 | structured schedule creation fails closed for an unbounded generated target | internal: Elixir's prepared-command, ACL and routing metadata |
+| 82 | structured schedule discovery does not let nested options shadow native fields | internal: Elixir's prepared-command, ACL and routing metadata |
+| 100 | FLOW.QUERY preparation binds once and shares tenant ACL, routing, and read scope | internal: Elixir's prepared-command, ACL and routing metadata |
+| 133 | FLOW.QUERY text preparation decodes declared integer parameters and rejects bad input | covered: query/text_tests.rs (G39) |
+| 180 | FLOW.QUERY raw preparation formats positioned parser guidance | covered: query/error_tests.rs |
+| 189 | KeyDiscovery describe keeps the command key contract | internal: Elixir's prepared-command, ACL and routing metadata |
+| 197 | PreparedCommand has one canonical preparation boundary | internal: Elixir's prepared-command, ACL and routing metadata |
+| 209 | dynamic merge keys share one ACL, routing, and mutation footprint | internal: Elixir's prepared-command, ACL and routing metadata |
+| 235 | counted and variadic dynamic commands keep read-only footprints | internal: Elixir's prepared-command, ACL and routing metadata |
+| 256 | MEMORY USAGE keeps its dynamically discovered key read-only | internal: Elixir's prepared-command, ACL and routing metadata |
+| 265 | source and destination commands describe asymmetric access | internal: Elixir's prepared-command, ACL and routing metadata |
+| 293 | conditional writes retain the keys whose prior state controls the result | internal: Elixir's prepared-command, ACL and routing metadata |
+| 307 | read-modify-write commands and SET GET retain read access | internal: Elixir's prepared-command, ACL and routing metadata |
+| 329 | key access normalization accepts lowercase names and classifies pipelines | internal: Elixir's prepared-command, ACL and routing metadata |
+| 336 | routing derives cross-shard status from prepared routing keys | internal: Elixir's prepared-command, ACL and routing metadata |
+| 348 | no-key commands do not invent ACL, routing, or mutation keys | internal: Elixir's prepared-command, ACL and routing metadata |
+| 362 | Pub/Sub preparation separates channel ACLs from data-key ACLs | internal: Elixir's prepared-command, ACL and routing metadata |
+| 374 | prepared commands identify deterministic transaction-local execution | internal: Elixir's prepared-command, ACL and routing metadata |
+| 388 | transaction-local multi-key ASTs namespace every prepared routing key | internal: Elixir's prepared-command, ACL and routing metadata |
+| 448 | prepared commands fail closed when replicated apply would escape the local store | internal: Elixir's prepared-command, ACL and routing metadata |
+| 468 | native mutations remain request-scoped until their apply contract is admitted | internal: Elixir's prepared-command, ACL and routing metadata |
+| 482 | transaction execution entries retain only the compact validated apply plan | internal: Elixir's prepared-command, ACL and routing metadata |
+| 527 | compound work preflight stops at the replicated boundary | internal: Elixir's prepared-command, ACL and routing metadata |
+| 541 | a literal wildcard data key remains routable | internal: Elixir's prepared-command, ACL and routing metadata |
+| 548 | Flow commands expose coordinated routing instead of logical ACL keys | internal: Elixir's prepared-command, ACL and routing metadata |
+| 576 | global data mutations expose coordinated routing | internal: Elixir's prepared-command, ACL and routing metadata |
+| 585 | global keyspace reads expose coordinated routing | internal: Elixir's prepared-command, ACL and routing metadata |
+| 600 | tuple projection APIs are not part of the prepared-command contract | internal: Elixir's prepared-command, ACL and routing metadata |
+| 605 | raw transaction queue tuples are not part of the execution contract | internal: Elixir's prepared-command, ACL and routing metadata |
 
 ## `ferricstore/test/ferricstore/flow/claim_due_empty_precheck_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 10 | an automatic-partition claim on an empty queue checks each shard's index once | open |
-| 32 | an automatic-partition claim still finds work at any priority | open |
+| 10 | an automatic-partition claim on an empty queue checks each shard's index once | internal: Elixir's empty-queue precheck |
+| 32 | an automatic-partition claim still finds work at any priority | covered: audit::priority_shards::a_claim_takes_its_own_types_highest_priority_across_shards |
 
 ## `ferricstore/test/ferricstore/flow/claim_waiter_scheduler_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 16 | schedule_next_due fails closed for unsupported inputs | open |
-| 20 | schedule_next_due tolerates missing router/index context | open |
-| 24 | broad hot scheduling aggregates the earliest score without copying all due keys | open |
-| 32 | scoped auto scheduling uses one aggregate probe instead of per-bucket fanout | open |
-| 59 | unbounded due-count-key router and shard endpoints are not compiled | open |
-| 71 | broad cold scheduling stays correct when a bucket exceeds the scan limit | open |
-| 189 | cold scheduling stops probing after the earliest matching bucket | open |
-| 276 | exact cold scheduling stays conservative when stale rows fill the scan window | open |
-| 397 | cold auto-partition matching accepts only canonical generated buckets | open |
+| 16 | schedule_next_due fails closed for unsupported inputs | internal: Elixir's cold/hot due-time probes for waiter timers |
+| 20 | schedule_next_due tolerates missing router/index context | internal: Elixir's cold/hot due-time probes for waiter timers |
+| 24 | broad hot scheduling aggregates the earliest score without copying all due keys | internal: Elixir's cold/hot due-time probes for waiter timers |
+| 32 | scoped auto scheduling uses one aggregate probe instead of per-bucket fanout | internal: Elixir's cold/hot due-time probes for waiter timers |
+| 59 | unbounded due-count-key router and shard endpoints are not compiled | internal: Elixir's cold/hot due-time probes for waiter timers |
+| 71 | broad cold scheduling stays correct when a bucket exceeds the scan limit | internal: Elixir's cold/hot due-time probes for waiter timers |
+| 189 | cold scheduling stops probing after the earliest matching bucket | internal: Elixir's cold/hot due-time probes for waiter timers |
+| 276 | exact cold scheduling stays conservative when stale rows fill the scan window | internal: Elixir's cold/hot due-time probes for waiter timers |
+| 397 | cold auto-partition matching accepts only canonical generated buckets | internal: Elixir's cold/hot due-time probes for waiter timers |
 
 ## `ferricstore/test/ferricstore/flow/claim_waiters_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 36 | register capacity check does not scan all waiters on the hot path | open |
-| 52 | capacity-pressure pruning is bounded and does not scan every waiter row | open |
-| 68 | scheduled ready cleanup uses a bounded timer-table page | open |
-| 84 | stale waiter pruning does not copy the whole waiter table | open |
-| 97 | flow retry wake gate does not scan all blocked waiters | open |
-| 106 | flow delayed wake gate checks only matching waiter keys | open |
-| 115 | register fails closed when blocked claim_due waiter row cap is reached | open |
-| 129 | register rejects broad waiter atomically when row cap cannot fit all keys | open |
-| 140 | concurrent registrations cannot oversubscribe the waiter row cap | open |
-| 185 | register rejects a direct key set larger than the waiter footprint limit | open |
-| 194 | multi-state multi-partition wait keys stay compact | open |
-| 206 | registering a broad claim_due waiter uses bounded ETS rows | open |
-| 216 | compact partition waiter still wakes for matching ready work | open |
-| 226 | small partition-list waiters do not wake for unrelated partitions | open |
-| 240 | moderate partition-list waiters stay bounded without waking for unrelated partitions | open |
-| 256 | broad shared-scope waiters stay compact without cross-scope wakeups | open |
-| 273 | notify skips expired waiters | open |
-| 283 | total_count prunes waiters whose process died before unregistering | open |
-| 309 | ready credits coalesce repeated hints and wake available workers for ready work | open |
-| 325 | ready credits keep distinct ready buckets independent | open |
-| 342 | ready credits use waiter claim limits to avoid herd wakeups | open |
-| 358 | large ready batches are not stranded behind the legacy fixed wake cap | open |
-| 368 | future ready timers coalesce by ready bucket | open |
-| 391 | future ready timers use flow wall-clock due times | open |
-| 401 | future ready timers are pruned when the matching waiter unregisters | open |
-| 413 | unregister cancels the underlying delayed wake timer | open |
+| 36 | register capacity check does not scan all waiters on the hot path | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 52 | capacity-pressure pruning is bounded and does not scan every waiter row | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 68 | scheduled ready cleanup uses a bounded timer-table page | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 84 | stale waiter pruning does not copy the whole waiter table | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 97 | flow retry wake gate does not scan all blocked waiters | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 106 | flow delayed wake gate checks only matching waiter keys | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 115 | register fails closed when blocked claim_due waiter row cap is reached | ported: blocking::the_node_parks_at_most_its_waiter_limit |
+| 129 | register rejects broad waiter atomically when row cap cannot fit all keys | ported: blocking::the_node_parks_at_most_its_waiter_limit |
+| 140 | concurrent registrations cannot oversubscribe the waiter row cap | ported: blocking::the_node_parks_at_most_its_waiter_limit |
+| 185 | register rejects a direct key set larger than the waiter footprint limit | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 194 | multi-state multi-partition wait keys stay compact | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 206 | registering a broad claim_due waiter uses bounded ETS rows | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 216 | compact partition waiter still wakes for matching ready work | covered: blocking::a_blocking_claim_wakes_for_a_create |
+| 226 | small partition-list waiters do not wake for unrelated partitions | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 240 | moderate partition-list waiters stay bounded without waking for unrelated partitions | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 256 | broad shared-scope waiters stay compact without cross-scope wakeups | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 273 | notify skips expired waiters | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 283 | total_count prunes waiters whose process died before unregistering | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 309 | ready credits coalesce repeated hints and wake available workers for ready work | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 325 | ready credits keep distinct ready buckets independent | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 342 | ready credits use waiter claim limits to avoid herd wakeups | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 358 | large ready batches are not stranded behind the legacy fixed wake cap | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 368 | future ready timers coalesce by ready bucket | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 391 | future ready timers use flow wall-clock due times | covered: blocking::a_blocking_claim_wakes_when_a_scheduled_flow_falls_due |
+| 401 | future ready timers are pruned when the matching waiter unregisters | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
+| 413 | unregister cancels the underlying delayed wake timer | internal: Elixir's ETS waiter registry; the node's waiter board is covered by blocking.rs |
 
 ## `ferricstore/test/ferricstore/flow/history_entry_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | converts tuple history entries to event id and fields map | open |
-| 12 | converts list history entries to event id and fields map | open |
-| 17 | last duplicate field wins | open |
-| 23 | malformed stored fields do not crash history reads | open |
+| 7 | converts tuple history entries to event id and fields map | internal: Elixir's stored history entry shapes |
+| 12 | converts list history entries to event id and fields map | internal: Elixir's stored history entry shapes |
+| 17 | last duplicate field wins | internal: Elixir's stored history entry shapes |
+| 23 | malformed stored fields do not crash history reads | internal: Elixir's stored history entry shapes |
 
 ## `ferricstore/test/ferricstore/flow/history_event_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | parses millisecond prefix from generated event ids | open |
-| 11 | parses bare millisecond event ids | open |
-| 15 | returns zero for malformed and non-binary event ids | open |
-| 21 | orders event ids by millisecond, then version | open |
-| 28 | reads the version of generated event ids only | open |
+| 7 | parses millisecond prefix from generated event ids | internal: Elixir's event id parser |
+| 11 | parses bare millisecond event ids | internal: Elixir's event id parser |
+| 15 | returns zero for malformed and non-binary event ids | internal: Elixir's event id parser |
+| 21 | orders event ids by millisecond, then version | covered: audit::history_requests::event_ids_within_a_millisecond_compare_by_version_number |
+| 28 | reads the version of generated event ids only | internal: Elixir's event id parser |
 
 ## `ferricstore/test/ferricstore/flow/history_order_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 27 | lists and filters events in version order | open |
-| 39 | pages through events in version order | open |
-| 46 | trimming keeps the newest events | open |
+| 27 | lists and filters events in version order | covered: audit::history_filters::history_filters_by_event_range_time_order_event_worker_and_version |
+| 39 | pages through events in version order | covered: audit::history_requests::history_cursors_are_event_ids_and_values_stay_bounded |
+| 46 | trimming keeps the newest events | covered: audit::history_filters::history_keeps_its_cap_and_its_event_ids_rise |
 
 ## `ferricstore/test/ferricstore/flow/history_retention_restart_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 24 | a Flow ID reused after retention and a restart starts with an empty history | open |
-| 72 | history retention removed stays removed when the node dies before its tombstones | open |
-| 134 | retention waits for a Flow's history that waits in the overflow queue | open |
+| 24 | a Flow ID reused after retention and a restart starts with an empty history | ported: audit::retention_reuse::a_flow_id_reused_after_retention_and_a_restart_starts_a_new_history |
+| 72 | history retention removed stays removed when the node dies before its tombstones | covered: retention::a_restart_replays_removals |
+| 134 | retention waits for a Flow's history that waits in the overflow queue | internal: Elixir's history overflow queue |
 
 ## `ferricstore/test/ferricstore/flow/history_value_release_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 84 | a release deletes the values only trimmed history used, with their cleanup members | open |
-| 108 | a release pages through the cleanup members | open |
-| 117 | trimming alone keeps a running Flow's cleanup members bounded | open |
-| 133 | pruning a finished Flow deletes its release floor | open |
-| 171 | nothing is released until feature level 2 is active | open |
-| 179 | a rewound Flow keeps the old value it points at again | open |
-| 204 | a rewind cannot restore a value a release deleted | open |
+| 84 | a release deletes the values only trimmed history used, with their cleanup members | decided (G37 revised): the node keeps a Flow's replaced values while it lives and drops them with it at retention |
+| 108 | a release pages through the cleanup members | decided (G37 revised): the node keeps a Flow's replaced values while it lives and drops them with it at retention |
+| 117 | trimming alone keeps a running Flow's cleanup members bounded | decided (G37 revised): the node keeps a Flow's replaced values while it lives and drops them with it at retention |
+| 133 | pruning a finished Flow deletes its release floor | decided (G37 revised): the node keeps a Flow's replaced values while it lives and drops them with it at retention |
+| 171 | nothing is released until feature level 2 is active | internal: cluster feature-level rollout gates |
+| 179 | a rewound Flow keeps the old value it points at again | covered: audit::history_requests::a_value_an_event_still_names_stays_readable_in_history |
+| 204 | a rewind cannot restore a value a release deleted | decided (G37 revised): the node keeps a Flow's replaced values while it lives and drops them with it at retention, so a rewind always finds the values it names (audit::history_requests::replaced_values_stay_readable_while_the_flow_lives) |
 
 ## `ferricstore/test/ferricstore/flow/info_api_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | info rejects non-keyword opts | open |
-| 11 | info rejects invalid type | open |
+| 7 | info rejects non-keyword opts | internal: Elixir keyword-list options |
+| 11 | info rejects invalid type | covered: parity probe (empty type refused alike); flow_info.rs |
 
 ## `ferricstore/test/ferricstore/flow/info_count_read_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | zset_count_many returns empty counts without router access | open |
-| 11 | terminal_lmdb_counts skips cold counts when disabled | open |
-| 22 | terminal_lmdb_counts skips LMDB when no terminal states match | open |
-| 35 | terminal sweep limit rejects invalid configuration instead of disabling cleanup | open |
+| 7 | zset_count_many returns empty counts without router access | internal: Elixir's count readers |
+| 11 | terminal_lmdb_counts skips cold counts when disabled | internal: Elixir's count readers |
+| 22 | terminal_lmdb_counts skips LMDB when no terminal states match | internal: Elixir's count readers |
+| 35 | terminal sweep limit rejects invalid configuration instead of disabling cleanup | internal: Elixir's count readers |
 
 ## `ferricstore/test/ferricstore/flow/info_counts_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | zero_counts creates atom keys for active and terminal states | open |
-| 16 | state_keys and inflight_key use Flow key layout | open |
-| 29 | merge_auto combines counts and inflight totals | open |
-| 34 | terminal_keys returns only terminal state index keys | open |
-| 45 | merge_terminal_counts adds counts into existing accumulator | open |
-| 50 | merge_terminal_counts rejects a partial count vector | open |
-| 55 | merge_terminal_counts rejects malformed counts without raising | open |
-| 67 | validate_counts rejects malformed vectors before callers inspect them | open |
+| 7 | zero_counts creates atom keys for active and terminal states | internal: Elixir's count vectors |
+| 16 | state_keys and inflight_key use Flow key layout | internal: Elixir's count vectors |
+| 29 | merge_auto combines counts and inflight totals | internal: Elixir's count vectors |
+| 34 | terminal_keys returns only terminal state index keys | internal: Elixir's count vectors |
+| 45 | merge_terminal_counts adds counts into existing accumulator | internal: Elixir's count vectors |
+| 50 | merge_terminal_counts rejects a partial count vector | internal: Elixir's count vectors |
+| 55 | merge_terminal_counts rejects malformed counts without raising | internal: Elixir's count vectors |
+| 67 | validate_counts rejects malformed vectors before callers inspect them | internal: Elixir's count vectors |
 
 ## `ferricstore/test/ferricstore/flow/invariant_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 5 | states are parallel by default until policy opts a state into fifo | open |
-| 38 | fifo state claims one flow per partition lane in state-entry order | open |
-| 108 | fifo retry keeps the same partition lane blocked until the retried flow leaves | open |
-| 196 | fifo lanes are scoped to type state and partition | open |
-| 246 | fifo any-partition claims at most one flow per partition lane | open |
-| 312 | fifo partition list claims at most one flow per listed partition lane | open |
-| 368 | fifo pipeline claim batch does not overclaim a single partition lane | open |
-| 413 | fifo reclaim picks the expired lane head instead of the queued follower | open |
-| 466 | fifo limit one reclaims an expired lane head before its queued follower | open |
-| 510 | fifo keeps a cold lane head ahead of a hot due follower | open |
-| 546 | fifo claims a due lane head beyond the bounded follower scan window | open |
-| 584 | fifo preserves global due order when a deep lane head is injected | open |
-| 626 | fifo times out an expired lane head injected beyond the bounded scan window | open |
-| 683 | fifo times out an expired follower while a live lane head blocks claims | open |
-| 723 | fifo unlinks a cancelled middle entry without disturbing lane order | open |
-| 772 | enabling fifo on a populated state uses its existing state-entry order | open |
-| 802 | enabling fifo waits for already leased lane members to drain | open |
-| 850 | step_continue records a fresh logical state entry order before fifo activation | open |
-| 917 | fifo lane unblocks when the running flow transitions out of the fifo state | open |
-| 958 | fifo state-entry order survives restart when ids and timestamps would sort differently | open |
-| 989 | fifo state rejects priority and implicit partition entry | open |
-| 1053 | fifo state rejects direct running entry | open |
-| 1102 | fifo planning preserves due order for parallel states in mixed claims | open |
-| 1149 | public record returns hide fifo state entry sequence | open |
-| 1205 | pipeline get hides fifo state entry sequence | open |
-| 1231 | spawn_children rejects reserved child group ids | open |
-| 1246 | leased and terminal flows are not returned by later claim_due calls | open |
-| 1291 | future due work is invisible until its due timestamp | open |
-| 1325 | complete writes terminal state and keeps history queryable | open |
-| 1370 | stored value refs are readable through mget without duplicating command flow state | open |
+| 5 | states are parallel by default until policy opts a state into fifo | ported: audit::fifo_invariants::states_are_parallel_until_a_policy_makes_one_fifo |
+| 38 | fifo state claims one flow per partition lane in state-entry order | ported: audit::fifo_invariants::states_are_parallel_until_a_policy_makes_one_fifo |
+| 108 | fifo retry keeps the same partition lane blocked until the retried flow leaves | ported: audit::fifo_invariants::a_retried_head_keeps_its_lane_until_it_leaves |
+| 196 | fifo lanes are scoped to type state and partition | ported: audit::fifo_invariants::lanes_are_per_state_and_partition |
+| 246 | fifo any-partition claims at most one flow per partition lane | ported: audit::fifo_invariants::lanes_are_per_state_and_partition |
+| 312 | fifo partition list claims at most one flow per listed partition lane | ported: audit::fifo_invariants::lanes_are_per_state_and_partition |
+| 368 | fifo pipeline claim batch does not overclaim a single partition lane | internal: Elixir's coalesced pipeline claim batch; the node runs each pipeline claim as it runs alone |
+| 413 | fifo reclaim picks the expired lane head instead of the queued follower | ported: audit::fifo_invariants::an_expired_head_is_reclaimed_before_its_follower |
+| 466 | fifo limit one reclaims an expired lane head before its queued follower | ported: audit::fifo_invariants::an_expired_head_is_reclaimed_before_its_follower |
+| 510 | fifo keeps a cold lane head ahead of a hot due follower | ported: audit::fifo_invariants::a_head_not_yet_due_holds_back_a_due_follower |
+| 546 | fifo claims a due lane head beyond the bounded follower scan window | internal: Elixir's bounded follower scan window; the node's lanes index every member |
+| 584 | fifo preserves global due order when a deep lane head is injected | internal: Elixir's bounded follower scan window; the node's lanes index every member |
+| 626 | fifo times out an expired lane head injected beyond the bounded scan window | internal: Elixir's bounded follower scan window; the node's lanes index every member |
+| 683 | fifo times out an expired follower while a live lane head blocks claims | fixed G75 (audit::fifo_invariants::an_overdue_follower_times_out_while_its_head_holds_the_lane) |
+| 723 | fifo unlinks a cancelled middle entry without disturbing lane order | ported: audit::fifo_invariants::a_cancelled_middle_entry_leaves_the_lane_order |
+| 772 | enabling fifo on a populated state uses its existing state-entry order | ported: audit::fifo_activation::turning_fifo_on_keeps_the_existing_entry_order |
+| 802 | enabling fifo waits for already leased lane members to drain | fixed G77 (audit::fifo_activation::turning_fifo_on_waits_for_leased_members_to_finish) |
+| 850 | step_continue records a fresh logical state entry order before fifo activation | ported: audit::fifo_activation::a_step_enters_its_next_state_afresh |
+| 917 | fifo lane unblocks when the running flow transitions out of the fifo state | ported: audit::fifo_activation::a_lane_frees_when_its_running_flow_moves_out_of_the_state |
+| 958 | fifo state-entry order survives restart when ids and timestamps would sort differently | covered: flow_fifo::fifo_lanes_take_one_head_per_partition_and_keep_order_across_a_restart |
+| 989 | fifo state rejects priority and implicit partition entry | ported: audit::fifo_invariants::fifo_entries_need_a_partition_and_no_priority_or_running_entry |
+| 1053 | fifo state rejects direct running entry | fixed G76 (audit::fifo_invariants::fifo_entries_need_a_partition_and_no_priority_or_running_entry) |
+| 1102 | fifo planning preserves due order for parallel states in mixed claims | ported: audit::fifo_activation::a_mixed_claim_takes_parallel_states_in_due_order |
+| 1149 | public record returns hide fifo state entry sequence | ported: audit::fifo_activation::records_never_show_the_state_entry_sequence |
+| 1205 | pipeline get hides fifo state entry sequence | ported: audit::fifo_activation::records_never_show_the_state_entry_sequence |
+| 1231 | spawn_children rejects reserved child group ids | ported: audit::fifo_activation::a_child_group_id_may_not_take_a_reserved_name |
+| 1246 | leased and terminal flows are not returned by later claim_due calls | covered: audit::claim_reads::a_claim_leases_due_flows_once |
+| 1291 | future due work is invisible until its due timestamp | covered: audit::priority_retries::a_flow_due_far_ahead_is_claimed_when_due |
+| 1325 | complete writes terminal state and keeps history queryable | covered: audit::priority_retries::a_completion_checks_its_lease_and_finishes_the_flow |
+| 1370 | stored value refs are readable through mget without duplicating command flow state | covered: audit::value_refs |
 
 ## `ferricstore/test/ferricstore/flow/pipeline_claim_due_command_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 17 | normalizes grouped claim_due command options | open |
-| 48 | rejects mixed ANY and explicit states | open |
-| 56 | rejects claim filters whose state and partition product exceeds the bound | open |
-| 68 | rejects internal keys that exceed the limit only after component encoding | open |
-| 79 | rejects lease durations that cannot produce exact Flow index deadlines | open |
-| 87 | rejects claim deadlines that leave the exact Flow timestamp range | open |
-| 96 | rejects blocking claims because pipelines cannot wait | open |
+| 17 | normalizes grouped claim_due command options | internal: Elixir's pipeline claim normalizer |
+| 48 | rejects mixed ANY and explicit states | fixed G68 (audit::claim_value_rules::a_claim_takes_any_state_alone_or_named_states_but_not_both) |
+| 56 | rejects claim filters whose state and partition product exceeds the bound | covered: audit::claim_api (claim filter footprint, G34) |
+| 68 | rejects internal keys that exceed the limit only after component encoding | internal: Elixir's internal key size |
+| 79 | rejects lease durations that cannot produce exact Flow index deadlines | covered: audit::create_rules::times_and_lease_deadlines_stay_within_the_exact_integer_range |
+| 87 | rejects claim deadlines that leave the exact Flow timestamp range | covered: audit::create_rules::times_and_lease_deadlines_stay_within_the_exact_integer_range |
+| 96 | rejects blocking claims because pipelines cannot wait | internal: Elixir's internal pipeline claim batch; over the wire both servers let a pipelined claim wait |
 
 ## `ferricstore/test/ferricstore/flow/pipeline_claim_due_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 28 | results preserves accumulated results for an empty command batch | open |
-| 35 | results preserves errors and coalesces globally compatible claims | open |
-| 66 | results falls back to adjacent grouping when queue keys conflict | open |
-| 97 | routed singleton batches fail every claim on a partial router result | open |
+| 28 | results preserves accumulated results for an empty command batch | internal: Elixir's pipeline claim coalescing; the node runs each pipeline claim alone |
+| 35 | results preserves errors and coalesces globally compatible claims | internal: Elixir's pipeline claim coalescing; the node runs each pipeline claim alone |
+| 66 | results falls back to adjacent grouping when queue keys conflict | internal: Elixir's pipeline claim coalescing; the node runs each pipeline claim alone |
+| 97 | routed singleton batches fail every claim on a partial router result | internal: Elixir's pipeline claim coalescing; the node runs each pipeline claim alone |
 
 ## `ferricstore/test/ferricstore/flow/pipeline_read_command_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 15 | command parses get with default payload return and sealed scope | open |
-| 22 | command preserves metadata-only return shape | open |
-| 28 | scope-sensitive commands fail closed for a malformed context | open |
-| 33 | command rejects unsupported operation | open |
-| 38 | command rejects payload hydration above the configured ceiling | open |
-| 46 | decode_get fails closed for corrupt stored records | open |
-| 57 | history command uses the direct history preparation contract | open |
-| 66 | history decode contexts distinguish missing state from corrupt state | open |
+| 15 | command parses get with default payload return and sealed scope | internal: Elixir's pipeline read preparation |
+| 22 | command preserves metadata-only return shape | internal: Elixir's pipeline read preparation |
+| 28 | scope-sensitive commands fail closed for a malformed context | internal: Elixir's pipeline read preparation |
+| 33 | command rejects unsupported operation | internal: Elixir's pipeline read preparation |
+| 38 | command rejects payload hydration above the configured ceiling | internal: Elixir's pipeline read preparation |
+| 46 | decode_get fails closed for corrupt stored records | internal: Elixir's pipeline read preparation |
+| 57 | history command uses the direct history preparation contract | internal: Elixir's pipeline read preparation |
+| 66 | history decode contexts distinguish missing state from corrupt state | internal: Elixir's pipeline read preparation |
 
 ## `ferricstore/test/ferricstore/flow/pipeline_read_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 9 | batch fast path preserves same-partition get order directly | open |
-| 35 | batch fast path projects internal record fields before returning | open |
-| 60 | batch metadata return uses the lightweight decoder and public metadata projection | open |
-| 88 | batch fast path fails every read closed when a batch reply is short | open |
-| 108 | batch fast path preserves get order without payload hydration | open |
-| 142 | batch fast path isolates a short reply to its partition group | open |
-| 172 | batch generic path isolates a short get reply to its partition group | open |
-| 207 | batch preserves order across history, other, and errors | open |
-| 239 | batch prepares each command once when the get fast path falls back | open |
-| 259 | batch coalesces identical keyed reads while preserving output order | open |
-| 288 | batch keeps unkeyed other reads independent | open |
-| 311 | hydrate_get_results passes through non-record results and records without payload | open |
-| 325 | hydrate_get_results projects internal record fields | open |
+| 9 | batch fast path preserves same-partition get order directly | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 35 | batch fast path projects internal record fields before returning | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 60 | batch metadata return uses the lightweight decoder and public metadata projection | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 88 | batch fast path fails every read closed when a batch reply is short | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 108 | batch fast path preserves get order without payload hydration | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 142 | batch fast path isolates a short reply to its partition group | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 172 | batch generic path isolates a short get reply to its partition group | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 207 | batch preserves order across history, other, and errors | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 239 | batch prepares each command once when the get fast path falls back | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 259 | batch coalesces identical keyed reads while preserving output order | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 288 | batch keeps unkeyed other reads independent | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 311 | hydrate_get_results passes through non-record results and records without payload | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
+| 325 | hydrate_get_results projects internal record fields | internal: Elixir's pipeline read fast paths; the node runs each pipeline command as it runs alone |
 
 ## `ferricstore/test/ferricstore/flow/pipeline_write_command_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | command parses create through callbacks | open |
-| 14 | command rejects unsupported op | open |
+| 7 | command parses create through callbacks | internal: Elixir's pipeline write preparation |
+| 14 | command rejects unsupported op | internal: Elixir's pipeline write preparation |
 
 ## `ferricstore/test/ferricstore/flow/pipeline_write_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | create_attrs_from_commands accepts unique flow_create commands | open |
-| 17 | create_attrs_from_commands rejects duplicate keys and mixed commands | open |
-| 30 | start_and_claim_attrs_from_commands accepts unique flow_start_and_claim commands | open |
-| 40 | start_and_claim_attrs_from_commands rejects duplicate keys and mixed commands | open |
-| 53 | named_value_put_attrs_from_commands accepts unique owned value put commands | open |
-| 63 | named_value_put_attrs_from_commands preserves success-only return mode | open |
-| 71 | named_value_put_attrs_from_commands rejects duplicate keys and mixed commands | open |
-| 84 | transition_attrs_from_commands accepts only transition commands | open |
+| 7 | create_attrs_from_commands accepts unique flow_create commands | internal: Elixir's pipeline write batching; the node runs each pipeline command as it runs alone |
+| 17 | create_attrs_from_commands rejects duplicate keys and mixed commands | internal: Elixir's pipeline write batching; the node runs each pipeline command as it runs alone |
+| 30 | start_and_claim_attrs_from_commands accepts unique flow_start_and_claim commands | internal: Elixir's pipeline write batching; the node runs each pipeline command as it runs alone |
+| 40 | start_and_claim_attrs_from_commands rejects duplicate keys and mixed commands | internal: Elixir's pipeline write batching; the node runs each pipeline command as it runs alone |
+| 53 | named_value_put_attrs_from_commands accepts unique owned value put commands | internal: Elixir's pipeline write batching; the node runs each pipeline command as it runs alone |
+| 63 | named_value_put_attrs_from_commands preserves success-only return mode | internal: Elixir's pipeline write batching; the node runs each pipeline command as it runs alone |
+| 71 | named_value_put_attrs_from_commands rejects duplicate keys and mixed commands | internal: Elixir's pipeline write batching; the node runs each pipeline command as it runs alone |
+| 84 | transition_attrs_from_commands accepts only transition commands | internal: Elixir's pipeline write batching; the node runs each pipeline command as it runs alone |
 
 ## `ferricstore/test/ferricstore/flow/record_query_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 18 | fetch_count keeps count when no time filter is present | open |
-| 24 | fetch_count delegates when a time filter is present | open |
-| 29 | filter_by_ms honors optional bounds | open |
-| 47 | sort_by_update uses timestamp then id order | open |
-| 57 | maybe_reverse and chunk helpers preserve query semantics | open |
-| 68 | bounded ordered chunk merge preserves ascending rank and first-source duplicates | open |
-| 91 | bounded ordered chunk merge preserves descending rank and first-source duplicates | open |
-| 116 | auto-partition merge caps each fetch and fails instead of returning an inexact prefix | open |
-| 140 | auto-partition merge keeps only the globally ranked result window | open |
-| 158 | auto-partition merge applies the same global order in reverse | open |
-| 175 | auto-partition merge rejects malformed fetch results without raising | open |
-| 185 | filtered auto-partition merge enforces the global scanned candidate budget | open |
-| 201 | filtered source merge uses the caller's global candidate budget | open |
+| 18 | fetch_count keeps count when no time filter is present | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 24 | fetch_count delegates when a time filter is present | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 29 | filter_by_ms honors optional bounds | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 47 | sort_by_update uses timestamp then id order | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 57 | maybe_reverse and chunk helpers preserve query semantics | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 68 | bounded ordered chunk merge preserves ascending rank and first-source duplicates | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 91 | bounded ordered chunk merge preserves descending rank and first-source duplicates | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 116 | auto-partition merge caps each fetch and fails instead of returning an inexact prefix | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 140 | auto-partition merge keeps only the globally ranked result window | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 158 | auto-partition merge applies the same global order in reverse | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 175 | auto-partition merge rejects malformed fetch results without raising | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 185 | filtered auto-partition merge enforces the global scanned candidate budget | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
+| 201 | filtered source merge uses the caller's global candidate budget | internal: Elixir's retired record-query merge helpers; FQL is the node's query surface |
 
 ## `ferricstore/test/ferricstore/flow/retention_sweeper_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | test runtime keeps the application sweeper out of explicit cleanup tests | open |
-| 15 | catch-up scheduling treats history-only cleanup at limit as backlog | open |
-| 43 | catch-up scheduling continues after an underfilled cleanup pass does work | open |
-| 74 | completed pass does not schedule a final empty catch-up | open |
-| 103 | catch-up scheduling treats active timeouts and terminal cleanup as one budget | open |
-| 131 | sustained backlog pauses between bounded catch-up bursts | open |
-| 162 | pressure mode uses pressure limit and triggers compaction | open |
-| 197 | pressure compaction is throttled | open |
-| 225 | compaction task start failure does not stop retention cleanup | open |
+| 7 | test runtime keeps the application sweeper out of explicit cleanup tests | internal: Elixir's sweeper scheduling; the node sweeps on its own cadence (3540349) |
+| 15 | catch-up scheduling treats history-only cleanup at limit as backlog | internal: Elixir's sweeper scheduling; the node sweeps on its own cadence (3540349) |
+| 43 | catch-up scheduling continues after an underfilled cleanup pass does work | internal: Elixir's sweeper scheduling; the node sweeps on its own cadence (3540349) |
+| 74 | completed pass does not schedule a final empty catch-up | internal: Elixir's sweeper scheduling; the node sweeps on its own cadence (3540349) |
+| 103 | catch-up scheduling treats active timeouts and terminal cleanup as one budget | internal: Elixir's sweeper scheduling; the node sweeps on its own cadence (3540349) |
+| 131 | sustained backlog pauses between bounded catch-up bursts | internal: Elixir's sweeper scheduling; the node sweeps on its own cadence (3540349) |
+| 162 | pressure mode uses pressure limit and triggers compaction | internal: Elixir's sweeper scheduling; the node sweeps on its own cadence (3540349) |
+| 197 | pressure compaction is throttled | internal: Elixir's sweeper scheduling; the node sweeps on its own cadence (3540349) |
+| 225 | compaction task start failure does not stop retention cleanup | internal: Elixir's sweeper scheduling; the node sweeps on its own cadence (3540349) |
 
 ## `ferricstore/test/ferricstore/flow/terminal_query_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 9 | state accepts any and known terminal states | open |
-| 15 | state rejects non-terminal values | open |
-| 20 | ids_from_chunks flattens deduplicates and caps by terminal state count | open |
-| 29 | record filters keep only terminal or exact state records | open |
+| 9 | state accepts any and known terminal states | internal: Elixir's retired terminal-list helpers; FQL is the node's query surface |
+| 15 | state rejects non-terminal values | internal: Elixir's retired terminal-list helpers; FQL is the node's query surface |
+| 20 | ids_from_chunks flattens deduplicates and caps by terminal state count | internal: Elixir's retired terminal-list helpers; FQL is the node's query surface |
+| 29 | record filters keep only terminal or exact state records | internal: Elixir's retired terminal-list helpers; FQL is the node's query surface |
 
 ## `ferricstore/test/ferricstore/flow/value_store_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 9 | mget result decoding preserves order and enforces exact cardinality | open |
-| 23 | mget result decoding sanitizes storage read failures | open |
-| 30 | mget rejects corrupted typed values instead of returning encoded bytes | open |
-| 37 | shared value batch mapping rejects extra backend results | open |
-| 44 | named value puts reject independently expiring values | open |
-| 53 | named value identity components must be non-empty | open |
+| 9 | mget result decoding preserves order and enforces exact cardinality | internal: Elixir's MGET result decoder |
+| 23 | mget result decoding sanitizes storage read failures | internal: Elixir's MGET result decoder |
+| 30 | mget rejects corrupted typed values instead of returning encoded bytes | internal: Elixir's MGET result decoder |
+| 37 | shared value batch mapping rejects extra backend results | internal: Elixir's shared value batch mapping |
+| 44 | named value puts reject independently expiring values | covered: parity probe (ttl_ms on a named value refused alike); flow_value.rs |
+| 53 | named value identity components must be non-empty | fixed G69 (audit::claim_value_rules::a_value_s_owner_and_name_must_not_be_empty) |
 
 ## `ferricstore/test/ferricstore/flow_backpressure_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 49 | flow_create rejects new flows under memory overload | open |
-| 65 | flow_create_pipeline_batch returns per-item overload errors | open |
-| 89 | flow_create_pipeline_batch rejects malformed attrs without crashing shard | open |
-| 108 | flow_create_many_independent returns top-level overload for SDK backpressure | open |
-| 131 | flow admission gate rejects new creates before memory guard hard reject | open |
-| 147 | flow_create telemetry separates attempts successes and rejections | open |
-| 187 | flow_create_many rejected telemetry counts blocked records | open |
-| 206 | concurrent flow creates under pressure return BUSY or succeed and recover cleanly | open |
+| 49 | flow_create rejects new flows under memory overload | covered: backpressure::without_room_for_new_work_every_create_form_is_refused_and_other_work_runs (ADR-017 admission instead of a memory guard) |
+| 65 | flow_create_pipeline_batch returns per-item overload errors | covered: session::pipeline_rules::pipeline_items_keep_their_refusal_s_status_and_value (a busy item is `busy`) |
+| 89 | flow_create_pipeline_batch rejects malformed attrs without crashing shard | covered: audit::many_items (malformed batch items are refused) |
+| 108 | flow_create_many_independent returns top-level overload for SDK backpressure | covered: session::backpressure::a_busy_refusal_is_the_retryable_busy_reply |
+| 131 | flow admission gate rejects new creates before memory guard hard reject | internal: Elixir's memory guard |
+| 147 | flow_create telemetry separates attempts successes and rejections | internal: telemetry |
+| 187 | flow_create_many rejected telemetry counts blocked records | internal: telemetry |
+| 206 | concurrent flow creates under pressure return BUSY or succeed and recover cleanly | covered: backpressure::new_work_behind_a_slow_log_is_refused_busy_once_the_backlog_is_full |
 
 ## `ferricstore/test/ferricstore/flow_crash_matrix_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 35 | unknown outcome after WARaft commit recovers committed Flow state and hot due index | open |
-| 69 | crash after WARaft apply projection write rebuilds visible Flow state | open |
-| 102 | crash during blob side-channel write leaves command retryable and blobs collectible | open |
-| 144 | LMDB writer crash during flush replays terminal projection from durable truth | open |
-| 184 | history projector crash after fsync replays history and preserves values | open |
-| 245 | blob GC crash after live-ref scan does not delete live Flow blobs | open |
+| 35 | unknown outcome after WARaft commit recovers committed Flow state and hot due index | covered: crash::sigkill_keeps_every_acknowledged_create |
+| 69 | crash after WARaft apply projection write rebuilds visible Flow state | internal: crash points inside Elixir's WARaft, LMDB, blob and projector writers |
+| 102 | crash during blob side-channel write leaves command retryable and blobs collectible | internal: crash points inside Elixir's WARaft, LMDB, blob and projector writers |
+| 144 | LMDB writer crash during flush replays terminal projection from durable truth | internal: crash points inside Elixir's WARaft, LMDB, blob and projector writers |
+| 184 | history projector crash after fsync replays history and preserves values | internal: crash points inside Elixir's WARaft, LMDB, blob and projector writers |
+| 245 | blob GC crash after live-ref scan does not delete live Flow blobs | internal: crash points inside Elixir's WARaft, LMDB, blob and projector writers |
 
 ## `ferricstore/test/ferricstore/flow_policy_generation_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 14 | policy generations are always allocated and advance monotonically | open |
-| 28 | policy set rejects a stale expected generation without changing the policy | open |
-| 50 | policy set uses the allocator shard generation when a routed replica is stale | open |
-| 70 | policy reads use the allocator shard when a routed replica is stale | open |
-| 86 | policy reads reject a value stored under a different type key | open |
-| 108 | a corrupt policy row does not stop a restart and stays fail-closed for its type | open |
-| 145 | missing existing-flow targets are stamped with an absence guard | open |
-| 161 | existing-flow targets retain both their policy reference and incarnation guard | open |
-| 199 | policy set merges independent type and state patches | open |
-| 232 | string-key state patches override the equivalent normalized setting | open |
-| 258 | native state-pair patches merge with existing states | open |
-| 280 | policy set validates the optional response state | open |
-| 287 | concurrent policy patches preserve both writers | open |
-| 321 | a burst of concurrent policy patches preserves every writer | open |
-| 361 | replace resets fields omitted from an explicit full policy snapshot | open |
+| 14 | policy generations are always allocated and advance monotonically | ported: audit::policy_patches::state_patches_merge_by_state_and_by_field |
+| 28 | policy set rejects a stale expected generation without changing the policy | covered: flow_policy::policies_merge_apply_on_every_shard_and_survive_a_restart |
+| 50 | policy set uses the allocator shard generation when a routed replica is stale | internal: Elixir's per-shard policy allocator; the node's policy authority is shard 0 and copies install in log order |
+| 70 | policy reads use the allocator shard when a routed replica is stale | internal: Elixir's per-shard policy allocator; the node's policy authority is shard 0 and copies install in log order |
+| 86 | policy reads reject a value stored under a different type key | internal: Elixir's policy storage keys |
+| 108 | a corrupt policy row does not stop a restart and stays fail-closed for its type | internal: Elixir's policy rows; the node's log and snapshots are checksummed |
+| 145 | missing existing-flow targets are stamped with an absence guard | internal: Elixir's policy references stamped on Flows |
+| 161 | existing-flow targets retain both their policy reference and incarnation guard | internal: Elixir's policy references stamped on Flows |
+| 199 | policy set merges independent type and state patches | ported: audit::policy_patches::state_patches_merge_by_state_and_by_field |
+| 232 | string-key state patches override the equivalent normalized setting | ported: audit::policy_patches::state_patches_merge_by_state_and_by_field |
+| 258 | native state-pair patches merge with existing states | internal: Elixir keyword-list state pairs; the wire takes maps |
+| 280 | policy set validates the optional response state | ported: audit::policy_patches::state_patches_merge_by_state_and_by_field |
+| 287 | concurrent policy patches preserve both writers | ported: audit::policy_patches::concurrent_patches_all_land |
+| 321 | a burst of concurrent policy patches preserves every writer | ported: audit::policy_patches::concurrent_patches_all_land |
+| 361 | replace resets fields omitted from an explicit full policy snapshot | covered: flow_policy::policies_merge_apply_on_every_shard_and_survive_a_restart (replace) |
 
 ## `ferricstore/test/ferricstore/flow_policy_migration_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 22 | catalog members store the exact type once per shard instead of once per flow | open |
-| 37 | catalog projection keys sort by generation and retain exact catalog ownership | open |
-| 53 | work cursors reject an after-key outside their staged run | open |
-| 58 | batch state writes keep catalog generation current and lifetime aligned with state | open |
-| 142 | terminal catalog survives retention TTL until explicit cleanup and later migration | open |
-| 200 | policy changes are independent of unrelated shard keydir cardinality | open |
-| 230 | bounded policy migration resumes from durable progress after index restart | open |
-| 274 | exact-type catalog remains bounded above ten thousand members | open |
-| 356 | flush clears catalog rows and pending migration jobs | open |
-| 400 | worker uses configured migration and backfill limits independently | open |
-| 430 | worker polls shards in bounded round-robin sweeps | open |
-| 470 | explicit worker enabled option takes precedence over global configuration | open |
-| 488 | worker reports a corrupt migration job projection instead of treating it as idle | open |
-| 517 | job discovery fails closed when a committed job loses its mirror enqueue | open |
-| 538 | worker bounds keydir snapshots and stops its owned snapshot task | open |
-| 573 | worker ignores stale scheduled runs after timer replacement | open |
-| 607 | worker rebuilds missing local staging before resuming a replicated work cursor | open |
-| 667 | keydir snapshot pages persist their cursor and release the fixed table | open |
-| 712 | a fresh keydir snapshot removes the staging of earlier runs | open |
-| 746 | keydir snapshot rejects a non-canonical durable continuation | open |
-| 781 | keydir snapshot restarts safely when its ETS table is rebuilt | open |
-| 821 | keydir snapshot discards an invalidated continuation instead of retrying it forever | open |
-| 860 | worker does not repeat snapshot cleanup after the manifest is removed | open |
-| 904 | worker retains the manifest and retries a failed snapshot cleanup | open |
-| 955 | catalog pagination enforces raw and hydrated byte bounds before final proof | open |
-| 989 | catalog hydration binds shared records to their sealed physical scope | open |
-| 1056 | backfill discovers a primary state that is absent from the lagged LMDB mirror | open |
-| 1124 | backfill skips and counts a registered flow whose state record is gone | open |
-| 1139 | backfill skips a registered flow whose LMDB row names a lost projection frame | open |
-| 1152 | worker reports registered flows without a state record once a backfill finishes | open |
-| 1193 | backfill keeps waiting for a registered flow while the LMDB mirror is degraded | open |
-| 1209 | backfill derives a cold LMDB state candidate from its primary registry | open |
-| 1295 | replicated cold backfill candidate does not read local LMDB during apply | open |
-| 1392 | planned backfill record cannot recreate membership after retention cleanup | open |
-| 1502 | replicated cold migration plan does not read local LMDB during apply | open |
-| 1586 | backfill resolves a stale LMDB record from the current primary record | open |
-| 1639 | duplicate old projection rows for one catalog member are repaired | open |
-| 1676 | planner rejects a primary descriptor that is ahead of its durable mirror | open |
-| 1738 | membership inserted after planning prevents the stale plan from finishing | open |
-| 1769 | newer completed migration dominates stale policy entries applied out of order | open |
-| 1818 | delayed older-policy mutation is rejected and a current mutation converges attributes | open |
-| 1911 | malformed projection generation fails closed without crashing apply | open |
-| 1958 | matching durable backfill completion survives worker process restart | open |
-| 1988 | ordinary embedded restart preserves source token while destructive reconcile rotates it | open |
+| 22 | catalog members store the exact type once per shard instead of once per flow | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 37 | catalog projection keys sort by generation and retain exact catalog ownership | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 53 | work cursors reject an after-key outside their staged run | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 58 | batch state writes keep catalog generation current and lifetime aligned with state | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 142 | terminal catalog survives retention TTL until explicit cleanup and later migration | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 200 | policy changes are independent of unrelated shard keydir cardinality | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 230 | bounded policy migration resumes from durable progress after index restart | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 274 | exact-type catalog remains bounded above ten thousand members | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 356 | flush clears catalog rows and pending migration jobs | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 400 | worker uses configured migration and backfill limits independently | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 430 | worker polls shards in bounded round-robin sweeps | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 470 | explicit worker enabled option takes precedence over global configuration | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 488 | worker reports a corrupt migration job projection instead of treating it as idle | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 517 | job discovery fails closed when a committed job loses its mirror enqueue | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 538 | worker bounds keydir snapshots and stops its owned snapshot task | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 573 | worker ignores stale scheduled runs after timer replacement | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 607 | worker rebuilds missing local staging before resuming a replicated work cursor | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 667 | keydir snapshot pages persist their cursor and release the fixed table | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 712 | a fresh keydir snapshot removes the staging of earlier runs | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 746 | keydir snapshot rejects a non-canonical durable continuation | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 781 | keydir snapshot restarts safely when its ETS table is rebuilt | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 821 | keydir snapshot discards an invalidated continuation instead of retrying it forever | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 860 | worker does not repeat snapshot cleanup after the manifest is removed | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 904 | worker retains the manifest and retries a failed snapshot cleanup | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 955 | catalog pagination enforces raw and hydrated byte bounds before final proof | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 989 | catalog hydration binds shared records to their sealed physical scope | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1056 | backfill discovers a primary state that is absent from the lagged LMDB mirror | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1124 | backfill skips and counts a registered flow whose state record is gone | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1139 | backfill skips a registered flow whose LMDB row names a lost projection frame | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1152 | worker reports registered flows without a state record once a backfill finishes | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1193 | backfill keeps waiting for a registered flow while the LMDB mirror is degraded | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1209 | backfill derives a cold LMDB state candidate from its primary registry | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1295 | replicated cold backfill candidate does not read local LMDB during apply | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1392 | planned backfill record cannot recreate membership after retention cleanup | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1502 | replicated cold migration plan does not read local LMDB during apply | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1586 | backfill resolves a stale LMDB record from the current primary record | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1639 | duplicate old projection rows for one catalog member are repaired | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1676 | planner rejects a primary descriptor that is ahead of its durable mirror | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1738 | membership inserted after planning prevents the stale plan from finishing | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1769 | newer completed migration dominates stale policy entries applied out of order | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1818 | delayed older-policy mutation is rejected and a current mutation converges attributes | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1911 | malformed projection generation fails closed without crashing apply | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1958 | matching durable backfill completion survives worker process restart | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
+| 1988 | ordinary embedded restart preserves source token while destructive reconcile rotates it | internal: Elixir migrates existing Flows' catalog rows and LMDB projections in background jobs when a policy changes; the node's catalog is in memory and index changes apply to later writes (G31) |
 
 ## `ferricstore/test/ferricstore/flow_policy_repair_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 26 | replace cannot repair a corrupt policy until feature level 1 is active | open |
-| 36 | replace repairs a policy stored under another type above its generation | open |
-| 57 | replace repairs an unreadable policy above every earlier generation | open |
-| 71 | a corrupt policy still needs replace to be overwritten | open |
-| 87 | repair also replaces corrupt copies installed on other shards | open |
+| 26 | replace cannot repair a corrupt policy until feature level 1 is active | internal: repair of corrupt Elixir policy rows and feature levels |
+| 36 | replace repairs a policy stored under another type above its generation | internal: repair of corrupt Elixir policy rows and feature levels |
+| 57 | replace repairs an unreadable policy above every earlier generation | internal: repair of corrupt Elixir policy rows and feature levels |
+| 71 | a corrupt policy still needs replace to be overwritten | internal: repair of corrupt Elixir policy rows and feature levels |
+| 87 | repair also replaces corrupt copies installed on other shards | internal: repair of corrupt Elixir policy rows and feature levels |
 
 ## `ferricstore/test/ferricstore/flow_production_recovery_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 36 | Flow truth, hot indexes, blob values, history, and cold projection survive supervised shard crash | open |
-| 173 | an FQL-visible Flow can expire before a restart without blocking recovery | open |
-| 278 | retention deletes a cold expired QueryRow whose apply-projection source was compacted away before a process restart | open |
-| 373 | a process restart keeps a completed shared-ref backfill instead of migrating again | open |
+| 36 | Flow truth, hot indexes, blob values, history, and cold projection survive supervised shard crash | covered: crash::sigkill_keeps_every_acknowledged_create, restart::a_restart_replays_creates_claims_and_completions (a failed shard stops the node, which restarts from its log) |
+| 173 | an FQL-visible Flow can expire before a restart without blocking recovery | covered: retention::a_restart_replays_removals |
+| 278 | retention deletes a cold expired QueryRow whose apply-projection source was compacted away before a process restart | internal: Elixir's QueryRow compaction |
+| 373 | a process restart keeps a completed shared-ref backfill instead of migrating again | internal: Elixir's shared-ref backfill |
 
 ## `ferricstore/test/ferricstore/management_contract_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 153 | default management capabilities expose OSS-safe feature flags | open |
-| 165 | FERRICSTORE.CAPABILITIES returns string-keyed SDK contract | open |
-| 179 | FLOW_QUERY transports opaque cursor IDs without scalar coercion | open |
-| 196 | capabilities can be extended by a configured implementation | open |
-| 210 | capability adapters fail clearly when they violate the public contract | open |
-| 224 | management mutations fail closed in OSS | open |
-| 241 | ACL LOAD delegates to the configured durable management adapter | open |
-| 248 | resource limit enforcement hooks are neutral no-ops by default | open |
-| 269 | resource limit command hooks delegate to configured implementation | open |
-| 305 | FERRICSTORE.QUOTA delegates to configured resource limit implementation | open |
-| 322 | FERRICSTORE.NAMESPACE delegates mutations with caller store opts | open |
-| 332 | ACL command delegates to configured implementation | open |
-| 355 | native AST parser recognizes management command names | open |
+| 153 | default management capabilities expose OSS-safe feature flags | fixed G73 (session::capabilities::capabilities_name_what_this_node_serves) |
+| 165 | FERRICSTORE.CAPABILITIES returns string-keyed SDK contract | fixed G73 (session::capabilities::capabilities_name_what_this_node_serves) |
+| 179 | FLOW_QUERY transports opaque cursor IDs without scalar coercion | covered: query/cursor.rs tests (cursors are opaque text) |
+| 196 | capabilities can be extended by a configured implementation | internal: Elixir's pluggable management adapters |
+| 210 | capability adapters fail clearly when they violate the public contract | internal: Elixir's pluggable management adapters |
+| 224 | management mutations fail closed in OSS | surface: ACL, quota, namespace and extension management |
+| 241 | ACL LOAD delegates to the configured durable management adapter | surface: ACL, quota, namespace and extension management |
+| 248 | resource limit enforcement hooks are neutral no-ops by default | surface: ACL, quota, namespace and extension management |
+| 269 | resource limit command hooks delegate to configured implementation | surface: ACL, quota, namespace and extension management |
+| 305 | FERRICSTORE.QUOTA delegates to configured resource limit implementation | surface: ACL, quota, namespace and extension management |
+| 322 | FERRICSTORE.NAMESPACE delegates mutations with caller store opts | surface: ACL, quota, namespace and extension management |
+| 332 | ACL command delegates to configured implementation | surface: ACL, quota, namespace and extension management |
+| 355 | native AST parser recognizes management command names | internal: Elixir's parser command table |
 
 ## `ferricstore/test/ferricstore/raft/apply_context_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 8 | history hot limits cannot exceed the total history maximum | open |
-| 61 | the replicated schema tag reflects store-wide apply ownership | open |
-| 68 | captured retention limits do not change while a command is applying | open |
-| 88 | standalone shards carry their startup apply context into Flow commands | open |
-| 114 | isolated instances accept an explicit promotion threshold | open |
-| 129 | captured cleanup and hibernation limits are flat immutable data | open |
-| 148 | promotion threshold is captured once and strictly serialized | open |
-| 166 | promotion threshold has no process-global runtime API | open |
-| 181 | WARaft segment projection reads promotion threshold only from replicated state | open |
-| 194 | invalid runtime values normalize once before replication | open |
-| 222 | value-size limits are bounded and preserved by the replicated context | open |
-| 239 | compound member apply budget is bounded and preserved by the replicated context | open |
-| 258 | batch command apply budget is bounded and preserved by the replicated context | open |
-| 277 | transaction result byte budget is bounded and preserved by the replicated context | open |
-| 296 | transaction command budget is bounded and preserved by the replicated context | open |
-| 315 | transaction key apply budget is bounded and preserved by the replicated context | open |
-| 334 | Flow batch work is bounded and preserved by the replicated context | open |
-| 351 | command construction and replicated apply clamp Flow batch work identically | open |
-| 358 | replicated history limits retain the existing hot-history safety cap | open |
-| 371 | replicated work limits clamp runtime values and reject oversized encodings | open |
-| 406 | replicated metadata field versions stay inside the unsigned 64-bit contract | open |
-| 426 | only policy-sensitive commands carry the compact replicated context | open |
-| 450 | all policy-sensitive apply tags and shared-ref wrappers carry context | open |
-| 521 | two-field async envelopes are not current context carriers | open |
-| 528 | reserved wrappers cannot inject context or pessimize ordinary KV commands | open |
-| 568 | ordinary command dispatch does not eagerly encode the apply context | open |
-| 585 | large ordinary batches use a constant-stack sanitizer and preserve identity | open |
-| 601 | pre-stamped commands cannot bypass or inject replicated context | open |
-| 633 | replicated command context overrides a replica's node-local context | open |
-| 656 | rollout requires an exact acknowledgement from every raft group | open |
-| 676 | rollout fails closed when any raft group does not acknowledge the context | open |
-| 690 | targeted rollout only writes the elected raft group | open |
-| 706 | barrier adopts and acknowledges the exact replicated context | open |
-| 732 | malformed replicated contexts fail closed without running the command | open |
-| 754 | malformed replicated wrapper commands fail closed and advance apply accounting | open |
-| 775 | retention cleanup budgets cannot exceed the replicated context | open |
-| 812 | retention planning derives budgets from the instance apply context | open |
-| 838 | Raft apply limit readers do not consult application configuration | open |
+| 8 | history hot limits cannot exceed the total history maximum | covered: audit::history_limits::requests_past_the_node_s_limits_are_refused |
+| 61 | the replicated schema tag reflects store-wide apply ownership | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 68 | captured retention limits do not change while a command is applying | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 88 | standalone shards carry their startup apply context into Flow commands | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 114 | isolated instances accept an explicit promotion threshold | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 129 | captured cleanup and hibernation limits are flat immutable data | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 148 | promotion threshold is captured once and strictly serialized | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 166 | promotion threshold has no process-global runtime API | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 181 | WARaft segment projection reads promotion threshold only from replicated state | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 194 | invalid runtime values normalize once before replication | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 222 | value-size limits are bounded and preserved by the replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 239 | compound member apply budget is bounded and preserved by the replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 258 | batch command apply budget is bounded and preserved by the replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 277 | transaction result byte budget is bounded and preserved by the replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 296 | transaction command budget is bounded and preserved by the replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 315 | transaction key apply budget is bounded and preserved by the replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 334 | Flow batch work is bounded and preserved by the replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 351 | command construction and replicated apply clamp Flow batch work identically | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 358 | replicated history limits retain the existing hot-history safety cap | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 371 | replicated work limits clamp runtime values and reject oversized encodings | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 406 | replicated metadata field versions stay inside the unsigned 64-bit contract | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 426 | only policy-sensitive commands carry the compact replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 450 | all policy-sensitive apply tags and shared-ref wrappers carry context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 521 | two-field async envelopes are not current context carriers | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 528 | reserved wrappers cannot inject context or pessimize ordinary KV commands | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 568 | ordinary command dispatch does not eagerly encode the apply context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 585 | large ordinary batches use a constant-stack sanitizer and preserve identity | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 601 | pre-stamped commands cannot bypass or inject replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 633 | replicated command context overrides a replica's node-local context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 656 | rollout requires an exact acknowledgement from every raft group | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 676 | rollout fails closed when any raft group does not acknowledge the context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 690 | targeted rollout only writes the elected raft group | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 706 | barrier adopts and acknowledges the exact replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 732 | malformed replicated contexts fail closed without running the command | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 754 | malformed replicated wrapper commands fail closed and advance apply accounting | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 775 | retention cleanup budgets cannot exceed the replicated context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 812 | retention planning derives budgets from the instance apply context | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 838 | Raft apply limit readers do not consult application configuration | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
 
 ## `ferricstore/test/ferricstore/raft/apply_limits_flow_time_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 8 | rejects inexact Flow timestamps in top-level and batched command attributes | open |
-| 25 | rejects derived deadlines that leave the exact Flow timestamp range | open |
-| 39 | validates structural shared attributes but leaves user data opaque | open |
-| 57 | both Flow apply wrappers enforce the replicated time invariant | open |
-| 61 | replicated apply context bounds the total structural batch footprint | open |
-| 76 | both Flow apply wrappers enforce the replicated batch invariant | open |
+| 8 | rejects inexact Flow timestamps in top-level and batched command attributes | covered: audit::create_rules::times_and_lease_deadlines_stay_within_the_exact_integer_range |
+| 25 | rejects derived deadlines that leave the exact Flow timestamp range | covered: audit::create_rules::times_and_lease_deadlines_stay_within_the_exact_integer_range |
+| 39 | validates structural shared attributes but leaves user data opaque | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 57 | both Flow apply wrappers enforce the replicated time invariant | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 61 | replicated apply context bounds the total structural batch footprint | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 76 | both Flow apply wrappers enforce the replicated batch invariant | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
 
 ## `ferricstore/test/ferricstore/raft/flow_retention_active_reverse_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 8 | hibernated timeout cleanup accepts only the exact active-timeout reverse plan | open |
-| 54 | hibernated timeout cleanup fails closed for missing, corrupt, and unreadable reverses | open |
+| 8 | hibernated timeout cleanup accepts only the exact active-timeout reverse plan | internal: hibernated timeout cleanup; the node keeps live Flows in RAM (ADR-016) |
+| 54 | hibernated timeout cleanup fails closed for missing, corrupt, and unreadable reverses | internal: hibernated timeout cleanup; the node keeps live Flows in RAM (ADR-016) |
 
 ## `ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_command_time.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 14 | Flow writes materialize a preceding compound fast delete | open |
-| 52 | MSET falls back to staged puts after a compound fast delete | open |
-| 81 | RMW commands observe a preceding compound fast delete | open |
-| 107 | list reads observe a preceding compound fast delete | open |
-| 136 | fast-delete materialization ignores unrelated pending writes | open |
-| 167 | Flow create rejects a policy reference older than the local generation | open |
-| 256 | Flow create rejects a policy generation not yet applied locally | open |
-| 287 | a policy fence installs a future generation before its Flow command | open |
-| 323 | Flow create rejects a conflicting digest at the same generation | open |
-| 366 | an existing-flow command rejects a recreated flow incarnation | open |
-| 422 | unstamped Flow commands are rejected instead of reading replica-local policy | open |
-| 464 | generation-zero direct puts remain valid before a high-water exists | open |
-| 488 | reserved policy puts reject invalid keys and values without storing them | open |
-| 550 | policy patch allocation stamps generations and rejects non-map payloads | open |
-| 614 | policy patch allocation rejects an out-of-range expected generation | open |
-| 639 | policy patch validation uses replicated limits instead of runtime config | open |
-| 696 | successive generation-zero direct puts replay before a stamped policy | open |
-| 744 | generationless policy payloads cannot overwrite a generation-stamped policy | open |
-| 781 | generation-zero direct puts replay across an active migration high-water | open |
-| 820 | generation-zero direct puts replay across a completed migration high-water | open |
-| 859 | terminal batches are rejected without canonical policy metadata | open |
-| 905 | policy patch allocation fails closed on corrupt migration high-water state | open |
-| 950 | policy patch allocation and install fail closed on a corrupt stored high-water | open |
-| 985 | an absent target guard rejects a flow created before apply | open |
-| 1048 | Flow apply rejects an invalid policy reference before mutation | open |
-| 1136 | Flow apply rejects conflicting batch policy references before mutation | open |
-| 1184 | Flow batches resolve one deduplicated command-level policy reference | open |
-| 1233 | internal policy generations do not replace public policy versions | open |
-| 1260 | Flow create does not return projection failure after committing state | open |
-| 1293 | uses stamped apply time when Flow attrs omit now_ms | open |
-| 1399 | create_many stages Flow state writes into one append batch and projects history | open |
-| 1461 | Ra-batched Flow commands share state append batch but keep semantic results | open |
-| 1557 | claim_due pages past 256 stale due indexes without hiding an eligible job | open |
-| 1703 | claim_due stages claimed state records into one append batch | open |
-| 1782 | a terminal batch answers a refused state write instead of raising | open |
-| 1846 | claim_due apply uses a claim-specific bulk index plan | open |
-| 1859 | claim_due bulk index plan keeps metadata and reclaimed running indexes correct | open |
-| 2031 | claim_due mirror does not enqueue full active state blobs | open |
-| 2158 | active Flow writes do not enqueue cold LMDB projection | open |
-| 2297 | Flow hot path does not depend on LMDB writer availability | open |
+| 14 | Flow writes materialize a preceding compound fast delete | internal: Elixir KV compound fast deletes |
+| 52 | MSET falls back to staged puts after a compound fast delete | surface: MSET |
+| 81 | RMW commands observe a preceding compound fast delete | surface: KV read-modify-write |
+| 107 | list reads observe a preceding compound fast delete | surface: list reads |
+| 136 | fast-delete materialization ignores unrelated pending writes | internal: Elixir KV compound fast deletes |
+| 167 | Flow create rejects a policy reference older than the local generation | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 256 | Flow create rejects a policy generation not yet applied locally | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 287 | a policy fence installs a future generation before its Flow command | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 323 | Flow create rejects a conflicting digest at the same generation | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 366 | an existing-flow command rejects a recreated flow incarnation | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 422 | unstamped Flow commands are rejected instead of reading replica-local policy | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 464 | generation-zero direct puts remain valid before a high-water exists | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 488 | reserved policy puts reject invalid keys and values without storing them | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 550 | policy patch allocation stamps generations and rejects non-map payloads | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 614 | policy patch allocation rejects an out-of-range expected generation | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 639 | policy patch validation uses replicated limits instead of runtime config | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 696 | successive generation-zero direct puts replay before a stamped policy | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 744 | generationless policy payloads cannot overwrite a generation-stamped policy | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 781 | generation-zero direct puts replay across an active migration high-water | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 820 | generation-zero direct puts replay across a completed migration high-water | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 859 | terminal batches are rejected without canonical policy metadata | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 905 | policy patch allocation fails closed on corrupt migration high-water state | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 950 | policy patch allocation and install fail closed on a corrupt stored high-water | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 985 | an absent target guard rejects a flow created before apply | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 1048 | Flow apply rejects an invalid policy reference before mutation | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 1136 | Flow apply rejects conflicting batch policy references before mutation | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 1184 | Flow batches resolve one deduplicated command-level policy reference | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 1233 | internal policy generations do not replace public policy versions | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 1260 | Flow create does not return projection failure after committing state | internal: Elixir's projection after commit |
+| 1293 | uses stamped apply time when Flow attrs omit now_ms | internal: Elixir replicates commands and stamps policy, generation, time and limits so that replicas re-running them agree; the node logs each command's after-images and replicas apply those results (ADR-018) |
+| 1399 | create_many stages Flow state writes into one append batch and projects history | internal: Elixir's append batching |
+| 1461 | Ra-batched Flow commands share state append batch but keep semantic results | internal: Elixir's Ra batching |
+| 1557 | claim_due pages past 256 stale due indexes without hiding an eligible job | internal: Elixir's stale due-index rows; the node keeps no stale index entries |
+| 1703 | claim_due stages claimed state records into one append batch | internal: Elixir's append batching |
+| 1782 | a terminal batch answers a refused state write instead of raising | covered: audit::terminal_batches::a_mixed_batch_decides_each_partition_together (a refused item is answered, not raised) |
+| 1846 | claim_due apply uses a claim-specific bulk index plan | internal: Elixir's claim index plan |
+| 1859 | claim_due bulk index plan keeps metadata and reclaimed running indexes correct | internal: Elixir's claim index plan |
+| 2031 | claim_due mirror does not enqueue full active state blobs | internal: Elixir's LMDB mirror |
+| 2158 | active Flow writes do not enqueue cold LMDB projection | internal: Elixir's LMDB projection |
+| 2297 | Flow hot path does not depend on LMDB writer availability | internal: Elixir's LMDB writer |
 
 ## `ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_governance_limit.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | malformed limit mutation is rejected as an applied command | open |
-| 17 | new limit replay resumes a durable catalog intent without cursor metadata | open |
-| 26 | new limit replay resumes durable catalog intent and cursor metadata | open |
-| 35 | new limit replaces an intent-only prefix whose owner never committed | open |
+| 7 | malformed limit mutation is rejected as an applied command | internal: Elixir's durable limit catalog intents and their replay |
+| 17 | new limit replay resumes a durable catalog intent without cursor metadata | internal: Elixir's durable limit catalog intents and their replay |
+| 26 | new limit replay resumes durable catalog intent and cursor metadata | internal: Elixir's durable limit catalog intents and their replay |
+| 35 | new limit replaces an intent-only prefix whose owner never committed | internal: Elixir's durable limit catalog intents and their replay |
 
 ## `ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_governance_release_outbox.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | malformed release outbox acknowledgement is rejected as an applied command | open |
-| 24 | oversized release completion is rejected as an applied command | open |
+| 7 | malformed release outbox acknowledgement is rejected as an applied command | internal: Elixir's governance release outbox |
+| 24 | oversized release completion is rejected as an applied command | internal: Elixir's governance release outbox |
 
 ## `ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_index_rollback.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 14 | native Flow index apply errors are returned before durable publication | open |
-| 40 | native Flow index preparation failures happen before durable append | open |
-| 89 | native Flow index apply failures rebuild from committed keydir | open |
-| 149 | rolls back native Flow index mutations when apply append fails | open |
-| 197 | does not roll back published storage when native Flow index repair fails | open |
-| 259 | waits for promoted compaction latch before cleanup | open |
-| 312 | applied writes rotate the active file when they exceed max_active_file_size | open |
-| 335 | persists the pending origin value when ETS still matches the command | open |
-| 349 | replays origin PUT when recovery has no local pending row | open |
-| 367 | replays origin large PUT over an older cold value | open |
-| 389 | does not duplicate an already-applied origin large PUT | open |
-| 409 | persists stale origin PUT for replay without publishing over newer pending ETS | open |
-| 455 | replays origin RMW when recovery has no local value | open |
-| 470 | replays origin RMW when recovery has the old pre-command value | open |
-| 492 | replays origin APPEND when cold location changes during apply read | open |
-| 533 | replays origin GETSET when recovery has the pre-command value | open |
-| 552 | replays origin GETSET over an unaccepted pending local value | open |
-| 571 | does not replay origin GETSET over a durable newer local value | open |
-| 590 | does not replay stale origin PUT over a durable newer local value | open |
-| 609 | does not replay stale origin DELETE over a durable newer local value | open |
-| 628 | does not replay stale origin GETDEL over a durable newer local value | open |
-| 647 | does not replay stale origin PUT over a pending newer local value | open |
-| 666 | does not replay stale origin DELETE over a pending newer local value | open |
-| 685 | does not replay stale origin GETDEL over a pending newer local value | open |
-| 704 | replays origin GETDEL tombstone when local delete already removed the key | open |
-| 724 | materializes pending origin GETSET even when value equals expected | open |
-| 747 | does not replay origin INCR over a provably newer pending local value | open |
-| 766 | does not replay origin DECR over a provably newer pending local value | open |
-| 785 | replays origin GETEX when recovery has the old expiry | open |
-| 805 | replays origin SETRANGE when recovery has the pre-command value | open |
-| 824 | replays origin SETRANGE expected value over pending local value | open |
-| 847 | replays origin checked large APPEND over an older cold value | open |
-| 877 | replays origin async DELETE when recovery still has an older value | open |
-| 898 | DELETE aborts when pending PUT cannot be flushed before tombstone | open |
-| 931 | origin async DELETE persists tombstone even when Router already removed ETS | open |
-| 954 | replays origin async GETDEL when recovery still has an older value | open |
-| 975 | origin async GETDEL persists tombstone even when Router already removed ETS | open |
-| 998 | GETDEL returns flush error when pending PUT cannot be ordered before tombstone | open |
+| 14 | native Flow index apply errors are returned before durable publication | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 40 | native Flow index preparation failures happen before durable append | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 89 | native Flow index apply failures rebuild from committed keydir | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 149 | rolls back native Flow index mutations when apply append fails | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 197 | does not roll back published storage when native Flow index repair fails | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 259 | waits for promoted compaction latch before cleanup | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 312 | applied writes rotate the active file when they exceed max_active_file_size | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 335 | persists the pending origin value when ETS still matches the command | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 349 | replays origin PUT when recovery has no local pending row | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 367 | replays origin large PUT over an older cold value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 389 | does not duplicate an already-applied origin large PUT | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 409 | persists stale origin PUT for replay without publishing over newer pending ETS | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 455 | replays origin RMW when recovery has no local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 470 | replays origin RMW when recovery has the old pre-command value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 492 | replays origin APPEND when cold location changes during apply read | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 533 | replays origin GETSET when recovery has the pre-command value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 552 | replays origin GETSET over an unaccepted pending local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 571 | does not replay origin GETSET over a durable newer local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 590 | does not replay stale origin PUT over a durable newer local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 609 | does not replay stale origin DELETE over a durable newer local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 628 | does not replay stale origin GETDEL over a durable newer local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 647 | does not replay stale origin PUT over a pending newer local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 666 | does not replay stale origin DELETE over a pending newer local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 685 | does not replay stale origin GETDEL over a pending newer local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 704 | replays origin GETDEL tombstone when local delete already removed the key | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 724 | materializes pending origin GETSET even when value equals expected | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 747 | does not replay origin INCR over a provably newer pending local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 766 | does not replay origin DECR over a provably newer pending local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 785 | replays origin GETEX when recovery has the old expiry | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 805 | replays origin SETRANGE when recovery has the pre-command value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 824 | replays origin SETRANGE expected value over pending local value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 847 | replays origin checked large APPEND over an older cold value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 877 | replays origin async DELETE when recovery still has an older value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 898 | DELETE aborts when pending PUT cannot be flushed before tombstone | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 931 | origin async DELETE persists tombstone even when Router already removed ETS | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 954 | replays origin async GETDEL when recovery still has an older value | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 975 | origin async GETDEL persists tombstone even when Router already removed ETS | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
+| 998 | GETDEL returns flush error when pending PUT cannot be ordered before tombstone | internal: Elixir's native index publication and Bitcask origin replay; a refused node command changes nothing (shard memory is updated only once the after-images are logged) |
 
 ## `ferricstore/test/ferricstore/raft/state_machine_test/sections/flow_restore.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 16 | a restored run takes its sequence numbers from this shard's Raft position | open |
-| 76 | restore refuses a run that already exists | open |
+| 16 | a restored run takes its sequence numbers from this shard's Raft position | internal: Elixir's run restore between shards (resharding); the node does not move Flows between shards |
+| 76 | restore refuses a run that already exists | internal: Elixir's run restore between shards (resharding); the node does not move Flows between shards |
 
 ## `ferricstore_server/test/ferricstore_server/native/accounting_gate_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | reconciliation waits for an in-progress publication and excludes new entrants | open |
-| 50 | a stalled live mutation defers repair instead of resetting active reservations | open |
-| 70 | an interrupted unindexed grant to a surviving owner restores its index and monitor | open |
-| 99 | death notifications reclaim interrupted reservations without a saturation request | open |
+| 7 | reconciliation waits for an in-progress publication and excludes new entrants | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 50 | a stalled live mutation defers repair instead of resetting active reservations | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 70 | an interrupted unindexed grant to a surviving owner restores its index and monitor | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 99 | death notifications reclaim interrupted reservations without a saturation request | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
 
 ## `ferricstore_server/test/ferricstore_server/native/admission_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | capacity is global and reclaimed when an owner is killed | open |
-| 36 | a restart preserves live leases and accepts their original release tokens | open |
+| 7 | capacity is global and reclaimed when an owner is killed | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 36 | a restart preserves live leases and accepts their original release tokens | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
 
 ## `ferricstore_server/test/ferricstore_server/native/apply_budget_error_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 30 | RPUSH past the member budget explains the limit | open |
-| 40 | HDEL past the member budget explains the limit | open |
+| 30 | RPUSH past the member budget explains the limit | surface: RPUSH and HDEL |
+| 40 | HDEL past the member budget explains the limit | surface: RPUSH and HDEL |
 
 ## `ferricstore_server/test/ferricstore_server/native/blocking_lane_order_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 19 | later independent lane can unblock a lane with deferred work | open |
-| 37 | replayed work defers again when its next command also blocks | open |
+| 19 | later independent lane can unblock a lane with deferred work | covered: flow_fifo::a_finished_head_wakes_a_parked_claim_for_its_lane, audit::multi_state_claims::a_blocking_claim_wakes_for_a_retry_due_after_its_backoff |
+| 37 | replayed work defers again when its next command also blocks | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
 
 ## `ferricstore_server/test/ferricstore_server/native/blocking_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 12 | blocking workers are monitored by their connection owner | open |
-| 34 | blocking workers terminate when their connection owner dies | open |
-| 64 | blocking workers share a server-wide waiter budget | open |
-| 98 | finite blocking timeouts are not starved by queued notifications | open |
-| 123 | list workers rearm after a consumed notification finds no remaining value | open |
-| 173 | #{command} drains a multi-value push through FIFO waiter handoffs | open |
-| 228 | blocking results retain outbound capacity after the worker exits | open |
-| 267 | completed list-worker cleanup does not scale with unrelated waiter keys | open |
-| 316 | a completed multi-key pop unregisters every watched key before worker exit | open |
-| 363 | blocking result overflow emits a bounded close signal without the result | open |
-| 394 | XREAD remains wakeable when a stream is deleted and immediately recreated | open |
-| 432 | XREAD wakes with WRONGTYPE when SET replaces its stream | open |
-| 471 | XREAD remains wakeable across FLUSHDB and immediate recreation | open |
-| 509 | BRPOPLPUSH is not exposed as a blocking compatibility command | open |
-| 564 | a served blocking pop notifies the key it popped | open |
+| 12 | blocking workers are monitored by their connection owner | covered: session::options::closing_the_connection_cancels_its_waiting_claims |
+| 34 | blocking workers terminate when their connection owner dies | covered: session::options::closing_the_connection_cancels_its_waiting_claims |
+| 64 | blocking workers share a server-wide waiter budget | ported: blocking::the_node_parks_at_most_its_waiter_limit |
+| 98 | finite blocking timeouts are not starved by queued notifications | covered: blocking::a_blocking_claim_returns_nothing_at_its_deadline |
+| 123 | list workers rearm after a consumed notification finds no remaining value | surface: list blocking commands |
+| 173 | #{command} drains a multi-value push through FIFO waiter handoffs | surface: list blocking commands |
+| 228 | blocking results retain outbound capacity after the worker exits | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 267 | completed list-worker cleanup does not scale with unrelated waiter keys | surface: list blocking commands |
+| 316 | a completed multi-key pop unregisters every watched key before worker exit | surface: list blocking commands |
+| 363 | blocking result overflow emits a bounded close signal without the result | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 394 | XREAD remains wakeable when a stream is deleted and immediately recreated | surface: XREAD |
+| 432 | XREAD wakes with WRONGTYPE when SET replaces its stream | surface: XREAD |
+| 471 | XREAD remains wakeable across FLUSHDB and immediate recreation | surface: XREAD |
+| 509 | BRPOPLPUSH is not exposed as a blocking compatibility command | surface: BRPOPLPUSH |
+| 564 | a served blocking pop notifies the key it popped | surface: list pops |
 
 ## `ferricstore_server/test/ferricstore_server/native/codec_test.exs`
 
@@ -1450,266 +1475,266 @@ for the whole file:
 
 | Line | Test | Status |
 |---:|---|---|
-| 33 | session classification does not fully decode command payloads | open |
-| 48 | drains budgeted frame continuations without waiting for more socket data | open |
-| 61 | preserves FIFO when a data frame precedes a session frame on one lane | open |
-| 90 | flushes a synchronous session response before following data on one lane | open |
-| 114 | orders multiple session and control frames around one lane batch | open |
-| 162 | waits for a blocking session command before later same-lane work | open |
-| 213 | deferred frames honor queued request byte caps | open |
-| 268 | replayed deferred frames transfer queued byte reservations once | open |
-| 345 | same-lane blocking work at the inflight cap cannot overtake | open |
-| 378 | parked frames over queued request byte caps get ordered busy replies | open |
-| 435 | orders a synchronous inflight error after earlier lane work | open |
-| 471 | waits only for the session lane while draining another lane | open |
-| 528 | buffers a later pipelined write while waiting on a lane barrier | open |
-| 592 | closes when a lane terminates before its barrier | open |
-| 644 | bounds a stalled lane barrier and cleans up its resources | open |
-| 710 | stops a pending lane barrier when the client disconnects | open |
-| 767 | preserves an incomplete frame until the remaining socket bytes arrive | open |
-| 782 | partial frame assembly has an absolute deadline | open |
-| 801 | chunked request assembly has an absolute deadline across complete wire frames | open |
-| 826 | blocking commands inside MULTI are rejected by the session path | open |
-| 847 | blocking session commands consume the connection inflight window | open |
-| 875 | EXEC preserves its transaction when server-wide execution capacity is exhausted | open |
-| 914 | NO_REPLY suppresses a data command rejected by the inflight gate | open |
-| 950 | NO_REPLY suppresses native session command responses | open |
-| 968 | NO_REPLY control commands skip response encoding | open |
-| 1013 | control commands consume global execution capacity | open |
-| 1041 | handshake and heartbeat frames answer while server execution capacity is exhausted | open |
-| 1071 | NO_REPLY suppresses delayed native blocking responses | open |
-| 1093 | blocking results release outbound capacity after socket send | open |
-| 1117 | blocking result overflow closes the connection | open |
-| 1139 | idle timeout does not terminate an active blocking request | open |
-| 1158 | all native command forms enforce the connection response byte budget | open |
-| 1194 | lane responses close a connection before crossing its outbound byte ceiling | open |
-| 1213 | lane responses close when global outbound capacity is exhausted | open |
-| 1237 | pubsub events release guarded outbound capacity after socket send | open |
-| 1264 | pubsub batches use one guarded reservation and still emit one frame per message | open |
-| 1290 | negotiated pubsub batches emit one ordered batch event frame | open |
-| 1334 | HELLO refreshes prepared batch delivery metadata for existing subscriptions | open |
-| 1371 | negotiated pubsub batches split before the response limit | open |
-| 1425 | pubsub coalescing processes an ACL barrier before later events | open |
-| 1449 | pubsub closes a slow subscriber before queueing an over-limit event | open |
-| 1473 | pubsub batches cannot bypass the slow-subscriber outbound limit | open |
-| 1497 | keeps fragmented multi-megabyte frames chunked until the frame is complete | open |
-| 1534 | buffer accounting work stays constant as the fragment list grows | open |
-| 1570 | frame buffer preserves nonuniform fragment order across many fragments | open |
-| 1596 | frame buffer keeps already-large fragments independent | open |
-| 1622 | accepts a complete maximum-size frame coalesced with continuation bytes | open |
-| 1642 | rejects an oversized coalesced read even when its first frame is complete | open |
-| 1657 | rejects a declared frame larger than the current buffer budget at its header | open |
-| 1666 | unauthenticated connections apply the smaller frame budget | open |
-| 1689 | unauthenticated chunk streams cannot exceed the logical frame budget | open |
-| 1729 | unauthenticated compressed frames cannot inflate past the logical frame budget | open |
-| 1779 | accepts a multi-megabyte frame sent as 64 KiB socket chunks | open |
-| 1792 | closes a one-byte fragment batch when metadata exhausts inbound budget | open |
-| 1841 | tiny received fragments exhaust metadata admission before the raw payload budget | open |
-| 1890 | decoded requests remain charged to the inbound byte budget while queued in a lane | open |
-| 1927 | validates configured frame bodies against the wire buffer limit | open |
-| 1951 | outbound responses never exceed the connection frame limit | open |
-| 1980 | compact MGET responses use the connection frame limit when chunking is disabled | open |
-| 2013 | large response encoders run on dirty CPU schedulers | open |
+| 33 | session classification does not fully decode command payloads | internal: Elixir's session classification probe |
+| 48 | drains budgeted frame continuations without waiting for more socket data | internal: Elixir's frame buffer drain loop |
+| 61 | preserves FIFO when a data frame precedes a session frame on one lane | ported: session::lanes::a_session_frame_on_a_data_lane_answers_in_its_place |
+| 90 | flushes a synchronous session response before following data on one lane | ported: session::lanes::a_session_frame_on_a_data_lane_answers_in_its_place |
+| 114 | orders multiple session and control frames around one lane batch | ported: session::lanes::a_session_frame_on_a_data_lane_answers_in_its_place |
+| 162 | waits for a blocking session command before later same-lane work | covered (reply order): session::lanes::a_slow_command_holds_only_its_own_lane; the node runs later lane work at once and holds its reply |
+| 213 | deferred frames honor queued request byte caps | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 268 | replayed deferred frames transfer queued byte reservations once | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 345 | same-lane blocking work at the inflight cap cannot overtake | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 378 | parked frames over queued request byte caps get ordered busy replies | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 435 | orders a synchronous inflight error after earlier lane work | covered: session::queue::replies_on_one_lane_keep_request_order |
+| 471 | waits only for the session lane while draining another lane | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 528 | buffers a later pipelined write while waiting on a lane barrier | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 592 | closes when a lane terminates before its barrier | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 644 | bounds a stalled lane barrier and cleans up its resources | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 710 | stops a pending lane barrier when the client disconnects | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 767 | preserves an incomplete frame until the remaining socket bytes arrive | ported: session::connection_guards::a_frame_waits_for_bytes_that_arrive_within_the_deadline |
+| 782 | partial frame assembly has an absolute deadline | fixed G66 (session::connection_guards::a_frame_unfinished_at_its_deadline_closes_the_connection, an_idle_connection_is_not_a_late_frame) |
+| 801 | chunked request assembly has an absolute deadline across complete wire frames | surface: chunked frames |
+| 826 | blocking commands inside MULTI are rejected by the session path | surface: MULTI |
+| 847 | blocking session commands consume the connection inflight window | covered: session::backpressure::a_connection_at_its_in_flight_limit_reads_nothing_more_until_a_reply_leaves (a parked claim holds its permits) |
+| 875 | EXEC preserves its transaction when server-wide execution capacity is exhausted | surface: MULTI/EXEC |
+| 914 | NO_REPLY suppresses a data command rejected by the inflight gate | ported: session::no_reply::no_reply_commands_run_without_answering |
+| 950 | NO_REPLY suppresses native session command responses | ported: session::no_reply::no_reply_commands_run_without_answering (HELLO; MULTI is a surface) |
+| 968 | NO_REPLY control commands skip response encoding | ported: session::no_reply::no_reply_commands_run_without_answering (OPTIONS) |
+| 1013 | control commands consume global execution capacity | internal: the node has no global execution budget |
+| 1041 | handshake and heartbeat frames answer while server execution capacity is exhausted | internal: the node has no global execution budget; PING and handshakes never reach shard admission (ADR-017) |
+| 1071 | NO_REPLY suppresses delayed native blocking responses | covered: the writer sends nothing for a NO_REPLY request whenever its reply comes (session::no_reply) |
+| 1093 | blocking results release outbound capacity after socket send | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 1117 | blocking result overflow closes the connection | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 1139 | idle timeout does not terminate an active blocking request | internal: the node closes no idle connection |
+| 1158 | all native command forms enforce the connection response byte budget | covered: fsnp::frame::a_reply_longer_than_a_frame_is_refused_whole |
+| 1194 | lane responses close a connection before crossing its outbound byte ceiling | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 1213 | lane responses close when global outbound capacity is exhausted | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 1237 | pubsub events release guarded outbound capacity after socket send | surface: PubSub |
+| 1264 | pubsub batches use one guarded reservation and still emit one frame per message | surface: PubSub |
+| 1290 | negotiated pubsub batches emit one ordered batch event frame | surface: PubSub |
+| 1334 | HELLO refreshes prepared batch delivery metadata for existing subscriptions | surface: PubSub |
+| 1371 | negotiated pubsub batches split before the response limit | surface: PubSub |
+| 1425 | pubsub coalescing processes an ACL barrier before later events | surface: PubSub |
+| 1449 | pubsub closes a slow subscriber before queueing an over-limit event | surface: PubSub |
+| 1473 | pubsub batches cannot bypass the slow-subscriber outbound limit | surface: PubSub |
+| 1497 | keeps fragmented multi-megabyte frames chunked until the frame is complete | internal: Elixir's fragment buffer |
+| 1534 | buffer accounting work stays constant as the fragment list grows | internal: Elixir's fragment buffer |
+| 1570 | frame buffer preserves nonuniform fragment order across many fragments | internal: Elixir's fragment buffer |
+| 1596 | frame buffer keeps already-large fragments independent | internal: Elixir's fragment buffer |
+| 1622 | accepts a complete maximum-size frame coalesced with continuation bytes | covered: fsnp::frame::refuses_bad_magic_version_and_oversized_bodies (the limit is accepted) |
+| 1642 | rejects an oversized coalesced read even when its first frame is complete | internal: Elixir's fragment buffer |
+| 1657 | rejects a declared frame larger than the current buffer budget at its header | covered: fsnp::frame::refuses_bad_magic_version_and_oversized_bodies |
+| 1666 | unauthenticated connections apply the smaller frame budget | surface: AUTH |
+| 1689 | unauthenticated chunk streams cannot exceed the logical frame budget | surface: AUTH |
+| 1729 | unauthenticated compressed frames cannot inflate past the logical frame budget | surface: AUTH |
+| 1779 | accepts a multi-megabyte frame sent as 64 KiB socket chunks | ported: session::connection_guards::a_large_frame_sent_in_pieces_is_read_whole |
+| 1792 | closes a one-byte fragment batch when metadata exhausts inbound budget | internal: Elixir's fragment metadata budget |
+| 1841 | tiny received fragments exhaust metadata admission before the raw payload budget | internal: Elixir's fragment metadata budget |
+| 1890 | decoded requests remain charged to the inbound byte budget while queued in a lane | covered: session::backpressure::a_connection_at_its_in_flight_limit_reads_nothing_more_until_a_reply_leaves |
+| 1927 | validates configured frame bodies against the wire buffer limit | internal: Elixir's configurable frame limits; the node's are constants |
+| 1951 | outbound responses never exceed the connection frame limit | covered: fsnp::frame::a_reply_longer_than_a_frame_is_refused_whole |
+| 1980 | compact MGET responses use the connection frame limit when chunking is disabled | surface: MGET |
+| 2013 | large response encoders run on dirty CPU schedulers | internal: BEAM dirty schedulers |
 
 ## `ferricstore_server/test/ferricstore_server/native/connection_idle_lane_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 30 | a connection frees its idle lanes when the server's lane budget is full | open |
-| 44 | lanes idle past the idle period stop and start again on their next frame | open |
-| 56 | a lane with a request in flight is not stopped as idle | open |
+| 30 | a connection frees its idle lanes when the server's lane budget is full | internal: the node keeps no lane processes to stop |
+| 44 | lanes idle past the idle period stop and start again on their next frame | internal: the node keeps no lane processes to stop |
+| 56 | a lane with a request in flight is not stopped as idle | internal: the node keeps no lane processes to stop |
 
 ## `ferricstore_server/test/ferricstore_server/native/flow_query_documentation_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 29 | every runnable FQL example parses identically and accepts typed bindings | open |
-| 57 | the field reference tracks every supported built-in field | open |
-| 70 | the index reference tracks the bundled catalog | open |
-| 79 | the execution-limit reference tracks the immutable default budget | open |
-| 88 | the guide contains the complete user and operator reference | open |
-| 120 | the guide covers every public entry point and versioned response contract | open |
-| 146 | the native protocol documents the complete compact query result schema | open |
-| 168 | the troubleshooting table covers every structured query error | open |
+| 29 | every runnable FQL example parses identically and accepts typed bindings | internal: Elixir's FQL guide and its examples; the node's FQL reference cases are ported (query/fql/reference_tests.rs) |
+| 57 | the field reference tracks every supported built-in field | internal: Elixir's FQL guide and its examples; the node's FQL reference cases are ported (query/fql/reference_tests.rs) |
+| 70 | the index reference tracks the bundled catalog | internal: Elixir's FQL guide and its examples; the node's FQL reference cases are ported (query/fql/reference_tests.rs) |
+| 79 | the execution-limit reference tracks the immutable default budget | internal: Elixir's FQL guide and its examples; the node's FQL reference cases are ported (query/fql/reference_tests.rs) |
+| 88 | the guide contains the complete user and operator reference | internal: Elixir's FQL guide and its examples; the node's FQL reference cases are ported (query/fql/reference_tests.rs) |
+| 120 | the guide covers every public entry point and versioned response contract | internal: Elixir's FQL guide and its examples; the node's FQL reference cases are ported (query/fql/reference_tests.rs) |
+| 146 | the native protocol documents the complete compact query result schema | internal: Elixir's FQL guide and its examples; the node's FQL reference cases are ported (query/fql/reference_tests.rs) |
+| 168 | the troubleshooting table covers every structured query error | internal: Elixir's FQL guide and its examples; the node's FQL reference cases are ported (query/fql/reference_tests.rs) |
 
 ## `ferricstore_server/test/ferricstore_server/native/flow_query_result_codec_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 12 | explicitly selected FLOW.QUERY responses use the fixed-schema result codec | open |
-| 27 | COMMAND_EXEC gets the same compact query result contract | open |
-| 41 | forwards a prepared bounded query payload without re-encoding its value | open |
-| 55 | fails closed instead of framing a corrupted prepared payload | open |
-| 74 | unwraps a prepared response when compact negotiation is unavailable | open |
-| 89 | the broad compact flag cannot opt a client into an undeclared query codec | open |
-| 134 | response byte limits use the selected compact representation | open |
-| 167 | compact query results retain custom framing across bounded chunks | open |
-| 190 | compact query results compose with negotiated response compression | open |
+| 12 | explicitly selected FLOW.QUERY responses use the fixed-schema result codec | surface: the compact query result codec (flow_query_result_v1) is not offered |
+| 27 | COMMAND_EXEC gets the same compact query result contract | surface: the compact query result codec (flow_query_result_v1) is not offered |
+| 41 | forwards a prepared bounded query payload without re-encoding its value | surface: the compact query result codec (flow_query_result_v1) is not offered |
+| 55 | fails closed instead of framing a corrupted prepared payload | surface: the compact query result codec (flow_query_result_v1) is not offered |
+| 74 | unwraps a prepared response when compact negotiation is unavailable | surface: the compact query result codec (flow_query_result_v1) is not offered |
+| 89 | the broad compact flag cannot opt a client into an undeclared query codec | covered: session::negotiation::a_malformed_codec_request_is_a_bad_request_that_keeps_the_earlier_choice (a known codec the node does not write is never selected) |
+| 134 | response byte limits use the selected compact representation | surface: the compact query result codec (flow_query_result_v1) is not offered |
+| 167 | compact query results retain custom framing across bounded chunks | surface: the compact query result codec (flow_query_result_v1) is not offered |
+| 190 | compact query results compose with negotiated response compression | surface: the compact query result codec (flow_query_result_v1) is not offered |
 
 ## `ferricstore_server/test/ferricstore_server/native/fql_parser_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 44 | Rust parser matches the Elixir reference parser | open |
-| 51 | Rust parser matches bounded reference failures | open |
-| 83 | Rust parser matches the oracle across deterministic byte mutations | open |
-| 95 | Rust parser matches generated valid grammar combinations | open |
-| 134 | Rust parser matches the oracle at exact byte and token limits | open |
-| 157 | Rust parser enforces the canonical predicate and IN value limits | open |
-| 181 | Rust parser matches the oracle for every truncation of a valid query | open |
-| 192 | Rust parser matches the oracle for seeded arbitrary binary input | open |
-| 207 | diagnostic parsing positions malformed sources, fields, lists, and terminators | open |
-| 250 | diagnostic positions do not leak across failures or successful parses | open |
-| 264 | diagnostics preserve bracket fields and report a missing tail at end of input | open |
-| 278 | every truncated query diagnostic stays inside its source boundary | open |
+| 44 | Rust parser matches the Elixir reference parser | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 51 | Rust parser matches bounded reference failures | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 83 | Rust parser matches the oracle across deterministic byte mutations | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 95 | Rust parser matches generated valid grammar combinations | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 134 | Rust parser matches the oracle at exact byte and token limits | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 157 | Rust parser enforces the canonical predicate and IN value limits | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 181 | Rust parser matches the oracle for every truncation of a valid query | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 192 | Rust parser matches the oracle for seeded arbitrary binary input | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 207 | diagnostic parsing positions malformed sources, fields, lists, and terminators | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 250 | diagnostic positions do not leak across failures or successful parses | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 264 | diagnostics preserve bracket fields and report a missing tail at end of input | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
+| 278 | every truncated query diagnostic stays inside its source boundary | covered: the node's FQL parser is the Elixir NIF parser ported (535069d); query/fql/reference_tests.rs, query/error_tests.rs and query/fql/tests.rs hold its cases |
 
 ## `ferricstore_server/test/ferricstore_server/native/lane_barrier_review_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 31 | a control frame does not wait for a blocking command on a lane with an actor | open |
-| 49 | a blocking response cannot overtake an earlier session response on its lane | open |
-| 68 | a barrier does not read the socket while decode backpressure paused input | open |
-| 104 | a control barrier across lanes is bounded by one barrier timeout | open |
-| 122 | a control frame skips barrier round trips for idle lanes | open |
-| 142 | an ACL invalidation during a barrier still emits AUTH_INVALIDATED | open |
-| 170 | a blocking command behind a busy lane does not stall another lane | open |
-| 191 | a deferred blocking command keeps lane order around it | open |
-| 209 | MULTI/EXEC behind a slow command still executes in lane order | open |
-| 227 | a lane busy rejection stays ordered without stalling other lanes | open |
-| 264 | pipelined frames on a busy lane classify each command once | open |
-| 282 | a barrier stops reading once a complete frame is buffered | open |
-| 311 | heartbeat and flow-control frames answer while a data lane is busy | open |
-| 334 | deferred lanes are not rescanned for unrelated traffic | open |
-| 361 | a MULTI behind a busy lane still captures later frames from other lanes | open |
-| 379 | EXEC answers counter commands with their integers | open |
-| 394 | a WATCH behind a busy lane still sees later writes from other lanes | open |
-| 420 | a command rejected while MULTI is queuing makes EXEC discard the transaction | open |
-| 440 | MULTI is refused while a blocking command is pending on the connection | open |
-| 467 | a transaction command behind a blocked lane gets an ordered error | open |
-| 488 | a queued command that would be parked aborts the transaction | open |
-| 517 | the barrier timeout is fixed when the connection starts | open |
-| 531 | per-frame dispatch cost does not grow with blocked requests on other lanes | open |
-| 569 | pubsub messages are delivered while a barrier waits | open |
-| 592 | pubsub during a barrier stops at an ACL invalidation in arrival order | open |
+| 31 | a control frame does not wait for a blocking command on a lane with an actor | ported: session::lanes::a_slow_command_holds_only_its_own_lane |
+| 49 | a blocking response cannot overtake an earlier session response on its lane | covered: session::lanes::a_session_frame_on_a_data_lane_answers_in_its_place |
+| 68 | a barrier does not read the socket while decode backpressure paused input | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 104 | a control barrier across lanes is bounded by one barrier timeout | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 122 | a control frame skips barrier round trips for idle lanes | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 142 | an ACL invalidation during a barrier still emits AUTH_INVALIDATED | surface: ACL |
+| 170 | a blocking command behind a busy lane does not stall another lane | ported: session::lanes::a_slow_command_holds_only_its_own_lane |
+| 191 | a deferred blocking command keeps lane order around it | ported: session::lanes::a_slow_command_holds_only_its_own_lane |
+| 209 | MULTI/EXEC behind a slow command still executes in lane order | surface: MULTI/EXEC |
+| 227 | a lane busy rejection stays ordered without stalling other lanes | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 264 | pipelined frames on a busy lane classify each command once | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 282 | a barrier stops reading once a complete frame is buffered | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 311 | heartbeat and flow-control frames answer while a data lane is busy | ported: session::lanes::a_slow_command_holds_only_its_own_lane |
+| 334 | deferred lanes are not rescanned for unrelated traffic | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 361 | a MULTI behind a busy lane still captures later frames from other lanes | surface: MULTI |
+| 379 | EXEC answers counter commands with their integers | surface: EXEC |
+| 394 | a WATCH behind a busy lane still sees later writes from other lanes | surface: WATCH |
+| 420 | a command rejected while MULTI is queuing makes EXEC discard the transaction | surface: MULTI |
+| 440 | MULTI is refused while a blocking command is pending on the connection | surface: MULTI |
+| 467 | a transaction command behind a blocked lane gets an ordered error | surface: MULTI |
+| 488 | a queued command that would be parked aborts the transaction | surface: MULTI |
+| 517 | the barrier timeout is fixed when the connection starts | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 531 | per-frame dispatch cost does not grow with blocked requests on other lanes | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 569 | pubsub messages are delivered while a barrier waits | surface: PubSub |
+| 592 | pubsub during a barrier stops at an ACL invalidation in arrival order | surface: PubSub and ACL |
 
 ## `ferricstore_server/test/ferricstore_server/native/lane_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 83 | prepared fast batches never retry an applied mutation after encoding fails | open |
-| 101 | lane workers share server-wide lane capacity | open |
-| 122 | lane reports resource governor failure instead of polling forever | open |
-| 143 | fetch waiters do not starve their completion at the global execution limit | open |
-| 199 | already batched SET frames execute immediately without coalescing delay | open |
-| 223 | coalesces ordinary COMMAND_EXEC XADD frames into one Raft entry | open |
-| 265 | coalesced COMMAND_EXEC XADD preserves ordering and per-command errors | open |
-| 294 | large COMMAND_EXEC Stream ranges encode correctly through the lane | open |
-| 330 | trimmed COMMAND_EXEC XADD frames stay on the sequential correctness path | open |
-| 361 | COMMAND_EXEC XADD burst coalescing cannot bypass resource governance | open |
-| 387 | NO_REPLY lane commands execute without encoding a response | open |
-| 418 | lane responses retain exact outbound capacity until the owner releases them | open |
-| 447 | lane response overflow emits a bounded close signal instead of the response | open |
-| 471 | batched GET and SET frames cannot bypass reserved-key authorization | open |
-| 506 | batched GET and MGET reject oversized cold values before materializing them | open |
-| 540 | batched SET frames honor resource checks and activity accounting | open |
-| 563 | one-frame SET messages retain mailbox order | open |
-| 578 | coalesces compact pipeline SET frames into one lane batch | open |
-| 593 | coalesces compact Stream producer frames and preserves response boundaries | open |
-| 646 | coalesces compact Stream producer frames once per destination shard | open |
-| 699 | compact pipeline fast paths cannot bypass resource governance | open |
-| 729 | compact pipeline fast paths cannot write reserved keys | open |
-| 758 | one-frame compact pipeline SET messages retain mailbox order | open |
-| 773 | coalesces compact pipeline data write frames into one lane batch | open |
-| 798 | one-frame compact data writes retain mailbox order | open |
-| 822 | command state updates are ordering barriers for batchable frames | open |
-| 846 | preserves order between compact data write and following read frames | open |
-| 861 | preserves order between SET and following GET frames | open |
+| 83 | prepared fast batches never retry an applied mutation after encoding fails | surface: compact KV batches |
+| 101 | lane workers share server-wide lane capacity | internal: Elixir's lane worker processes and barriers; node lanes are reply order counters |
+| 122 | lane reports resource governor failure instead of polling forever | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 143 | fetch waiters do not starve their completion at the global execution limit | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 199 | already batched SET frames execute immediately without coalescing delay | surface: KV, Stream or compact pipeline write coalescing |
+| 223 | coalesces ordinary COMMAND_EXEC XADD frames into one Raft entry | surface: KV, Stream or compact pipeline write coalescing |
+| 265 | coalesced COMMAND_EXEC XADD preserves ordering and per-command errors | surface: KV, Stream or compact pipeline write coalescing |
+| 294 | large COMMAND_EXEC Stream ranges encode correctly through the lane | surface: KV, Stream or compact pipeline write coalescing |
+| 330 | trimmed COMMAND_EXEC XADD frames stay on the sequential correctness path | surface: KV, Stream or compact pipeline write coalescing |
+| 361 | COMMAND_EXEC XADD burst coalescing cannot bypass resource governance | surface: KV, Stream or compact pipeline write coalescing |
+| 387 | NO_REPLY lane commands execute without encoding a response | ported: session::no_reply::no_reply_commands_run_without_answering |
+| 418 | lane responses retain exact outbound capacity until the owner releases them | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 447 | lane response overflow emits a bounded close signal instead of the response | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 471 | batched GET and SET frames cannot bypass reserved-key authorization | surface: KV, Stream or compact pipeline write coalescing |
+| 506 | batched GET and MGET reject oversized cold values before materializing them | surface: KV, Stream or compact pipeline write coalescing |
+| 540 | batched SET frames honor resource checks and activity accounting | surface: KV, Stream or compact pipeline write coalescing |
+| 563 | one-frame SET messages retain mailbox order | surface: KV, Stream or compact pipeline write coalescing |
+| 578 | coalesces compact pipeline SET frames into one lane batch | surface: KV, Stream or compact pipeline write coalescing |
+| 593 | coalesces compact Stream producer frames and preserves response boundaries | surface: KV, Stream or compact pipeline write coalescing |
+| 646 | coalesces compact Stream producer frames once per destination shard | surface: KV, Stream or compact pipeline write coalescing |
+| 699 | compact pipeline fast paths cannot bypass resource governance | surface: KV, Stream or compact pipeline write coalescing |
+| 729 | compact pipeline fast paths cannot write reserved keys | surface: KV, Stream or compact pipeline write coalescing |
+| 758 | one-frame compact pipeline SET messages retain mailbox order | surface: KV, Stream or compact pipeline write coalescing |
+| 773 | coalesces compact pipeline data write frames into one lane batch | surface: KV, Stream or compact pipeline write coalescing |
+| 798 | one-frame compact data writes retain mailbox order | surface: KV, Stream or compact pipeline write coalescing |
+| 822 | command state updates are ordering barriers for batchable frames | covered: same-shard commands enter their shard's queue in arrival order (session::queue::replies_on_one_lane_keep_request_order); the rest is KV |
+| 846 | preserves order between compact data write and following read frames | surface: KV |
+| 861 | preserves order between SET and following GET frames | surface: KV |
 
 ## `ferricstore_server/test/ferricstore_server/native/listener_backpressure_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 6 | TCP listener bounds stalled sends | open |
-| 15 | native connection always uses one-shot socket activation | open |
+| 6 | TCP listener bounds stalled sends | covered: session::backpressure::a_connection_at_its_in_flight_limit_reads_nothing_more_until_a_reply_leaves (a reply not written holds its permits) |
+| 15 | native connection always uses one-shot socket activation | internal: Ranch socket activation |
 
 ## `ferricstore_server/test/ferricstore_server/native/outbound_budget_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 6 | reserves local and global bytes atomically and releases both | open |
-| 31 | rejects a per-connection overflow without consuming global capacity | open |
-| 48 | growing a lease reserves only the encoded delta and rolls back rejection | open |
-| 74 | bulk release clears every local and global lease | open |
+| 6 | reserves local and global bytes atomically and releases both | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 31 | rejects a per-connection overflow without consuming global capacity | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 48 | growing a lease reserves only the encoded delta and rolls back rejection | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 74 | bulk release clears every local and global lease | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
 
 ## `ferricstore_server/test/ferricstore_server/native/protocol_audit_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 24 | deleted text protocol runtime modules are not loadable | open |
-| 30 | application config enables the native protocol listener by default | open |
-| 34 | Ranch listener capacity matches the configured global maxclients gate | open |
-| 39 | application and test source do not reference deleted text protocol modules | open |
+| 24 | deleted text protocol runtime modules are not loadable | internal: Elixir's deleted text protocol modules |
+| 30 | application config enables the native protocol listener by default | internal: Elixir application config |
+| 34 | Ranch listener capacity matches the configured global maxclients gate | fixed G67 (session::connection_guards::the_listener_takes_no_connection_past_its_limit_until_one_closes) |
+| 39 | application and test source do not reference deleted text protocol modules | internal: Elixir's deleted text protocol modules |
 
 ## `ferricstore_server/test/ferricstore_server/native/read_error_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 30 | GET sanitizes storage read failures | open |
-| 35 | MGET sanitizes storage read failures | open |
+| 30 | GET sanitizes storage read failures | surface: GET and MGET |
+| 35 | MGET sanitizes storage read failures | surface: GET and MGET |
 
 ## `ferricstore_server/test/ferricstore_server/native/request_context_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 19 | normalizes configured trusted native users once at connection setup | open |
-| 31 | normalizes only bounded authority for a trusted connection | open |
-| 63 | accepts exact authority limits and rejects the next byte or scope | open |
-| 90 | rejects malformed or conflicting trusted authority instead of dropping it | open |
+| 19 | normalizes configured trusted native users once at connection setup | surface: trusted users and ACL request context |
+| 31 | normalizes only bounded authority for a trusted connection | surface: trusted users and ACL request context |
+| 63 | accepts exact authority limits and rejects the next byte or scope | surface: trusted users and ACL request context |
+| 90 | rejects malformed or conflicting trusted authority instead of dropping it | surface: trusted users and ACL request context |
 
 ## `ferricstore_server/test/ferricstore_server/native/resource_budget_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 6 | enforces limits across owners and reclaims every lease when an owner exits | open |
-| 37 | indexes leases and waiters by owner for bounded process-down cleanup | open |
-| 109 | resizing a byte lease is atomic and cannot cross the global ceiling | open |
-| 127 | scoped leases enforce limits and release exactly once | open |
-| 164 | scoped leases cannot be released by another process | open |
-| 176 | scoped leases are reclaimed when their owner exits | open |
-| 202 | a saturated scoped acquire reclaims a dead owner before returning busy | open |
-| 228 | monitored owner death reclaims all its scoped resources and preserves other owners | open |
-| 261 | scoped lease accounting does not use the coordinator mailbox after caller registration | open |
-| 284 | stale registry handles are rejected after the coordinator is killed | open |
-| 303 | non-waiting accounting does not block on the coordinator mailbox | open |
-| 344 | inbound buffers share one byte ceiling across connections | open |
-| 373 | waiters are admitted when release creates capacity without polling | open |
-| 406 | dead waiters cannot leave an unbounded saturated FIFO | open |
-| 431 | parallel fast-path acquisitions never oversubscribe the configured limit | open |
-| 477 | killed scoped accounting cannot strand capacity or erase a live owner's charge | open |
-| 501 | reclaim repairs a killed accounting worker whose DOWN is still queued | open |
-| 529 | killed transferable lease accounting cannot strand byte reservations | open |
-| 564 | idle accounting sweeps do not scan registered inactive callers | open |
+| 6 | enforces limits across owners and reclaims every lease when an owner exits | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 37 | indexes leases and waiters by owner for bounded process-down cleanup | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 109 | resizing a byte lease is atomic and cannot cross the global ceiling | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 127 | scoped leases enforce limits and release exactly once | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 164 | scoped leases cannot be released by another process | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 176 | scoped leases are reclaimed when their owner exits | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 202 | a saturated scoped acquire reclaims a dead owner before returning busy | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 228 | monitored owner death reclaims all its scoped resources and preserves other owners | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 261 | scoped lease accounting does not use the coordinator mailbox after caller registration | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 284 | stale registry handles are rejected after the coordinator is killed | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 303 | non-waiting accounting does not block on the coordinator mailbox | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 344 | inbound buffers share one byte ceiling across connections | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 373 | waiters are admitted when release creates capacity without polling | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 406 | dead waiters cannot leave an unbounded saturated FIFO | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 431 | parallel fast-path acquisitions never oversubscribe the configured limit | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 477 | killed scoped accounting cannot strand capacity or erase a live owner's charge | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 501 | reclaim repairs a killed accounting worker whose DOWN is still queued | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 529 | killed transferable lease accounting cannot strand byte reservations | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
+| 564 | idle accounting sweeps do not scan registered inactive callers | internal: Elixir's resource governor processes; the node bounds each connection with permits (ADR-017) |
 
 ## `ferricstore_server/test/ferricstore_server/native/route_metadata_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 6 | local endpoint uses explicit advertised host | open |
-| 17 | remote fallback endpoint does not reuse local advertised host | open |
-| 31 | unknown leader metadata is explicit and does not advertise local endpoint as leader | open |
+| 6 | local endpoint uses explicit advertised host | covered: session::handshake::hello_declares_the_fields_the_sdk_requires (route host) |
+| 17 | remote fallback endpoint does not reuse local advertised host | covered: session::topology::a_group_member_names_its_group_s_leader |
+| 31 | unknown leader metadata is explicit and does not advertise local endpoint as leader | covered: session::topology::a_member_that_does_not_lead_answers_reroute |
 
 ## `ferricstore_server/test/ferricstore_server/native/session_current_contract_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 7 | native sessions expose only the prepared-command parser | open |
-| 14 | prepared-command parsing rejects structured argument values without raising | open |
+| 7 | native sessions expose only the prepared-command parser | internal: Elixir's prepared-command parser |
+| 14 | prepared-command parsing rejects structured argument values without raising | internal: Elixir's prepared-command parser |
 
 ## `ferricstore_server/test/ferricstore_server/native/session_retained_budget_test.exs`
 
 | Line | Test | Status |
 |---:|---|---|
-| 8 | MULTI queues enforce one global retained-byte ceiling across sessions | open |
-| 43 | WATCH and MULTI share a lease that shrinks and releases with session state | open |
-| 79 | WATCH rejects global exhaustion before submitting a Raft command | open |
+| 8 | MULTI queues enforce one global retained-byte ceiling across sessions | surface: MULTI and WATCH |
+| 43 | WATCH and MULTI share a lease that shrinks and releases with session state | surface: MULTI and WATCH |
+| 79 | WATCH rejects global exhaustion before submitting a Raft command | surface: MULTI and WATCH |

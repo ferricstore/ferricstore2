@@ -204,8 +204,9 @@ pub fn parse_with_clock(
         return super::query::indexes::parse(&args)
             .map(|request| Parsed::Command(FlowCommand::QueryIndexes(request)));
     }
+    // Elixir answers an unknown command as a bad request (audit gap G72).
     let Some(form) = FORMS.iter().find(|form| form.name == name) else {
-        return Err(FlowError::rejected(format!(
+        return Err(FlowError::BadRequest(format!(
             "ERR unknown command '{}', with args beginning with: ",
             name.to_ascii_lowercase()
         )));

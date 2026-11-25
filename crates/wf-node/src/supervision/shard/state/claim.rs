@@ -108,12 +108,25 @@ impl ShardState {
         (limit, credits): (usize, Option<&CreditPool>),
         partitions: Option<&[Partition]>,
     ) -> Taken {
-        let now = request.now_ms.unwrap_or(now);
+        // A Flow timed out here starts its retention no earlier than the
+        // node's own clock (audit gaps G40, G75).
+        let wall = now;
+        let now = request.now_ms.unwrap_or(wall);
         let mut taken = Taken::default();
+        if !request.running_only() {
+            self.time_out_followers((wall, now), request, partitions, &mut taken);
+        }
         let mut step = |state: &mut Self, mode: Mode, wanted: usize| {
             let room = limit.saturating_sub(taken.claimed.len()).min(wanted);
             if room > 0 {
-                state.take(now, (request, credits), mode, room, partitions, &mut taken);
+                state.take(
+                    (wall, now),
+                    (request, credits),
+                    mode,
+                    room,
+                    partitions,
+                    &mut taken,
+                );
             }
         };
         if request.running_only() {
@@ -197,7 +210,7 @@ impl ShardState {
     /// G21), and the next matching Flow is claimed in its place.
     fn take(
         &mut self,
-        now: u64,
+        (wall, now): (u64, u64),
         claim: (&ClaimFlows, Option<&CreditPool>),
         mode: Mode,
         limit: usize,
@@ -207,7 +220,7 @@ impl ShardState {
         let mut wanted = limit;
         loop {
             let before = taken.claimed.len();
-            let timed_out = self.take_once(now, claim, mode, wanted, partitions, taken);
+            let timed_out = self.take_once((wall, now), claim, mode, wanted, partitions, taken);
             let got = taken.claimed.len().saturating_sub(before);
             if timed_out == 0 || got >= wanted {
                 return;
@@ -216,10 +229,34 @@ impl ShardState {
         }
     }
 
+    /// Fails the Flows waiting behind the heads of the request's FIFO lanes
+    /// that passed their active-time limit, as Elixir's claim scan does
+    /// while a head holds its lane (audit gap G75).
+    fn time_out_followers(
+        &mut self,
+        (wall, now): (u64, u64),
+        request: &ClaimFlows,
+        partitions: Option<&[Partition]>,
+        taken: &mut Taken,
+    ) {
+        if !self.any_overdue(now) {
+            return;
+        }
+        let followers: Vec<Key> = self
+            .matching(request, Mode::Due)
+            .filter(|(queue, _)| self.fifo(&queue.flow_type, &queue.state))
+            .flat_map(|(queue, _)| self.lane_followers(queue, request, partitions))
+            .filter(|key| self.overdue(key, now))
+            .collect();
+        for key in followers {
+            taken.logged.extend(self.time_out_one(wall, now, &key));
+        }
+    }
+
     /// One pass of [`Self::take`]; how many candidates it timed out.
     fn take_once(
         &mut self,
-        now: u64,
+        (wall, now): (u64, u64),
         (request, credits): (&ClaimFlows, Option<&CreditPool>),
         mode: Mode,
         limit: usize,
@@ -231,7 +268,7 @@ impl ShardState {
             self.candidates(now, request, mode, limit, partitions)
         {
             if self.overdue(&key, now) {
-                let change = self.time_out_one(now, now, &key);
+                let change = self.time_out_one(wall, now, &key);
                 timed_out = timed_out.saturating_add(usize::from(change.is_some()));
                 taken.logged.extend(change);
                 continue;

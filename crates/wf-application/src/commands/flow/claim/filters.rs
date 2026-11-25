@@ -19,11 +19,17 @@ pub(super) fn states(opts: &Opts<'_>) -> Result<Vec<Vec<u8>>, FlowError> {
         Term::List(items) => items.as_slice(),
         single => std::slice::from_ref(single),
     };
-    // `any`, alone, is every state, as Elixir reads it (audit gap G20).
-    if let [Term::Bin(name)] = list
-        && name.eq_ignore_ascii_case(b"any")
-    {
-        return Ok(Vec::new());
+    // `any` is every state, as Elixir reads it (audit gap G20), and cannot
+    // be named with other states (G68).
+    let any = |state: &Term| matches!(state, Term::Bin(name) if name.eq_ignore_ascii_case(b"any"));
+    if list.iter().any(any) {
+        return if list.iter().all(any) {
+            Ok(Vec::new())
+        } else {
+            Err(FlowError::rejected(
+                "ERR flow STATE ANY cannot be mixed with explicit states".to_owned(),
+            ))
+        };
     }
     let mut states = Vec::new();
     for state in list {
