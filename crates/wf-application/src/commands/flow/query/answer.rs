@@ -9,9 +9,9 @@ use std::fmt::Write as _;
 use sha2::{Digest, Sha256};
 
 use super::super::term::{Term, map};
-use super::Query;
 use super::field::Field;
 use super::fql::{Direction, Mode, Predicate, Shape, Source};
+use super::{Query, walk};
 
 const RESULT_CONTRACT: &str = "ferric.flow.query.result/v1";
 const EXPLAIN_CONTRACT: &str = "ferric.flow.explain/v1";
@@ -167,6 +167,18 @@ fn constrained(predicate: &Predicate) -> bool {
     )
 }
 
+/// How the rows come in order: `none` for one row or a count, `native`
+/// when they are read in order (history; a catalog walk), else
+/// `bounded_top_k`, the candidates' least by sort key.
+fn order(query: &Query) -> &'static str {
+    match (query.shape, query.source) {
+        (Shape::Point | Shape::Count, _) => "none",
+        (_, Source::Events) => "native",
+        _ if walk::native(query).is_some() => "native",
+        _ => "bounded_top_k",
+    }
+}
+
 fn plan(query: &Query) -> Term {
     let dimension = |predicate: &Predicate| {
         map(vec![
@@ -211,14 +223,7 @@ fn plan(query: &Query) -> Term {
             )]),
         ),
         ("limit", Term::optional_int(query.limit.map(count_of))),
-        (
-            "order",
-            Term::text(if query.order_by.is_empty() {
-                "none"
-            } else {
-                "sort"
-            }),
-        ),
+        ("order", Term::text(order(query))),
         ("path", Term::text(path(query))),
         ("range_count", Term::Int(1)),
         ("record_source", Term::text("catalog")),

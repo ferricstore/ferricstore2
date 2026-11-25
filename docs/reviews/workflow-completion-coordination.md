@@ -67763,3 +67763,59 @@ timeout now runs once per claim that is not reclaim-only. The last round
 mutants: `room > 0` -> `>=` before a claim step (a step with no room takes
 nothing), the read-ahead capacity `64 * 1024` (a capacity hint), and
 `run` -> `Ok(())` in the binary, which no test starts.
+
+### SDK suites after G63-G77; native order for update-time queries (G78) (25 Nov)
+
+The five SDK live suites (Python 8878c47, Go 2826c33, Java e102772, TS
+7cba5ae, Elixir 484a7a1) against the node at 8d1a313: Python 42/60, Go
+36/46, Java 22/37, TS 24/42, Elixir 17/32, the same failing tests as
+before the rest-of-suite audit. G63-G77 moved one test without passing
+it: the Elixir management test now gets past `FERRICSTORE.CAPABILITIES`
+(G73) and stops at `telemetry: true`, which this node does not serve.
+Every failure left is a surface the node does not serve (KV, Pub/Sub,
+streams, ACL and AUTH, transactions, the `COMMAND` catalog, the full
+`OPTIONS` opcode table, telemetry) except one:
+- G78: the TS and Elixir query tests expect `EXPLAIN` to name `order:
+  native` for `partition_key = @p AND type = @t AND state = @s ORDER BY
+  updated_at_ms DESC`. The node said `sort` (a word outside the explain
+  contract's `none`, `native`, `bounded_top_k`) and meant it: every page
+  built a row for each Flow of the partition's type and state, then
+  sorted them all. A LIMIT 2 page over 100,000 Flows took 155 ms on the
+  shard thread (Elixir 0.7 ms), and paging through them was quadratic.
+  A collection whose order is update time alone, once the fields its
+  equalities fix are dropped (Elixir's `order_mode/3`), now walks the
+  catalog's sets in that order (`query::walk`): sets of several types or
+  states merge by update time, each update time's rows are sorted by the
+  SHA-256 of the id (the key, order and cursors of the sort path are
+  unchanged, and Elixir's index entries end in the same digest), and the
+  walk stops once the page has one row past its limit. A cursor seeks to
+  its row's update time, decoded from the sort key. The same page now
+  takes 0.85 ms at 1,000 or 100,000 Flows. Any other order keeps a
+  bounded top-k (`select_nth_unstable` of limit + 1, then a sort of those)
+  and is named `bounded_top_k`; history reads are `native`, points and
+  counts `none`. Range and time-window predicates on `updated_at_ms` are
+  checked per row, not seeked.
+
+With G78 the suites are Python 42/60, Go 36/46, Java 22/37, TS 25/42 and
+Elixir 18/32, no test newly failing.
+
+RED: `flow_query_order::{explain_names_the_order_a_query_runs_in,
+a_page_in_update_order_reads_only_the_rows_it_returns}` failed (`sort`
+for `native`; 200 rows scanned for a page of 2).
+`pages_in_update_order_keep_the_sorted_order_across_ties` pins the walk
+to the expected order and to the top-k path: pages of 3, 4 and 100
+across ties of four, merged states and types, a residual predicate and a
+fixed order field.
+
+cargo-mutants on the source diff (tests: queue_node, wf-api-tcp,
+wf-application): 78 mutants, 55 caught, 11 unviable, 4 timeouts (the
+walk loops for ever when `next_time` or `taken` never advance) and 8
+missed. Tests now read a page's `residual_checks`, an `IN` of one value
+on an order field (native) beside one of two values and one on another
+field (top-k), and a second page whose cursor key puts an absent
+`max_active_ms` before the update time. `native` dropped its source
+check (a collection always reads runs; history is its own shape), and
+the descending seek lost its `time < u64::MAX` guard, which a cursor's
+update time, decoded through `i64`, always met. The second round over
+`checks`, `native`, `fixed`, `update_time` and `ordered`: 27 mutants, 25
+caught, 2 unviable, none missed.

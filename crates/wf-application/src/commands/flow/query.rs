@@ -29,6 +29,7 @@ mod tests;
 mod text_tests;
 #[cfg(test)]
 mod validation_tests;
+pub mod walk;
 
 pub use error::{Failure, Position, Reason};
 

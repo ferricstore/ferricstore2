@@ -38,6 +38,7 @@ mod flow_payload;
 mod flow_policy;
 mod flow_policy_governance;
 mod flow_query;
+mod flow_query_order;
 mod flow_record;
 mod flow_rewind;
 mod flow_schedule;

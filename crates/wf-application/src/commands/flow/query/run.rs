@@ -4,7 +4,8 @@
 //! values does; a nil field only matches `IS NULL`, an absent one only `IS
 //! MISSING`), rows sort by their order fields with nulls and absent values
 //! last and ties broken by the SHA-256 of the id, and a page resumes after
-//! the cursor's sort key.
+//! the cursor's sort key. A page is the bounded top-k of the candidates by
+//! that key, unless [`super::walk`] answers it in the catalog's order.
 
 use std::cmp::Ordering;
 
@@ -172,7 +173,7 @@ fn component(value: Option<&Term>, direction: Direction, out: &mut Vec<u8>) {
 }
 
 /// A row's sort key: its order components, then the SHA-256 of its id.
-fn sort_key(row: &Term, order_by: &[(Field, Direction)]) -> Vec<u8> {
+pub(super) fn sort_key(row: &Term, order_by: &[(Field, Direction)]) -> Vec<u8> {
     let mut key = Vec::with_capacity(48);
     for (field, direction) in order_by {
         component(fetch(row, field), *direction, &mut key);
@@ -244,41 +245,77 @@ pub struct Runs {
 /// An invalid or expired cursor.
 pub fn runs(query: &Query, input: Runs) -> Result<Term, Failure> {
     let scanned = input.rows.len();
-    let after = match &query.cursor {
-        Some(token) => Some(
-            cursor::open(&input.key, &query.digest, input.now_ms, token).map_err(Failure::new)?,
-        ),
-        None => None,
-    };
-    let predicate_count = query.predicates.len();
+    let after = opened(query, &input.key, input.now_ms)?;
     let matching: Vec<Term> = input
         .rows
         .into_iter()
-        .filter(|row| {
-            query
-                .predicates
-                .iter()
-                .all(|predicate| matches(row, predicate))
-        })
+        .filter(|row| satisfies(query, row))
         .collect();
-    let checks = scanned.saturating_mul(predicate_count.min(12));
     if query.shape == Shape::Count {
-        let usage = answer::Usage::new(scanned.max(1), 1, checks);
+        let usage = answer::Usage::new(scanned.max(1), 1, checks(query, scanned));
         return Ok(answer::count(query, matching.len(), &usage));
     }
-    let mut keyed: Vec<(Vec<u8>, Term)> = matching
+    let mut keyed: Vec<Keyed> = matching
         .into_iter()
         .map(|row| (sort_key(&row, &query.order_by), row))
         .filter(|(key, _)| after.as_ref().is_none_or(|after| key > after))
         .collect();
+    top(&mut keyed, query.limit.unwrap_or(1).saturating_add(1));
+    Ok(page(query, keyed, (&input.key, input.now_ms), scanned))
+}
+
+/// A candidate row and its sort key.
+pub(super) type Keyed = (Vec<u8>, Term);
+
+/// Whether `row` satisfies every predicate of `query`.
+pub(super) fn satisfies(query: &Query, row: &Term) -> bool {
+    query
+        .predicates
+        .iter()
+        .all(|predicate| matches(row, predicate))
+}
+
+/// The sort key a page of `query` resumes after, from its cursor.
+pub(super) fn opened(query: &Query, key: &Key, now_ms: u64) -> Result<Option<Vec<u8>>, Failure> {
+    query
+        .cursor
+        .as_ref()
+        .map(|token| cursor::open(key, &query.digest, now_ms, token).map_err(Failure::new))
+        .transpose()
+}
+
+/// Predicate tests over `scanned` rows, as `usage` reports them.
+fn checks(query: &Query, scanned: usize) -> usize {
+    scanned.saturating_mul(query.predicates.len().min(12))
+}
+
+/// Keeps the `wanted` least of `keyed` by sort key, in order.
+fn top(keyed: &mut Vec<Keyed>, wanted: usize) {
+    if let Some(last) = wanted.checked_sub(1)
+        && last < keyed.len()
+    {
+        keyed.select_nth_unstable_by(last, |left, right| left.0.cmp(&right.0));
+        keyed.truncate(wanted);
+    }
     keyed.sort_by(|left, right| left.0.cmp(&right.0));
+}
+
+/// The page of `query` from `keyed` (in order; one past the limit shows
+/// another page follows), its cursor under `(key, now_ms)`, and the usage
+/// of `scanned` rows.
+pub(super) fn page(
+    query: &Query,
+    mut keyed: Vec<Keyed>,
+    (key, now_ms): (&Key, u64),
+    scanned: usize,
+) -> Term {
     let limit = query.limit.unwrap_or(1);
     let has_more = keyed.len() > limit;
     keyed.truncate(limit);
     let next = if has_more && query.mode == Mode::Execute {
         keyed
             .last()
-            .map(|(key, _)| cursor::issue(&input.key, &query.digest, input.now_ms, key))
+            .map(|(last, _)| cursor::issue(key, &query.digest, now_ms, last))
     } else {
         None
     };
@@ -286,8 +323,12 @@ pub fn runs(query: &Query, input: Runs) -> Result<Term, Failure> {
         .into_iter()
         .map(|(_, row)| project(row, query.projection.as_deref()))
         .collect();
-    let usage = answer::Usage::new(scanned.max(records.len()), records.len(), checks);
-    Ok(answer::records(query, records, next, &usage))
+    let usage = answer::Usage::new(
+        scanned.max(records.len()),
+        records.len(),
+        checks(query, scanned),
+    );
+    answer::records(query, records, next, &usage)
 }
 
 /// One history event as a query row: `event_id` and `fields`.

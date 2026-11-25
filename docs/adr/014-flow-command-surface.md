@@ -355,8 +355,15 @@ Each step is one commit with its tests.
   are authoritative and current (Elixir's come from an asynchronous
   projection, so a new Flow appears there only after a lag); there are no
   scan, memory or response budgets, and usage reports rows and checks but
-  zero bytes and time. EXPLAIN describes the catalog path, not Elixir's
-  cost model; `FLOW.QUERY.INDEXES` reports the catalog as one active index.
+  zero bytes and time. A collection whose order is update time alone, once
+  the fields its equalities fix are dropped (Elixir's `order_mode/3` over
+  its `*_updated` indexes), walks the catalog's sets in that order, one
+  update time at a time, and stops once the page is full; a cursor seeks
+  to its row's update time (G78, 25 Nov). Any other order is the bounded
+  top-k of the candidates. EXPLAIN describes the catalog path, not
+  Elixir's cost model, and names the order as Elixir does (`none`,
+  `native`, `bounded_top_k`); `FLOW.QUERY.INDEXES` reports the catalog as
+  one active index.
   Not built: the compact `flow_query_result_v1` codec (the server declines
   it, so clients get typed values), the text form of `FLOW.QUERY`, and
   index lifecycle, statistics and mandatory scopes. The scenario of 90
