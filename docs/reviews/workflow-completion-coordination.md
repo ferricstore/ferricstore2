@@ -67462,3 +67462,37 @@ arm passed):
 runs a claim and a reclaim in one and compares each with its reply alone,
 and holds a pipelined claim and get to their deadlines. After: 38 caught,
 3 unviable, none missed.
+
+### The Elixir SDK accepts a workflow-only server (25 Nov)
+
+The open question above was settled on the SDK side (user, 25 Nov:
+"Should accept"): the node does not declare surfaces it refuses.
+ferricstore-elixir PR #31 (merged as 484a7a1, unreleased) checks each schema and opcode a server
+advertises and accepts one that leaves commands out; a call to one of
+those fails with the server's own error, as `CLUSTER.FEATURES` already
+did. A malformed `opcodes` or `events` capability is still refused. It
+subscribes to `TOPOLOGY_CHANGED` only when HELLO's `events` lists it, at
+startup and on reconnect. Sixteen hand-made mutants of that change were
+each caught by a test aimed at it.
+
+That check reads every schema the node does declare, and the node's
+`FLOW.POLICY.SET` schema named 3 of the fields its policy decoder takes
+and no required fields. The SDK would refuse that as missing `type` and
+eight fields, among them `retry`, `retention` and `governance`. HELLO now
+declares the schema as Elixir does: required `type`, and fields `type`,
+`expected_generation`, `replace`, `max_active_ms`, `retry`, `retention`,
+`states`, `indexed_attributes`, `indexed_state_meta`, `version`,
+`governance` and `deadline_ms`. Each field is one the node takes. RED:
+`handshake::hello_declares_every_policy_field_the_node_takes`. The Python
+SDK, which checks `expected_generation` and `replace` there, is
+unaffected.
+
+With PR #31 and this build, the Elixir live suite connects with no bypass:
+17 of 32 pass, as with the bypasses. The 15 failures are the non-Flow
+surfaces, which now get the node's `opcode ... is not supported`, plus the
+planner's `order: sort`.
+
+cargo-mutants on the change: its one mutant (`capabilities` to
+`Default::default()`) is unviable, because a list of names gives it nothing
+to mutate. By hand, dropping `governance` or the required list fails the
+new test.

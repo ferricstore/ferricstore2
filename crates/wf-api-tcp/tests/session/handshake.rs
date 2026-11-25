@@ -100,6 +100,36 @@ fn hello_declares_the_protocol_versions_the_go_sdk_requires() -> TestResult {
     Ok(())
 }
 
+/// The Elixir SDK checks every schema a server declares against its own:
+/// the policy schema names each field the node takes, as Elixir declares it.
+#[test]
+fn hello_declares_every_policy_field_the_node_takes() -> TestResult {
+    let running = start()?;
+    let mut client = Client::connect(&running)?;
+    let (status, value) = reply(&client.call(HELLO, 0, 0, &hello_body()?)?.body)?;
+    assert_eq!(status, 0);
+    let policy = at(&value, &["capabilities", "schemas", "FLOW.POLICY.SET"])?;
+    assert_eq!(texts(at(policy, &["required"])?)?, ["type"]);
+    assert_eq!(
+        texts(at(policy, &["fields"])?)?,
+        [
+            "type",
+            "expected_generation",
+            "replace",
+            "max_active_ms",
+            "retry",
+            "retention",
+            "states",
+            "indexed_attributes",
+            "indexed_state_meta",
+            "version",
+            "governance",
+            "deadline_ms",
+        ]
+    );
+    Ok(())
+}
+
 #[test]
 fn startup_selects_only_the_compact_codecs_this_server_writes() -> TestResult {
     let running = start()?;

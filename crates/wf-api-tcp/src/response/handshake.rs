@@ -131,12 +131,30 @@ fn capabilities(handshake: &Handshake<'_>) -> Value {
         (
             "schemas",
             map(vec![
+                // Every field the policy decoder takes, as Elixir declares
+                // them; the Elixir SDK checks each schema a server declares.
                 (
                     "FLOW.POLICY.SET",
-                    map(vec![(
-                        "fields",
-                        texts(&["type", "expected_generation", "replace"]),
-                    )]),
+                    map(vec![
+                        (
+                            "fields",
+                            texts(&[
+                                "type",
+                                "expected_generation",
+                                "replace",
+                                "max_active_ms",
+                                "retry",
+                                "retention",
+                                "states",
+                                "indexed_attributes",
+                                "indexed_state_meta",
+                                "version",
+                                "governance",
+                                "deadline_ms",
+                            ]),
+                        ),
+                        ("required", texts(&["type"])),
+                    ]),
                 ),
                 (
                     "FLOW.QUERY",
