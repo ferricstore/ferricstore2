@@ -19,6 +19,7 @@ use openraft::{LogId, Raft};
 use tokio::net::TcpListener;
 use tokio::task::JoinHandle;
 use wf_consensus::group::{Config, LogStore, Peers, Proposal, serve, serve_member};
+use wf_ports::consensus::log::ConsensusLog;
 use wf_storage::log::{EntryLog, GroupLogLimits};
 use wf_test_support::resources::TestResources;
 
@@ -73,24 +74,26 @@ async fn start_as(
         Serving::Voter => (format!("m{id}"), Machine::default()),
         Serving::Joining { log, machine } => ((*log).to_owned(), machine.clone()),
     };
-    let log = EntryLog::open(&root.path().join(directory), GroupLogLimits::default())?;
-    let fresh = log.bounds().1.is_none();
+    let log: Arc<dyn ConsensusLog> = Arc::new(EntryLog::open(
+        &root.path().join(directory),
+        GroupLogLimits::default(),
+    )?);
     let raft = Raft::new(
         id,
         Arc::new(config.validate()?),
         Peers::new(names(addresses)),
-        LogStore::new(Arc::new(log)),
+        LogStore::new(Arc::clone(&log)),
         machine.clone(),
     )
     .await?;
     let server = match serving {
-        Serving::Voter => tokio::spawn(serve(listener, raft.clone())),
+        Serving::Voter => tokio::spawn(serve(listener, raft.clone(), names(addresses), id)),
         Serving::Joining { .. } => tokio::spawn(serve_member(
             listener,
             raft.clone(),
             names(addresses),
             id,
-            fresh,
+            log,
         )),
     };
     Ok(Member {
@@ -352,6 +355,180 @@ fn a_member_that_lost_its_log_settles_from_answers_given_at_different_times() ->
         assert!(
             answers_votes_within(&addresses, wiped, Duration::from_secs(5)).await?,
             "no vote once every member had answered"
+        );
+        Ok(())
+    })
+}
+
+/// Binds a loopback listener for each of `ids`.
+async fn listeners(ids: &[u64]) -> TestResult<BTreeMap<u64, TcpListener>> {
+    let mut listeners = BTreeMap::new();
+    for id in ids {
+        listeners.insert(*id, TcpListener::bind("127.0.0.1:0").await?);
+    }
+    Ok(listeners)
+}
+
+fn addresses_of(listeners: &BTreeMap<u64, TcpListener>) -> TestResult<BTreeMap<u64, SocketAddr>> {
+    listeners
+        .iter()
+        .map(|(id, listener)| Ok((*id, listener.local_addr()?)))
+        .collect()
+}
+
+/// A group whose member list names another group's member (an address
+/// reused, or a list mistyped): that member takes none of its traffic, so
+/// it neither follows the other group's leader nor applies its entries.
+#[test]
+fn a_member_refuses_the_traffic_of_another_group() -> TestResult {
+    runtime()?.block_on(async {
+        let (x_root, y_root) = (TestResources::new()?, TestResources::new()?);
+        let mut x = listeners(&[1, 2, 3]).await?;
+        let x_addresses = addresses_of(&x)?;
+        let y = listeners(&[1, 2]).await?;
+        let mut y_addresses = addresses_of(&y)?;
+        let shared = *x_addresses.get(&3).ok_or("no address")?;
+        y_addresses.insert(3, shared);
+        // Of group X only member 3 runs: it has no log and no leader.
+        let listener = x.remove(&3).ok_or("no listener")?;
+        let stranger = start(&x_root, 3, listener, &x_addresses).await?;
+        let mut members = BTreeMap::new();
+        for (id, listener) in y {
+            members.insert(id, start(&y_root, id, listener, &y_addresses).await?);
+        }
+        let first = members.get(&1).ok_or("member 1 missing")?;
+        first.raft.initialize(BTreeSet::from([1, 2, 3])).await?;
+        let mut last = 0;
+        for value in 0..10 {
+            last = write(&members, value).await?;
+        }
+        converge(&members, last).await?;
+        // Many heartbeats later, group X's member still knows nothing of Y.
+        tokio::time::sleep(Duration::from_millis(500)).await;
+        let metrics = stranger.raft.metrics().borrow_watched().clone();
+        assert_eq!(metrics.current_leader, None, "followed another group");
+        assert_eq!(metrics.last_log_index, None, "took another group's log");
+        assert_eq!(stranger.machine.image().proposals, Vec::new());
+        Ok(())
+    })
+}
+
+/// A process serving at member 2's address as member 3 (a node started
+/// with another's id) answers none of the requests meant for member 2.
+#[test]
+fn a_member_refuses_requests_meant_for_another_member() -> TestResult {
+    runtime()?.block_on(async {
+        let root = TestResources::new()?;
+        let mut bound = listeners(&[1, 2, 3]).await?;
+        let addresses = addresses_of(&bound)?;
+        let listener = bound.remove(&2).ok_or("no listener")?;
+        let _impostor = start(&root, 3, listener, &addresses).await?;
+        assert!(
+            !answers_votes(&addresses, 2).await?,
+            "member 3 answered for 2"
+        );
+        // The refusal names both members, for whoever reads the error.
+        let mut link = Peers::new(names(&addresses)).new_client(2, &()).await;
+        let candidate = VoteRequest::new(Vote::new(1, 1), None);
+        let refusal = link
+            .vote(candidate, RPCOption::new(Duration::from_secs(1)))
+            .await
+            .err()
+            .map(|error| error.to_string())
+            .unwrap_or_default();
+        assert!(
+            refusal.contains("a request for member 2 of group ")
+                && refusal.contains(" reached member 3 of group "),
+            "{refusal}"
+        );
+        Ok(())
+    })
+}
+
+/// A member that settled into a new group and stopped before any entry
+/// reached it kept its storage: it holds the mark that it votes and no
+/// log. With the leader down, it votes for the other member, which leads
+/// and catches it up.
+#[test]
+fn a_member_stopped_before_its_first_entry_votes_when_it_starts_again() -> TestResult {
+    runtime()?.block_on(async {
+        let root = TestResources::new()?;
+        let (mut members, addresses, _) = joined_group(&root).await?;
+        let first = leader(&members).await?;
+        let early = if first == 3 { 2 } else { 3 };
+        stop(&mut members, early).await?;
+        stop(&mut members, first).await?;
+        EntryLog::open(&root.path().join("early"), GroupLogLimits::default())?.save_voter()?;
+        restart(
+            &root,
+            &mut members,
+            &addresses,
+            (early, "early"),
+            Machine::default(),
+        )
+        .await?;
+        let next = write(&members, 99).await?;
+        converge(&members, next).await?;
+        Ok(())
+    })
+}
+
+/// Waits until member `id` holds the log through `index`.
+async fn holds(members: &BTreeMap<u64, Member>, id: u64, index: u64) -> TestResult {
+    let until = Instant::now() + Duration::from_secs(10);
+    while Instant::now() < until {
+        let member = members.get(&id).ok_or("member missing")?;
+        if member.raft.metrics().borrow_watched().last_log_index >= Some(index) {
+            return Ok(());
+        }
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    Err(format!("member {id} did not take the log through {index}").into())
+}
+
+/// Restarts member `id` over the log under `log` with a machine that
+/// cannot apply: it takes entries, but no commit point it waits for.
+async fn restart_paused(
+    root: &TestResources,
+    members: &mut BTreeMap<u64, Member>,
+    addresses: &BTreeMap<u64, SocketAddr>,
+    (id, log): (u64, &str),
+) -> TestResult<Machine> {
+    stop(members, id).await?;
+    let machine = Machine::default();
+    machine.pause();
+    restart(root, members, addresses, (id, log), machine.clone()).await?;
+    Ok(machine)
+}
+
+/// A member that lost its log and stopped while catching up holds part of
+/// the group's log, but not the mark that it votes: it asks again when it
+/// starts and gives no vote until it caught up. Then the mark is saved, and
+/// it votes as soon as it starts again, before it applies anything.
+#[test]
+fn a_member_that_stopped_while_catching_up_votes_only_once_it_caught_up() -> TestResult {
+    runtime()?.block_on(async {
+        let root = TestResources::new()?;
+        let (mut members, addresses, last) = joined_group(&root).await?;
+        let wiped = if leader(&members).await? == 3 { 2 } else { 3 };
+        restart_paused(&root, &mut members, &addresses, (wiped, "lost")).await?;
+        holds(&members, wiped, last).await?;
+        let machine = restart_paused(&root, &mut members, &addresses, (wiped, "lost")).await?;
+        let until = Instant::now() + Duration::from_secs(1);
+        while Instant::now() < until {
+            assert!(
+                !answers_votes(&addresses, wiped).await?,
+                "voted with part of the log"
+            );
+            tokio::time::sleep(Duration::from_millis(50)).await;
+        }
+        machine.resume();
+        converge(&members, last).await?;
+        assert!(answers_votes_within(&addresses, wiped, Duration::from_secs(5)).await?);
+        restart_paused(&root, &mut members, &addresses, (wiped, "lost")).await?;
+        assert!(
+            answers_votes_within(&addresses, wiped, Duration::from_secs(2)).await?,
+            "the mark was not kept"
         );
         Ok(())
     })

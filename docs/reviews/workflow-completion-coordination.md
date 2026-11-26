@@ -67819,3 +67819,79 @@ the descending seek lost its `time < u64::MAX` guard, which a cursor's
 update time, decoded through `i64`, always met. The second round over
 `checks`, `native`, `fixed`, `update_time` and `ordered`: 27 mutants, 25
 caught, 2 unviable, none missed.
+
+### Replica stress: a member stopped before its first entry blocked its group; peer requests name their group (26 Nov)
+
+The user narrowed cargo-mutants to logic-heavy diffs (query, claim,
+consensus, storage) and asked for a periodic stress run of the replica
+tests instead: the wiped-member vote bug (32b80ff) showed only when those
+tests ran many times on a loaded machine. The rig's `stress-replica.sh
+COPIES ROUNDS` runs the node's replica tests and the consensus group's TCP
+and in-process tests in COPIES nextest processes at once, ROUNDS times
+each, with no retries. Its first runs failed 5 of 240 and 6 of 560 test
+runs.
+
+- **A member stopped before its first entry blocked its group** (three node
+  replica tests, "no member serves" for 20 s). Raft metrics at the failure:
+  the restarted member at term 1, a learner with no log and a committed
+  vote for the stopped leader; the candidate at term 24 to 28. It had been
+  stopped right after the group formed, before any entry reached it, so it
+  kept its vote and an empty log. ADR-019 took a member without a log for
+  one that lost its data, so it gave no vote until a leader caught it up,
+  and with another member down (the old leader, or a wiped member) nobody
+  could lead. The same rule let a member that lost its data, then stopped
+  while catching up, vote with part of the log: the case ADR-019 exists
+  for. The entry log now keeps a mark that its member votes (record `W`,
+  written again at a purge like the vote; `ConsensusLog::voter` and
+  `save_voter`), saved once the member settled into a new group or caught
+  up; a member without it asks first. `join` also returns when the member
+  stops, so the mark is saved only when the ballot lets it vote (the first
+  version saved it then, and the catching-up test caught it).
+- **Peer requests name their group and member.** My first reading of the
+  stuck member (following "leader 1, term 1" for 20 s) was another test's
+  group reaching it through a reused loopback port. That was wrong (a
+  stale lease lasts one `election_timeout_max` after a restart; the
+  metrics above settled it), but two tests showed the hazard is real: a
+  group whose member list names another group's member made it follow that
+  group's leader and take its entries, and a node started with another's
+  id answered for it. A reused address (a pod's IP) or a mistyped list does
+  the same in production. Each request now starts with the group's id (the
+  first eight bytes of the SHA-256 of the member list, ids and Raft
+  addresses in id order) and the member's id; a member refuses a request
+  for another with a text that names both (ADR-019).
+- **In-process tests under load:** the lossy run's end marker timed out
+  after 1 s, or came back `LogEntryDiscarded` (openraft 0.10: accepted, then
+  dropped when its leader was deposed). The marker now waits 10 s and is
+  sent again after a discard (a second marker changes nothing checked);
+  writes in the fault-free tests wait 10 s, since without faults only a
+  starved runtime delays a commit. Writes under loss keep 1 s.
+- **Not a hang:** after each rebuild macOS held the new test binary 90 to
+  220 s before it started (`syspolicyd` at 100% CPU), which nextest counts
+  in the first test's time.
+
+RED: `peer::a_member_refuses_the_traffic_of_another_group` ("followed
+another group") and `peer::a_member_refuses_requests_meant_for_another_member`
+failed before the recipient check.
+`peer::a_member_stopped_before_its_first_entry_votes_when_it_starts_again`
+("no leader") and
+`peer::a_member_that_stopped_while_catching_up_votes_only_once_it_caught_up`
+("voted with part of the log") fail with the old rule (a member without a
+log asks); `group_log::entries::the_voter_mark_survives_a_reopen_and_a_purge`
+and `wire::tests::a_group_is_known_by_its_member_list` pin the record and
+the id.
+
+cargo-mutants on the diff (consensus mutants against wf-consensus's tests,
+storage mutants against the entry log's): 42 mutants, 27 caught, 8
+unviable, 7 missed. The refusal's text was unchecked (two mutants); the
+misdirected-member test now reads it. Closing the connection after a
+refusal could not be observed (two mutants), and removing the `!` would
+have closed every connection after each request; a misdirected peer is
+refused request by request anyway, so the close is gone. The port's
+`voter` and `save_voter` on `EntryLog` (three) only forward to methods the
+storage tests call; against the consensus tests that use the port they
+are caught. The second round (peer.rs and the port methods): 13 mutants,
+11 caught, 2 unviable, none missed. Each catch came from a test of the
+changed code.
+
+After the fixes, `stress-replica.sh 4 10` (16 tests, four processes at
+once, ten rounds each) passed 640 of 640 runs.

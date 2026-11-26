@@ -3,12 +3,13 @@
 //!
 //! Every change is a group log record, so the log stays append-only: an
 //! entry with its id, a truncation that drops the entries after an index (a
-//! follower overwriting an uncommitted suffix), a vote, and a purge that
-//! drops the entries up to an id. Opening replays them in order. Appends
-//! report durability through a completion called by the notifier thread;
-//! truncations, votes and purges return once durable. A purge also removes
-//! the segments before the oldest kept entry, after writing the vote and the
-//! purge again so they outlive those segments. Entries since the last purge
+//! follower overwriting an uncommitted suffix), a vote, a purge that drops
+//! the entries up to an id, and the mark that the member votes (ADR-019).
+//! Opening replays them in order. Appends report durability through a
+//! completion called by the notifier thread; truncations, votes, purges and
+//! the mark return once durable. A purge also removes the segments before
+//! the oldest kept entry, after writing the vote, the mark and the purge
+//! again so they outlive those segments. Entries since the last purge
 //! are kept in memory for readers.
 
 mod codec;
@@ -76,6 +77,7 @@ struct State {
     entries: VecDeque<Kept>,
     purged: Option<EntryId>,
     vote: Option<Vec<u8>>,
+    voter: bool,
 }
 
 impl State {
@@ -155,6 +157,7 @@ impl EntryLog {
                 Record::Truncate(after) => state.truncate(after),
                 Record::Vote(vote) => state.vote = Some(vote),
                 Record::Purge(upto) => state.purge(upto),
+                Record::Voter => state.voter = true,
             }
         }
         let log = Arc::new(log);
@@ -196,6 +199,24 @@ impl EntryLog {
     pub fn save_vote(&self, vote: &[u8]) -> Result<(), EntryLogError> {
         self.write_durably(vec![codec::vote(vote)])?;
         self.state().vote = Some(vote.to_vec());
+        Ok(())
+    }
+
+    /// Whether the log's member may vote (ADR-019).
+    #[must_use]
+    pub fn voter(&self) -> bool {
+        self.state().voter
+    }
+
+    /// Marks that the log's member may vote; returns once it is durable.
+    ///
+    /// # Errors
+    /// The group log's refusals.
+    pub fn save_voter(&self) -> Result<(), EntryLogError> {
+        if !self.voter() {
+            self.write_durably(vec![codec::voter()])?;
+            self.state().voter = true;
+        }
         Ok(())
     }
 
@@ -303,6 +324,7 @@ impl EntryLog {
         let vote = self.vote();
         let mut records = vec![codec::purge(upto)];
         records.extend(vote.as_deref().map(codec::vote));
+        records.extend(self.voter().then(codec::voter));
         // The markers land in this segment or a later one.
         let markers = self.log.current_segment();
         self.write_durably(records)?;
@@ -334,6 +356,14 @@ impl ConsensusLog for EntryLog {
 
     fn save_vote(&self, vote: &[u8]) -> Result<(), ConsensusLogError> {
         Self::save_vote(self, vote).map_err(port_error)
+    }
+
+    fn voter(&self) -> bool {
+        Self::voter(self)
+    }
+
+    fn save_voter(&self) -> Result<(), ConsensusLogError> {
+        Self::save_voter(self).map_err(port_error)
     }
 
     fn append(

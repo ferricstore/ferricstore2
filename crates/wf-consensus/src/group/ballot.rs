@@ -1,10 +1,11 @@
 //! Whether this member may vote and stand for election (ADR-019).
 //!
 //! Raft's safety rests on a voter keeping its log and its vote. A member
-//! that starts without a log may have lost one, and its vote could then
-//! elect a member that lacks entries only it and a stopped member held:
-//! those entries would be lost. So such a member first asks every other
-//! member what it holds. If none holds a log beyond a forming group's first
+//! whose log lacks the mark that it votes (saved once it may) may have lost
+//! its storage, or stopped while catching up after losing it, and its vote
+//! could then elect a member that lacks entries only it and a stopped
+//! member held: those entries would be lost. So such a member first asks
+//! every other member what it holds. If none holds a log beyond a forming group's first
 //! entry, the group is new and it votes. Otherwise it votes once it applied
 //! a commit point that a leader at or above every other member's term set
 //! in its own term: such a leader holds every entry committed before it, so
@@ -24,7 +25,8 @@ use super::Config;
 enum Standing {
     /// It votes.
     Votes,
-    /// It started without a log and has not heard from every other member.
+    /// It started without the mark and has not heard from every other
+    /// member.
     Asking,
     /// The group exists and this member lost its log: it waits to apply a
     /// commit point set by a leader at `term` or above.
@@ -45,7 +47,8 @@ struct State {
 pub(super) struct Ballot(Mutex<State>);
 
 impl Ballot {
-    /// A member that starts with a log votes; one without asks first.
+    /// A member whose log has the mark votes; one without (`fresh`) asks
+    /// first.
     pub(super) const fn new(fresh: bool) -> Self {
         Self(Mutex::new(State {
             standing: if fresh {

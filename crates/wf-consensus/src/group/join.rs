@@ -1,6 +1,9 @@
-//! How a member that starts without a log joins its group (ADR-019): it
-//! asks every other member what it holds before it votes (`Ballot`), and
-//! the lowest member of a new group forms it.
+//! How a member that starts without the mark that it votes joins its group
+//! (ADR-019): it asks every other member what it holds before it votes
+//! (`Ballot`), and the lowest member of a new group forms it. The mark is
+//! saved once it may vote: a member stopped before its first entry votes
+//! when it starts again, and one whose storage was lost, or that stopped
+//! while catching up, asks again.
 
 #[cfg(test)]
 mod tests;
@@ -13,11 +16,12 @@ use openraft::Raft;
 use openraft::storage::RaftStateMachine;
 use openraft::type_config::async_runtime::watch::WatchReceiver;
 use tokio::net::TcpListener;
+use wf_ports::consensus::log::ConsensusLog;
 
 use super::Config;
 use super::ballot::Ballot;
 use super::peer;
-use super::wire::Held;
+use super::wire::{self, Held, Recipient};
 
 /// What a member that started without a log makes of what the others hold.
 #[derive(Debug, PartialEq, Eq)]
@@ -48,26 +52,36 @@ pub(super) fn settle(held: &[Held], id: u64, peers: &BTreeMap<u64, String>) -> S
     }
 }
 
-/// Serves Raft requests to `raft`, member `id` of `peers`, until the
-/// listener fails. A member that starts without a log (`fresh`) first
-/// settles whether it may vote.
+/// Serves Raft requests to `raft`, member `id` of `peers` keeping `log`,
+/// until the listener fails. A member whose log lacks the mark that it
+/// votes first settles whether it may vote, then saves the mark.
 pub async fn serve_member<SM>(
     listener: TcpListener,
     raft: Raft<Config, SM>,
     peers: BTreeMap<u64, String>,
     id: u64,
-    fresh: bool,
+    log: Arc<dyn ConsensusLog>,
 ) where
     SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
+    let fresh = !log.voter();
     let ballot = Arc::new(Ballot::new(fresh));
+    let own = Recipient {
+        group: wire::group_id(&peers),
+        member: id,
+    };
     let settling = async {
         if fresh {
-            join(&raft, &peers, id, &ballot).await;
+            join(&raft, &peers, own, &ballot).await;
+            // `join` also returns when the member stops. A mark that is not
+            // saved only makes the next start ask again.
+            if ballot.votes() {
+                let _saved = log.save_voter();
+            }
         }
     };
     futures_util::future::join(
-        peer::serving(listener, raft.clone(), Arc::clone(&ballot)),
+        peer::serving(listener, raft.clone(), Arc::clone(&ballot), own),
         settling,
     )
     .await;
@@ -79,16 +93,25 @@ pub async fn serve_member<SM>(
 /// forms it. The answers need not come together: a member's term only
 /// grows, so an earlier answer still bounds the term it knew when this
 /// member lost its log.
-async fn join<SM>(raft: &Raft<Config, SM>, peers: &BTreeMap<u64, String>, id: u64, ballot: &Ballot)
-where
+async fn join<SM>(
+    raft: &Raft<Config, SM>,
+    peers: &BTreeMap<u64, String>,
+    own: Recipient,
+    ballot: &Ballot,
+) where
     SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
+    let id = own.member;
     let mut held = BTreeMap::new();
     loop {
         for (member, address) in peers {
+            let recipient = Recipient {
+                member: *member,
+                ..own
+            };
             if *member != id
                 && !held.contains_key(member)
-                && let Ok(answer) = peer::status(address).await
+                && let Ok(answer) = peer::status(address, recipient).await
             {
                 held.insert(*member, answer);
             }

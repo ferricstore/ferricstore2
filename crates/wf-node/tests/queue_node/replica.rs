@@ -74,15 +74,32 @@ fn create(node: &QueueNode, ids: &[String]) -> TestResult<Result<(), ServiceErro
 /// there and is refused as not led everywhere else.
 fn serving(nodes: &BTreeMap<u64, QueueNode>, probe: &str) -> TestResult<u64> {
     let until = Instant::now() + Duration::from_secs(20);
+    let mut refused = None;
     while Instant::now() < until {
         for (id, node) in nodes {
-            if node.leader() == Some(*id) && create(node, &[probe.to_owned()])?.is_ok() {
-                return Ok(*id);
+            if node.leader() == Some(*id) {
+                match create(node, &[probe.to_owned()])? {
+                    Ok(()) => return Ok(*id),
+                    Err(error) => refused = Some((*id, error)),
+                }
             }
         }
         std::thread::sleep(Duration::from_millis(50));
     }
-    Err("no member serves".into())
+    let seen: Vec<_> = nodes
+        .iter()
+        .map(|(id, node)| {
+            (
+                *id,
+                node.route().map(|route| (route.leader, route.term)),
+                node.poisoned(),
+            )
+        })
+        .collect();
+    Err(format!(
+        "no member serves {probe}: (member, (leader, term), poisoned) {seen:?}, last refusal {refused:?}"
+    )
+    .into())
 }
 
 fn get(node: &QueueNode, id: &str) -> TestResult<Term> {

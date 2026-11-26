@@ -109,9 +109,38 @@ impl Group {
 
     /// Writes `value` through the leader; the index it committed at. Only a
     /// definite refusal (not the leader) is retried: after a timeout the
-    /// outcome is unknown, so the write is not sent again.
+    /// outcome is unknown, so the write is not sent again. Without faults a
+    /// write commits; only a loaded machine delays it, so it may take ten
+    /// seconds.
     async fn write(&self, value: &[u8]) -> TestResult<u64> {
-        let until = Instant::now() + Duration::from_secs(5);
+        self.write_within(value, Duration::from_secs(10), false)
+            .await
+    }
+
+    /// Writes `value` as [`Group::write`] does, under loss: a write lost
+    /// for a second stays unacknowledged.
+    async fn write_under_loss(&self, value: &[u8]) -> TestResult<u64> {
+        self.write_within(value, Duration::from_secs(1), false)
+            .await
+    }
+
+    /// Writes the end marker once the faults are gone: it commits, but a
+    /// replication stream may still be backing off from a lost message, the
+    /// last restart may have taken the leader, and a loaded machine
+    /// stretches both, so it waits longer than a write under loss. A marker
+    /// whose entry a deposed leader discarded is sent again: a second marker
+    /// changes nothing the run checks.
+    async fn end(&self) -> TestResult<u64> {
+        self.write_within(b"end", Duration::from_secs(10), true)
+            .await
+    }
+
+    /// Writes `value` as [`Group::write`] does, waiting up to `wait` for
+    /// the commit, and sending it again after a discarded entry when
+    /// `again` says so.
+    async fn write_within(&self, value: &[u8], wait: Duration, again: bool) -> TestResult<u64> {
+        // Time to find a leader beside the commit's own wait.
+        let until = Instant::now() + wait + Duration::from_secs(if again { 20 } else { 4 });
         while Instant::now() < until {
             let Ok(leader) = self.leader(Duration::from_millis(500)).await else {
                 continue;
@@ -120,10 +149,12 @@ impl Group {
                 continue;
             };
             let proposal = Proposal(value.to_vec());
-            match tokio::time::timeout(Duration::from_secs(1), member.client_write(proposal)).await
-            {
+            match tokio::time::timeout(wait, member.client_write(proposal)).await {
                 Ok(Ok(written)) => return Ok(written.log_id.index),
                 Ok(Err(RaftError::APIError(ClientWriteError::ForwardToLeader(_)))) => {
+                    tokio::time::sleep(Duration::from_millis(20)).await;
+                }
+                Ok(Err(RaftError::APIError(ClientWriteError::LogEntryDiscarded(_)))) if again => {
                     tokio::time::sleep(Duration::from_millis(20)).await;
                 }
                 Ok(Err(error)) => return Err(error.into()),
@@ -228,7 +259,7 @@ async fn lossy_run(seed: u64) -> TestResult {
                 faults.cut.insert((a.min(b), a.max(b)));
             }
         }
-        if let Ok(index) = group.write(&value.to_be_bytes()).await {
+        if let Ok(index) = group.write_under_loss(&value.to_be_bytes()).await {
             acknowledged.push((index, value));
         }
     }
@@ -237,7 +268,7 @@ async fn lossy_run(seed: u64) -> TestResult {
         faults.loss = 0;
         faults.cut.clear();
     }
-    let last = group.write(b"end").await?;
+    let last = group.end().await?;
     group.converge(last).await?;
     let applied = group.applied();
     assert!(

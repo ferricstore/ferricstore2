@@ -1,6 +1,10 @@
 //! Raft messages between members (ADR-018), as bytes.
 //!
-//! A request starts with its kind (`1` append entries, `2` vote, `3`
+//! A request starts with its recipient: the group's id (the first eight
+//! bytes of the SHA-256 of its member list, [`group_id`]) and the member's
+//! id. A member refuses a request for another group or member, so traffic
+//! that reaches it by a reused address or a mistyped member list moves
+//! nothing. Then comes its kind (`1` append entries, `2` vote, `3`
 //! pre-vote, `4` a full snapshot: the leader's vote, the snapshot's metadata
 //! and its bytes); a response with its outcome (`0` an append accepted up to
 //! an optional log id, `1` an append conflict at a log id, `2` a higher vote,
@@ -15,6 +19,7 @@
 #[cfg(test)]
 mod tests;
 
+use std::collections::BTreeMap;
 use std::io;
 
 use openraft::Snapshot;
@@ -22,9 +27,42 @@ use openraft::raft::{
     AppendEntriesRequest, AppendError, AppendResult, SnapshotResponse, VoteRequest, VoteResponse,
 };
 use openraft::type_config::alias::{LogIdOf, SnapshotOf, VoteOf};
+use sha2::{Digest, Sha256};
 use wf_ports::consensus::log::EntryId;
 
 use super::{Config, codec, snapshot};
+
+/// Whom a request is for.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct Recipient {
+    /// The group's id: [`group_id`] of its member list.
+    pub(crate) group: u64,
+    /// The member's id.
+    pub(crate) member: u64,
+}
+
+/// A group's id: the first eight bytes of the SHA-256 of its member list,
+/// each member's id and Raft address in id order. Every member is given the
+/// same list, so they agree on it; another group lists other addresses.
+pub(crate) fn group_id(peers: &BTreeMap<u64, String>) -> u64 {
+    let mut digest = Sha256::new();
+    for (id, address) in peers {
+        digest.update(id.to_be_bytes());
+        digest.update(
+            u64::try_from(address.len())
+                .unwrap_or(u64::MAX)
+                .to_be_bytes(),
+        );
+        digest.update(address.as_bytes());
+    }
+    u64::from_be_bytes(
+        digest
+            .finalize()
+            .first_chunk::<8>()
+            .copied()
+            .unwrap_or_default(),
+    )
+}
 
 /// A request from one member to another.
 pub(crate) enum Request {
@@ -98,12 +136,14 @@ fn put_bytes(out: &mut Vec<u8>, bytes: &[u8]) -> io::Result<()> {
     Ok(())
 }
 
-/// A request as bytes.
+/// A request for `recipient` as bytes.
 ///
 /// # Errors
 /// An entry or batch too large for the format.
-pub(crate) fn encode_request(request: &Request) -> io::Result<Vec<u8>> {
+pub(crate) fn encode_request(recipient: Recipient, request: &Request) -> io::Result<Vec<u8>> {
     let mut out = Vec::new();
+    put_u64(&mut out, recipient.group);
+    put_u64(&mut out, recipient.member);
     match request {
         Request::Append(append) => {
             out.push(1);
@@ -247,12 +287,16 @@ impl<'a> Reader<'a> {
     }
 }
 
-/// A request from its bytes.
+/// A request and its recipient from their bytes.
 ///
 /// # Errors
 /// Bytes no member wrote.
-pub(crate) fn decode_request(bytes: &[u8]) -> io::Result<Request> {
+pub(crate) fn decode_request(bytes: &[u8]) -> io::Result<(Recipient, Request)> {
     let mut reader = Reader(bytes);
+    let recipient = Recipient {
+        group: reader.u64()?,
+        member: reader.u64()?,
+    };
     let request = match reader.u8()? {
         1 => {
             let vote = reader.vote()?;
@@ -294,7 +338,7 @@ pub(crate) fn decode_request(bytes: &[u8]) -> io::Result<Request> {
         }
         _ => return Err(invalid()),
     };
-    reader.done(request)
+    reader.done((recipient, request))
 }
 
 /// A response from its bytes.

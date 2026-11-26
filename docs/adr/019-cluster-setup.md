@@ -40,7 +40,7 @@ and answers `GET /health/live` and `GET /health/ready` on
   entry's log id.
 - **A member that lost its data does not vote until it caught up:** Raft's
   safety rests on a voter keeping its log and its vote, so a member that
-  starts without a log gives no vote until every other member has answered
+  may have lost its data (see below) gives no vote until every other member has answered
   it once (`Status` answers the last log index and the term; the answers
   need not come together, since a term only grows). If none holds a log
   past a forming group's first entry, the group is new. Otherwise it waits
@@ -52,6 +52,16 @@ and answers `GET /health/live` and `GET /health/ready` on
   meanwhile, since each voter checks a candidate's log against its own. A
   group with one member down and another that lost its data has no
   majority until one of them is back.
+- **Which member may have lost its data** (26 Nov): one whose log lacks the
+  mark that it votes (entry log record `W`). The mark is saved once the
+  member may vote: it settled into a new group, or caught up after losing
+  its log. Its log was first taken to tell: a member that started without
+  one asked. That held back a member stopped after the group formed but
+  before any entry reached it (it kept its vote and an empty log), so with
+  another member down nobody could lead; and it let a member that lost its
+  data, then stopped while catching up, vote with part of the log. A lost
+  storage loses the mark with it, and the mark outlives purges as the vote
+  does.
 - **A leader takes back a follower that lost its data:** the leader had
   recorded how far that follower's log matched, and OpenRaft stops it when
   the follower's log goes back (a panic in debug builds; in release builds
@@ -59,6 +69,20 @@ and answers `GET /health/live` and `GET /health/ready` on
   the leader starts that follower's progress over. OpenRaft warns that such
   a member may vote unsafely; the rule above keeps it from voting, and the
   leader never lowers its commit point.
+- **A member takes only its own group's traffic** (26 Nov): every peer
+  request names its group, the first eight bytes of the SHA-256 of the
+  member list (each id and Raft address, `host:peer_port` with defaults
+  filled in, in id order), and the member it is for. A member answers a
+  request for another group or member with a refusal that names both.
+  Without this, a group whose list reached another group's
+  member (an address reused after a pod moved, a mistyped list, a node
+  started with another's id) made it follow the wrong leader: its lease
+  kept it from voting in its own group, and a member without a log took
+  the other group's entries. Found by the replica stress run, where tests
+  reuse each other's loopback ports. Members must be given the same list;
+  changing an address means restarting every member with the new list,
+  and until most have restarted, the members on the new list are refused
+  by those on the old one.
 - **Health:** `GET /health/live` (200) and `GET /health/ready` (200 once
   the member knows its leader and no lost round stopped it, else 503) on
   `FERRICSTORE_HEALTH_PORT`.

@@ -6,7 +6,8 @@ use wf_ports::consensus::log::EntryId;
 
 use super::super::{Proposal, codec};
 use super::{
-    Held, Request, Response, decode_request, decode_response, encode_request, encode_response,
+    Held, Recipient, Request, Response, decode_request, decode_response, encode_request,
+    encode_response, group_id,
 };
 
 fn id(term: u64, index: u64) -> EntryId {
@@ -48,8 +49,11 @@ fn requests_read_back_as_sent() {
         Request::Vote(vote.clone()),
         Request::PreVote(vote),
     ] {
-        let bytes = encode_request(&request).unwrap_or_default();
-        let read = decode_request(&bytes).ok();
+        let bytes = encode_request(RECIPIENT, &request).unwrap_or_default();
+        let (recipient, read) = decode_request(&bytes).map_or((None, None), |(recipient, read)| {
+            (Some(recipient), Some(read))
+        });
+        assert_eq!(recipient, Some(RECIPIENT));
         let same = match (&request, &read) {
             (Request::Append(sent), Some(Request::Append(read))) => {
                 format!("{sent:?}") == format!("{read:?}")
@@ -61,6 +65,50 @@ fn requests_read_back_as_sent() {
         assert!(same, "{bytes:?}");
     }
     assert!(decode_request(&[9]).is_err());
+    let mut status = 7_u64.to_be_bytes().to_vec();
+    status.extend_from_slice(&3_u64.to_be_bytes());
+    status.push(6);
+    assert!(matches!(
+        decode_request(&status),
+        Ok((
+            Recipient {
+                group: 7,
+                member: 3
+            },
+            Request::Status
+        ))
+    ));
+}
+
+const RECIPIENT: Recipient = Recipient {
+    group: 0x0123_4567_89ab_cdef,
+    member: 2,
+};
+
+/// A group's id is the digest of its member list: the same list gives the
+/// same id, and another id, address or member gives another.
+#[test]
+fn a_group_is_known_by_its_member_list() {
+    let list = |entries: &[(u64, &str)]| {
+        entries
+            .iter()
+            .map(|(id, address)| (*id, (*address).to_owned()))
+            .collect::<std::collections::BTreeMap<_, _>>()
+    };
+    let group = list(&[(1, "a:1"), (2, "b:2"), (3, "c:3")]);
+    // The first eight bytes of the SHA-256 of each id, address length and
+    // address: 1, 3, "a:1", 2, 3, "b:2", 3, 3, "c:3" (u64s big-endian).
+    assert_eq!(group_id(&group), 0x83dd_368e_ce33_933b);
+    assert_eq!(group_id(&group), group_id(&group.clone()));
+    for other in [
+        list(&[(1, "a:1"), (2, "b:2"), (3, "c:4")]),
+        list(&[(1, "a:1"), (2, "b:2"), (4, "c:3")]),
+        list(&[(1, "a:1"), (2, "b:2")]),
+        // The length keeps an address's bytes from running into the next id.
+        list(&[(1, "a:1"), (2, "b:2c:3")]),
+    ] {
+        assert_ne!(group_id(&group), group_id(&other), "{other:?}");
+    }
 }
 
 #[test]

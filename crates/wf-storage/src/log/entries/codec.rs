@@ -1,7 +1,8 @@
 //! The entry log's records, each one group log record: tag `E` an entry
 //! (its id, then its bytes), `T` a truncation (every entry after the index
 //! is dropped; no index drops all), `V` a vote (opaque bytes), `P` a purge
-//! (entries up to the id are gone).
+//! (entries up to the id are gone), `W` the mark that the log's member
+//! votes (ADR-019).
 
 use super::EntryId;
 
@@ -9,6 +10,7 @@ const ENTRY: u8 = b'E';
 const TRUNCATE: u8 = b'T';
 const VOTE: u8 = b'V';
 const PURGE: u8 = b'P';
+const VOTER: u8 = b'W';
 
 /// One decoded record.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -17,6 +19,7 @@ pub(super) enum Record {
     Truncate(Option<u64>),
     Vote(Vec<u8>),
     Purge(EntryId),
+    Voter,
 }
 
 fn put_id(out: &mut Vec<u8>, id: EntryId) {
@@ -59,6 +62,10 @@ pub(super) fn vote(bytes: &[u8]) -> Vec<u8> {
     out
 }
 
+pub(super) fn voter() -> Vec<u8> {
+    vec![VOTER]
+}
+
 pub(super) fn purge(id: EntryId) -> Vec<u8> {
     let mut out = vec![PURGE];
     put_id(&mut out, id);
@@ -77,13 +84,14 @@ pub(super) fn decode(record: &[u8]) -> Option<Record> {
         },
         VOTE => Some(Record::Vote(rest.to_vec())),
         PURGE if rest.len() == 24 => Some(Record::Purge(id_at(rest, 0)?)),
+        VOTER if rest.is_empty() => Some(Record::Voter),
         _ => None,
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{EntryId, Record, decode, entry, purge, truncate, vote};
+    use super::{EntryId, Record, decode, entry, purge, truncate, vote, voter};
 
     #[test]
     fn every_record_reads_back() {
@@ -99,10 +107,12 @@ mod tests {
             (truncate(Some(5)), Record::Truncate(Some(5))),
             (vote(b"v"), Record::Vote(b"v".to_vec())),
             (purge(id), Record::Purge(id)),
+            (voter(), Record::Voter),
         ] {
             assert_eq!(decode(&bytes), Some(record));
         }
         assert_eq!(decode(b"E"), None);
         assert_eq!(decode(b"Z"), None);
+        assert_eq!(decode(b"Wx"), None);
     }
 }

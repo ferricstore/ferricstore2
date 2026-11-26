@@ -134,3 +134,32 @@ fn a_reopened_log_continues_after_its_last_durable_entry() -> TestResult {
     assert_eq!(log.bounds(), (None, Some(id(1, 2))));
     Ok(())
 }
+
+/// The mark that the member votes (ADR-019) survives a reopen and a purge
+/// that removes the segment it was written in; a new log has none.
+#[test]
+fn the_voter_mark_survives_a_reopen_and_a_purge() -> TestResult {
+    let directory = directory("entries-voter")?;
+    let path = directory.join("log");
+    let limits = GroupLogLimits {
+        max_segment_bytes: 300,
+        ..GroupLogLimits::default()
+    };
+    {
+        let log = EntryLog::open(&path, limits)?;
+        assert!(!log.voter());
+        log.save_voter()?;
+        log.save_voter()?;
+        assert!(log.voter());
+        for index in 1..40 {
+            append(&log, 1, index..index + 1)?;
+        }
+        log.purge(id(1, 30))?;
+    }
+    let log = EntryLog::open(&path, limits)?;
+    assert!(log.voter());
+    assert_eq!(log.bounds(), (Some(id(1, 30)), Some(id(1, 39))));
+    let fresh = EntryLog::open(&directory.join("fresh"), limits)?;
+    assert!(!fresh.voter());
+    Ok(())
+}

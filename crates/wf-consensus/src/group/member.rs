@@ -1,9 +1,9 @@
 //! One member of a replicated group (ADR-018), on the node's Tokio runtime:
 //! its Raft over the consensus log, the peer listener, the proposer and a
 //! watcher that demotes the machine when this member stops leading. A
-//! member that starts without a log asks the others what they hold before
-//! it votes, and a fresh group is formed by its lowest-numbered member once
-//! every other member reports an empty log (`join`).
+//! member whose log lacks the mark that it votes asks the others what they
+//! hold before it votes, and a fresh group is formed by its lowest-numbered
+//! member once every other member reports an empty log (`join`).
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -128,7 +128,6 @@ impl Member {
             snapshot_every,
             keep_logs,
         } = config;
-        let fresh = log.bounds() == (None, None);
         let raft_config = openraft::Config {
             heartbeat_interval: 100,
             election_timeout_min: 500,
@@ -155,7 +154,7 @@ impl Member {
                 id,
                 Arc::new(raft_config),
                 Peers::new(peers.clone()),
-                LogStore::new(log),
+                LogStore::new(Arc::clone(&log)),
                 bridge.clone(),
             ))
             .map_err(|error| failed(&error))?;
@@ -170,7 +169,7 @@ impl Member {
         };
         let (proposer, proposing) = proposer::start(raft.clone(), bridge.epoch());
         let tasks = vec![
-            runtime.spawn(serve_member(listener, raft.clone(), peers, id, fresh)),
+            runtime.spawn(serve_member(listener, raft.clone(), peers, id, log)),
             runtime.spawn(proposing),
             runtime.spawn(watch(raft.clone(), id, machine)),
             runtime.spawn(snapshots(raft.clone(), id, snapshot_every)),

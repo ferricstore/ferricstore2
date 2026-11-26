@@ -7,7 +7,9 @@
 //! [`wire`] body. A member serves each connection's requests in order. A
 //! failed connection is dropped and the next request reconnects. A snapshot
 //! for a member the log no longer reaches goes in one frame (phase 3; at
-//! most the frame limit), with a longer deadline.
+//! most the frame limit), with a longer deadline. Each request names its
+//! group and member; a member answers one meant for another with a
+//! refusal that names both.
 
 use std::collections::BTreeMap;
 use std::future::{Future, ready};
@@ -29,7 +31,7 @@ use tokio::net::{TcpListener, TcpStream};
 
 use super::Config;
 use super::ballot::Ballot;
-use super::wire::{self, Held, Request, Response};
+use super::wire::{self, Held, Recipient, Request, Response};
 
 /// Largest frame a member accepts.
 const MAX_FRAME_BYTES: u32 = 256 * 1024 * 1024;
@@ -65,18 +67,31 @@ async fn write_frame(stream: &mut TcpStream, body: &[u8]) -> io::Result<()> {
     stream.write_all(&frame).await
 }
 
-/// Serves Raft requests from other members to `raft`, a member that votes,
-/// until the listener fails.
-pub async fn serve<SM>(listener: TcpListener, raft: Raft<Config, SM>)
-where
+/// Serves Raft requests from other members to `raft`, member `id` of the
+/// group `peers` lists and a member that votes, until the listener fails.
+pub async fn serve<SM>(
+    listener: TcpListener,
+    raft: Raft<Config, SM>,
+    peers: BTreeMap<u64, String>,
+    id: u64,
+) where
     SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
-    serving(listener, raft, Arc::new(Ballot::new(false))).await;
+    let own = Recipient {
+        group: wire::group_id(&peers),
+        member: id,
+    };
+    serving(listener, raft, Arc::new(Ballot::new(false)), own).await;
 }
 
-/// Serves Raft requests to `raft`, which votes as `ballot` allows.
-pub(super) async fn serving<SM>(listener: TcpListener, raft: Raft<Config, SM>, ballot: Arc<Ballot>)
-where
+/// Serves Raft requests for `own` to `raft`, which votes as `ballot`
+/// allows.
+pub(super) async fn serving<SM>(
+    listener: TcpListener,
+    raft: Raft<Config, SM>,
+    ballot: Arc<Ballot>,
+    own: Recipient,
+) where
     SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
     // The connections stop with the server, so a peer that still holds one
@@ -87,17 +102,22 @@ where
         if stream.set_nodelay(true).is_err() {
             continue;
         }
-        connections.spawn(connection(stream, raft.clone(), Arc::clone(&ballot)));
+        connections.spawn(connection(stream, raft.clone(), Arc::clone(&ballot), own));
     }
 }
 
-async fn connection<SM>(mut stream: TcpStream, raft: Raft<Config, SM>, ballot: Arc<Ballot>)
-where
+async fn connection<SM>(
+    mut stream: TcpStream,
+    raft: Raft<Config, SM>,
+    ballot: Arc<Ballot>,
+    own: Recipient,
+) where
     SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
 {
     while let Ok(body) = read_frame(&mut stream).await {
         let response = match wire::decode_request(&body) {
-            Ok(request) => handle(&raft, &ballot, request).await,
+            Ok((recipient, _)) if recipient != own => Response::Failed(misdirected(recipient, own)),
+            Ok((_, request)) => handle(&raft, &ballot, request).await,
             Err(error) => Response::Failed(error.to_string()),
         };
         let Ok(bytes) = wire::encode_response(&response) else {
@@ -107,6 +127,14 @@ where
             return;
         }
     }
+}
+
+/// The refusal of a request meant for another group or member.
+fn misdirected(recipient: Recipient, own: Recipient) -> String {
+    format!(
+        "a request for member {} of group {:016x} reached member {} of group {:016x}",
+        recipient.member, recipient.group, own.member, own.group
+    )
 }
 
 async fn handle<SM>(raft: &Raft<Config, SM>, ballot: &Ballot, request: Request) -> Response
@@ -152,14 +180,16 @@ where
 /// The members' Raft addresses: `OpenRaft`'s network factory.
 pub struct Peers {
     addresses: Arc<BTreeMap<u64, String>>,
+    group: u64,
 }
 
 impl Peers {
     /// The network to `addresses` (`host:port`, resolved on each
-    /// connection), by member id.
+    /// connection), by member id: the group they list.
     #[must_use]
     pub fn new(addresses: BTreeMap<u64, String>) -> Self {
         Self {
+            group: wire::group_id(&addresses),
             addresses: Arc::new(addresses),
         }
     }
@@ -171,6 +201,10 @@ impl RaftNetworkFactory<Config> for Peers {
     fn new_client(&mut self, target: u64, (): &()) -> impl Future<Output = Link> + Send {
         ready(Link {
             address: self.addresses.get(&target).cloned(),
+            recipient: Recipient {
+                group: self.group,
+                member: target,
+            },
             stream: None,
         })
     }
@@ -179,6 +213,7 @@ impl RaftNetworkFactory<Config> for Peers {
 /// One client's connection to a member.
 pub struct Link {
     address: Option<String>,
+    recipient: Recipient,
     stream: Option<TcpStream>,
 }
 
@@ -196,7 +231,7 @@ impl Link {
     }
 
     async fn exchange(&mut self, request: &Request) -> io::Result<Response> {
-        let body = wire::encode_request(request)?;
+        let body = wire::encode_request(self.recipient, request)?;
         let mut stream = if let Some(stream) = self.stream.take() {
             stream
         } else {
@@ -230,13 +265,15 @@ impl Link {
     }
 }
 
-/// What the member at `address` holds (ADR-019).
+/// What `recipient`, at `address`, holds (ADR-019).
 ///
 /// # Errors
-/// The member cannot be reached or answers something else.
-pub(super) async fn status(address: &str) -> io::Result<Held> {
+/// The member cannot be reached, refuses the request or answers something
+/// else.
+pub(super) async fn status(address: &str, recipient: Recipient) -> io::Result<Held> {
     let mut link = Link {
         address: Some(address.to_owned()),
+        recipient,
         stream: None,
     };
     let answer = tokio::time::timeout(CONNECT_TIMEOUT, link.exchange(&Request::Status))

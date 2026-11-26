@@ -62,6 +62,18 @@ pub trait ConsensusLog: Send + Sync {
     /// The storage's refusal or failure.
     fn save_vote(&self, vote: &[u8]) -> Result<(), ConsensusLogError>;
 
+    /// Whether the member keeping this log may vote: it settled into a new
+    /// group, or caught up after it lost its log (ADR-019). A log whose
+    /// storage was lost lost this mark with it.
+    fn voter(&self) -> bool;
+
+    /// Marks that the member keeping this log may vote; returns once
+    /// durable.
+    ///
+    /// # Errors
+    /// The storage's refusal or failure.
+    fn save_voter(&self) -> Result<(), ConsensusLogError>;
+
     /// Appends entries that follow the last one (or replace a suffix from an
     /// index already held); readers see them at once and `done` is called
     /// once they are durable.
