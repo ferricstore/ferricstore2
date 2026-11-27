@@ -9,6 +9,7 @@
 //! its fields beyond the lifecycle record (ADR-014, [`meta`]), then `0`, or
 //! `1` and its history events ([`history`]).
 
+pub(crate) mod blocks;
 mod history;
 mod holdings;
 mod meta;
@@ -202,51 +203,31 @@ fn decode_record(reader: &mut Reader<'_>, limits: AdmissionLimits) -> Result<Res
     })
 }
 
+/// The limits records in an image are decoded under.
+fn limits() -> Option<AdmissionLimits> {
+    AdmissionLimits::new(MAX_INLINE_BYTES, usize::MAX, 1).ok()
+}
+
 /// Decodes a whole image; `None` when it is not exactly a count and that
 /// many records the domain accepts.
 pub(crate) fn decode(bytes: &[u8]) -> Option<Image> {
-    let limits = AdmissionLimits::new(MAX_INLINE_BYTES, usize::MAX, 1).ok()?;
+    let limits = limits()?;
     let mut reader = Reader(bytes);
     let count = reader.u64().ok()?;
     let mut records = Vec::new();
     for _ in 0..count {
         records.push(decode_record(&mut reader, limits).ok()?);
     }
-    let shared_count = reader.u64().ok()?;
-    let mut shared = Vec::new();
-    for _ in 0..shared_count {
-        shared.push(SharedValue {
-            partition: Partition::parse(reader.bin().ok()?),
-            reference: reader.bin().ok()?.to_vec(),
-            bytes: reader.bin().ok()?.to_vec(),
-            expires_at: reader.optional_u64().ok()?,
-        });
-    }
-    let policy_count = reader.u64().ok()?;
-    let mut policies = Vec::new();
-    for _ in 0..policy_count {
-        policies.push((
-            reader.bin().ok()?.to_vec(),
-            reader.u64().ok()?,
-            reader.bin().ok()?.to_vec(),
-        ));
-    }
-    let governance_count = reader.u64().ok()?;
-    let mut governance = Vec::new();
-    for _ in 0..governance_count {
-        governance.push((
-            reader.u8().ok()?,
-            reader.bin().ok()?.to_vec(),
-            reader.bin().ok()?.to_vec(),
-        ));
-    }
-    let stub_count = reader.u64().ok()?;
-    let mut stubs = Vec::new();
-    for _ in 0..stub_count {
-        stubs.push(decode_stub(&mut reader).ok()?);
-    }
-    let holdings = holdings::decode(&mut reader).ok()?;
-    let stored = stored::decode(&mut reader).ok()?;
+    let blocks::Head {
+        shared,
+        policies,
+        governance,
+    } = blocks::read_head(&mut reader)?;
+    let blocks::Trailer {
+        stubs,
+        holdings,
+        stored,
+    } = blocks::read_trailer(&mut reader)?;
     reader.0.is_empty().then_some(Image {
         records,
         shared,

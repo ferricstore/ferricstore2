@@ -3,8 +3,7 @@
 
 use std::io;
 
-use openraft::Snapshot;
-use openraft::type_config::alias::{LogIdOf, SnapshotOf, VoteOf};
+use openraft::type_config::alias::{LogIdOf, SnapshotMetaOf, VoteOf};
 use wf_ports::consensus::log::EntryId;
 
 use super::super::{Config, codec, snapshot};
@@ -64,12 +63,10 @@ impl<'a> Reader<'a> {
         self.take(length)
     }
 
-    pub(super) fn snapshot(&mut self) -> io::Result<SnapshotOf<Config, Vec<u8>>> {
+    /// A snapshot's metadata and length.
+    pub(super) fn snapshot(&mut self) -> io::Result<(SnapshotMetaOf<Config>, u64)> {
         let meta = snapshot::parse_meta(self.bytes()?)?;
-        Ok(Snapshot {
-            meta,
-            snapshot: self.bytes()?.to_vec(),
-        })
+        Ok((meta, self.u64()?))
     }
 
     pub(super) fn done<T>(&self, value: T) -> io::Result<T> {

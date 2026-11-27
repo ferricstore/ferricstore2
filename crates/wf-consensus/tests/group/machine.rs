@@ -4,7 +4,7 @@
 
 use std::collections::BTreeSet;
 use std::future::{Future, ready};
-use std::io;
+use std::io::{self, Read, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
@@ -20,7 +20,10 @@ use openraft::{
     EntryPayload, LogId, Membership, OptionalSend, Snapshot, SnapshotMeta, StoredMembership,
 };
 
-use wf_consensus::group::Config;
+use wf_consensus::group::{Config, Stored};
+use wf_ports::consensus::log::{ConsensusLogError, SnapshotStore};
+
+use super::memory::MemoryStore;
 
 /// What a member applied.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -32,7 +35,7 @@ pub(super) struct Image {
 }
 
 /// The last snapshot, with its metadata.
-type Current = Option<(SnapshotMetaOf<Config>, Vec<u8>)>;
+type Current = Option<(SnapshotMetaOf<Config>, Stored)>;
 
 fn put_u64(out: &mut Vec<u8>, value: u64) {
     out.extend_from_slice(&value.to_be_bytes());
@@ -146,6 +149,8 @@ pub(super) struct Machine {
     snapshot: Arc<Mutex<Current>>,
     /// While set, applying waits.
     paused: Arc<AtomicBool>,
+    /// Where its snapshots are kept.
+    store: MemoryStore,
 }
 
 /// Applies one entry to `image`.
@@ -180,31 +185,51 @@ impl Machine {
     fn keep(&self, current: Current) {
         *self.snapshot.lock().unwrap_or_else(PoisonError::into_inner) = current;
     }
+
+    /// Where its snapshots are kept; a member over TCP receives snapshots
+    /// into it.
+    pub(super) fn store(&self) -> Arc<dyn SnapshotStore> {
+        Arc::new(self.store.clone())
+    }
+
+    /// Writes `bytes` as snapshot `id` and adopts it.
+    fn save(&self, id: u64, bytes: &[u8]) -> io::Result<Stored> {
+        let failed = |error: ConsensusLogError| io::Error::other(error.to_string());
+        let mut sink = self.store.create(id).map_err(failed)?;
+        sink.write_all(bytes)?;
+        let length = sink.finish().map_err(failed)?;
+        self.store.adopt(id).map_err(failed)?;
+        Ok(Stored::new(self.store(), id, length))
+    }
 }
 
 // The machine answers synchronously, so most methods return ready futures.
 impl RaftSnapshotBuilder<Config> for Machine {
-    type SnapshotData = Vec<u8>;
+    type SnapshotData = Stored;
 
     fn build_snapshot(
         &mut self,
-    ) -> impl Future<Output = Result<SnapshotOf<Config, Vec<u8>>, io::Error>> + Send {
+    ) -> impl Future<Output = Result<SnapshotOf<Config, Stored>, io::Error>> + Send {
         let image = self.image();
         let meta = SnapshotMeta {
             last_log_id: image.applied,
             last_membership: image.membership.clone(),
         };
-        let bytes = encode(&image);
-        self.keep(Some((meta.clone(), bytes.clone())));
+        let id = image.applied.map_or(0, |log_id| log_id.index);
+        let stored = match self.save(id, &encode(&image)) {
+            Ok(stored) => stored,
+            Err(error) => return ready(Err(error)),
+        };
+        self.keep(Some((meta.clone(), stored.clone())));
         ready(Ok(Snapshot {
             meta,
-            snapshot: bytes,
+            snapshot: stored,
         }))
     }
 }
 
 impl RaftStateMachine<Config> for Machine {
-    type SnapshotData = Vec<u8>;
+    type SnapshotData = Stored;
     type SnapshotBuilder = Self;
 
     fn applied_state(
@@ -242,9 +267,13 @@ impl RaftStateMachine<Config> for Machine {
     fn install_snapshot(
         &mut self,
         meta: &SnapshotMetaOf<Config>,
-        snapshot: Vec<u8>,
+        snapshot: Stored,
     ) -> impl Future<Output = Result<(), io::Error>> + Send {
-        let Some(image) = decode(&snapshot) else {
+        let mut bytes = Vec::new();
+        let read = snapshot
+            .open()
+            .and_then(|mut source| source.read_to_end(&mut bytes));
+        let Some(image) = read.ok().and_then(|_| decode(&bytes)) else {
             return ready(Err(io::Error::other("malformed test snapshot")));
         };
         *self.state.lock().unwrap_or_else(PoisonError::into_inner) = image;
@@ -254,15 +283,14 @@ impl RaftStateMachine<Config> for Machine {
 
     fn get_current_snapshot(
         &mut self,
-    ) -> impl Future<Output = Result<Option<SnapshotOf<Config, Vec<u8>>>, io::Error>> + Send {
+    ) -> impl Future<Output = Result<Option<SnapshotOf<Config, Stored>>, io::Error>> + Send {
         let current = self
             .snapshot
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
             .clone();
-        ready(Ok(current.map(|(meta, bytes)| Snapshot {
-            meta,
-            snapshot: bytes,
-        })))
+        ready(Ok(
+            current.map(|(meta, snapshot)| Snapshot { meta, snapshot })
+        ))
     }
 }

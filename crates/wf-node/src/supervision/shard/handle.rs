@@ -168,9 +168,15 @@ fn role_change(state: &mut ShardState, now: u64, request: Request) {
             done(Ok(()));
         }
         Request::Policies { done } => done(Ok(state.policies().cloned().collect())),
-        Request::Export { done } => done(state.export(now).ok_or(ServiceError::Unavailable)),
-        Request::Install { image, done } => {
-            done(state.install(&image).ok_or(ServiceError::Unavailable));
+        Request::Export { blocks, done } => {
+            let sent = state.export_to(now, &mut |block| blocks.send(block).is_ok());
+            // Dropped first: the writer stops reading on it before the answer.
+            drop(blocks);
+            done(sent.ok_or(ServiceError::Unavailable));
+        }
+        Request::Install { blocks, done } => {
+            let installed = state.install_from(&mut || blocks.recv().ok());
+            done(installed.ok_or(ServiceError::Unavailable));
         }
         other => other.fail(ServiceError::Unavailable),
     }

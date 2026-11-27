@@ -6,7 +6,8 @@
 //! that reaches it by a reused address or a mistyped member list moves
 //! nothing. Then comes its kind (`1` append entries, `2` vote, `3`
 //! pre-vote, `4` a full snapshot: the leader's vote, the snapshot's metadata
-//! and its bytes); a response with its outcome (`0` an append accepted up to
+//! and its length, its bytes following in frames of their own); a response
+//! with its outcome (`0` an append accepted up to
 //! an optional log id, `1` an append conflict at a log id, `2` a higher vote,
 //! `3` a vote response, `4` a failure with its text, `5` a snapshot taken,
 //! with the receiver's vote). Kind `6` asks what a member holds (ADR-019);
@@ -14,11 +15,12 @@
 //! and the term it knows. Kind `7` asks for the member's newest snapshot if
 //! its last index is past one index and at most another (a leader trimming
 //! its log, ADR-018 phase 3); its answer is `7`, a presence byte, then the
-//! snapshot's metadata and bytes. A vote is its term, node
+//! snapshot's metadata and length, its bytes following as for kind `4`. A vote is its term, node
 //! and committed byte; an optional log id is a presence byte and the id's
 //! term, node and index; an entry is its id, its payload length and payload
 //! (`codec::encode`). Conflict hints are not sent; they are optional.
 
+mod append;
 mod reader;
 #[cfg(test)]
 mod tests;
@@ -29,10 +31,11 @@ use std::io;
 use openraft::raft::{
     AppendEntriesRequest, AppendError, AppendResult, SnapshotResponse, VoteRequest, VoteResponse,
 };
-use openraft::type_config::alias::{LogIdOf, SnapshotOf, VoteOf};
+use openraft::type_config::alias::{LogIdOf, SnapshotMetaOf, VoteOf};
 use sha2::{Digest, Sha256};
 
 use super::{Config, codec, snapshot};
+pub(crate) use append::encode_append;
 use reader::Reader;
 
 /// Whom a request is for.
@@ -75,8 +78,9 @@ pub(crate) enum Request {
     Vote(VoteRequest<Config>),
     /// A pre-vote probe.
     PreVote(VoteRequest<Config>),
-    /// A snapshot for a member the log no longer reaches.
-    Snapshot(VoteOf<Config>, SnapshotOf<Config, Vec<u8>>),
+    /// A snapshot for a member the log no longer reaches: the leader's vote,
+    /// the snapshot's metadata and its length in bytes, which follow.
+    Snapshot(VoteOf<Config>, SnapshotMetaOf<Config>, u64),
     /// What the member holds, asked by a member that starts without a log
     /// (ADR-019).
     Status,
@@ -111,8 +115,9 @@ pub(crate) enum Response {
     Snapshot(SnapshotResponse<Config>),
     /// To a status request.
     Status(Held),
-    /// To a request for the newest snapshot: none in the range asked.
-    Newest(Option<SnapshotOf<Config, Vec<u8>>>),
+    /// To a request for the newest snapshot: its metadata and length in
+    /// bytes, which follow, or none in the range asked.
+    Newest(Option<(SnapshotMetaOf<Config>, u64)>),
 }
 
 fn invalid() -> io::Error {
@@ -149,9 +154,10 @@ fn put_bytes(out: &mut Vec<u8>, bytes: &[u8]) -> io::Result<()> {
     Ok(())
 }
 
-fn put_snapshot(out: &mut Vec<u8>, snapshot: &SnapshotOf<Config, Vec<u8>>) -> io::Result<()> {
-    put_bytes(out, &snapshot::meta_bytes(&snapshot.meta)?)?;
-    put_bytes(out, &snapshot.snapshot)
+fn put_snapshot(out: &mut Vec<u8>, meta: &SnapshotMetaOf<Config>, length: u64) -> io::Result<()> {
+    put_bytes(out, &snapshot::meta_bytes(meta)?)?;
+    put_u64(out, length);
+    Ok(())
 }
 
 /// A request for `recipient` as bytes.
@@ -175,10 +181,10 @@ pub(crate) fn encode_request(recipient: Recipient, request: &Request) -> io::Res
                 put_bytes(&mut out, &codec::encode(entry)?)?;
             }
         }
-        Request::Snapshot(vote, snapshot) => {
+        Request::Snapshot(vote, meta, length) => {
             out.push(4);
             put_vote(&mut out, vote);
-            put_snapshot(&mut out, snapshot)?;
+            put_snapshot(&mut out, meta, *length)?;
         }
         Request::Status => out.push(6),
         Request::Newest { after, upto } => {
@@ -246,8 +252,8 @@ pub(crate) fn encode_response(response: &Response) -> io::Result<Vec<u8>> {
         Response::Newest(newest) => {
             out.push(7);
             out.push(u8::from(newest.is_some()));
-            if let Some(snapshot) = newest {
-                put_snapshot(&mut out, snapshot)?;
+            if let Some((meta, length)) = newest {
+                put_snapshot(&mut out, meta, *length)?;
             }
         }
     }
@@ -282,7 +288,11 @@ pub(crate) fn decode_request(bytes: &[u8]) -> io::Result<(Recipient, Request)> {
                 leader_commit,
             })
         }
-        4 => Request::Snapshot(reader.vote()?, reader.snapshot()?),
+        4 => {
+            let vote = reader.vote()?;
+            let (meta, length) = reader.snapshot()?;
+            Request::Snapshot(vote, meta, length)
+        }
         6 => Request::Status,
         7 => Request::Newest {
             after: reader.u64()?,

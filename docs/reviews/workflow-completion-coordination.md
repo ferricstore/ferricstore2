@@ -68007,3 +68007,200 @@ wire kind 7 (the byte reader moved to `wire/reader.rs` to keep `wire.rs`
 under 400 lines), `Bridge::offer`/`capture`, `snapshot::save_aside`, the
 leader's branch of `member::snapshots`, `proposer::quorum_heard`, and
 `Group::stop`.
+
+### Snapshots as streamed files; peer messages larger than a frame (ADR-018) (27 Nov)
+
+The next gap I named: a snapshot went to a member in one peer frame of at
+most 256 MiB, so once a group's data outgrew that, a new or far-behind
+member could not catch up. The user said go, then "do the most
+optimizations": a snapshot is now never in memory whole. Before, a member
+held its newest snapshot's bytes in memory for good (`Bridge::current`),
+built it from every shard's image at once plus a joined copy, copied it
+for each send, and received it into one buffer; an install decoded each
+shard's whole image and restored every Flow, finished ones included, in
+memory. The same session found that an append batch is bounded by entry
+count only (`max_payload_entries`), so a burst of large entries made a
+frame no member would accept.
+
+Decision (solo):
+
+- **Snapshot files** (`wf_storage::snapshot::files::group::GroupSnapshots`,
+  the streaming `SnapshotStore` port: `create` a sink, `finish`, `adopt`,
+  `open` a source): magic, id, length, body, and a SHA-256 over the magic,
+  id, body and length, the length written into its place last. A sink is
+  finished (synced, renamed) without becoming the newest; `adopt` makes it
+  the newest and removes the other adopted files and the finished ones
+  before it (a finished one after it may be an install or an offer under
+  way). A source checks the digest as it is read: the read that reaches
+  the end fails when a byte changed. Opening the directory removes temp
+  and finished files a stopped process left. The node's own snapshots
+  (ADR-013, `SnapshotFiles`) are unchanged.
+- **The snapshot is a handle** (`wf_consensus::group::Stored`: store, id,
+  length): `OpenRaft`'s snapshot data, the bridge's current snapshot, the
+  leader's offer, what a transfer sends and receives.
+- **Capture** (the machine port's `Capture::write_to`): every shard's
+  export starts at once, so each images the state the proposals so far
+  left; each sends its head, its records (finished Flows read from their
+  cold files one at a time) and its trailer as blocks (`image::blocks`)
+  into a channel of 16 that the writer drains shard by shard into the
+  file, so a shard waits while the writer catches up. That pauses a
+  follower's apply for the export, not its log acknowledgments.
+- **Transfer** (`peer::frame`): a snapshot's request (or a fetch's answer)
+  carries its metadata and length; its bytes follow in frames of at most
+  1 MiB, a blocking thread reading or writing the file four chunks ahead
+  of the connection. A refused snapshot's bytes are read and dropped so
+  the connection stays in step; one cut short drops the receiver's file.
+- **Install** (the machine port takes a source): the node reads each
+  shard's blocks and feeds them to it as it reads; a shard restores its
+  records into a fresh state, moving finished Flows to its cold files
+  every 1,024 records (`cool`, `settle_cold`), and every shard takes its
+  new state only after a commit that follows the whole file's check.
+- **Appends larger than a frame** (`wire::encode_append`): the entries go
+  as several appends, each the size of the frame limit at most, each
+  part's previous log id the last entry of the one before; a single entry
+  larger than the limit is refused with that reason. The limit is a
+  member setting (`max_frame_bytes`, 256 MiB by default), so tests use 64
+  KiB.
+
+New artifacts (solo design review, AGENTS.md): `GroupSnapshots` and its
+sink and source (`snapshot/files/group.rs`, under the durable-sync module
+`wf-storage::snapshot::files`); the port traits `Capture`, `SnapshotSink`,
+`SnapshotSource` and the streaming `SnapshotStore`; `Stored`;
+`peer/frame.rs`, `peer/link.rs`, `peer/server.rs` (split from `peer.rs`,
+which was at its 400 lines); `image/blocks.rs`; the shard's `Part`, and
+`Request::Export`/`Install` carrying channels; test support
+`tests/group/memory.rs` (an in-memory store for the gate's test machine).
+
+RED: `replica_frames::a_follower_catches_up_on_entries_larger_than_a_frame`
+(64 KiB frames, 15 Flows of 8 KiB written while C is down, then B down)
+and `replica_frames::a_member_installs_a_snapshot_larger_than_a_frame`
+(50 such Flows, A trims, C installs) were run with the plumbing in place
+but splitting and chunking switched off (every append and snapshot in one
+frame): the first failed with `Timeout` (the write needing C never
+committed), the second with "member 1 keeps no snapshot" (the leader's
+fetch of B's snapshot was refused as too large). Both pass, in 0.9 s and
+1.7 s. Unit tests: `wire::tests::an_append_larger_than_a_frame_goes_in_parts_that_follow_each_other`
+(parts within the limit, chained, entries in order; one too large fails;
+a heartbeat stays one), the wire round trips of kinds 4 and 7 with
+lengths, `group_snapshots::*` (a stream reads back whole across buffer
+sizes; nothing unfinished stays; adopting keeps one and any finished
+after it; a changed byte fails the read that reaches the end, a truncated
+file fails to open), `machine::tests::a_follower_s_snapshot_is_a_stored_file`.
+All 1,331 node, storage and consensus tests and the 22 recovery tests
+pass.
+
+Memory (rig `mem-replica.sh`, release binaries, three members on this
+machine, 150,000 Flows with 512-byte payloads and results through 4 SDK
+benchmark clients, a snapshot every 2,000 entries, about 220 MB each;
+then member 3 wiped and restarted under `/usr/bin/time -l`, installing a
+snapshot from the leader). b763382, then this change, two runs each:
+
+| | b763382 | streamed |
+|---|---:|---:|
+| followers, RSS after load | 2,007-2,143 MB | 904-1,026 MB |
+| followers, footprint | 606-730 MB | 358-402 MB |
+| leader, RSS | 1,515-1,546 MB | 898-904 MB |
+| leader, footprint | 785-818 MB | 496-521 MB |
+| rejoining member, peak RSS | 1,461 MB | 196 MB |
+
+A follower's footprint fell by about the snapshot's size (it no longer
+keeps its newest snapshot in memory), and its RSS by the copies a capture
+made; the rejoining member no longer holds the received snapshot, the
+images and every restored Flow at once.
+
+Mutants (`cargo mutants --in-diff`, each crate's tests; the consensus
+crate's also against the node's `replica*` tests, since a member's fetch
+and install run only there). Storage: 3 caught, 7 missed, all equivalent
+or crash/race-only: the buffer size (`BUFFER_BYTES`), `Sink::flush`
+(`finish` flushes through `into_inner`), the directory sync, the
+`NotFound` guard in `remove` (another remover only), and `older < id` in
+`adopt_now` (no finished file of the adopted id survives its rename).
+Consensus: 40 caught, 16 missed. That showed real gaps, closed with
+`peer::tests` (a one-member group served over loopback, and frames on a
+loopback pair):
+
+- `skip` had no test at all (9 mutants): a snapshot for another member is
+  refused, nothing of it stored, and the same connection answers the next
+  request (`a_snapshot_for_another_member_is_refused_and_read_past`);
+  skipped bytes leave the connection in step, and an empty frame or one
+  past the length is refused (`skipped_snapshot_bytes_leave_the_connection_in_step`;
+  the same for `receive_into` in
+  `received_snapshot_bytes_land_in_the_store_as_sent`).
+- `own_newest` with its first check inverted declined every fetch, yet the
+  node's frames test passed under load in one mutants worker and failed in
+  30 s here: a follower whose metrics lag its newest build still answered
+  through the second check. A deterministic test now asks a member for its
+  newest snapshot before it has one, inside the bounds and at either
+  bound's wrong side (`a_member_sends_its_newest_snapshot_only_between_the_bounds`),
+  which also kills `newest` answering "none" as an error.
+- `chunk -> 1` (a snapshot in one-byte frames):
+  `a_snapshot_goes_in_frames_as_large_as_the_limit_allows`.
+- `part.1 > 0 &&` in `encode_append` was redundant (an entry that fits
+  alone always fits an empty part) and is gone.
+
+The targeted rerun on those functions against the consensus lib tests:
+28 caught, 3 timed out (the mutant hangs the test), 3 missed: the two
+`connection` guards, which the integration and node tests catch (rounds 1
+and 2), and `||` to `&&` in `read_chunks`, equivalent (after a failed
+read the next read ends the stream or the closed channel stops it). The
+node: 4 missed, accepted (`image::limits` moved unchanged; `Request::fail`
+predates this change; `export::sequence`, whose order the old export had
+too, untested before and not observable by an installer).
+
+Stress (`stress-replica.sh 16 10`, now with `replica_frames` and
+`replica_lease` in its filter) failed the snapshot tests far more often
+than b763382's last run (trim 17, frames 12, install 14 of 160). Two
+causes, found with temporary prints (removed):
+
+- A stop left the member's snapshot work running. Under 16 copies a
+  capture took up to 17 s, nearly all of it the disk: the shards' blocks
+  arrived in milliseconds, `finish` (file and directory sync) took up to
+  16 s and `adopt` (two more directory syncs) several more. The group
+  runtime's stop waits 10 s (`STOP_WAIT`); 45 of 109 slow stops hit it.
+  The test then reopened the member on the same directory while the old
+  capture still renamed and removed files there: `GroupSnapshots::open`
+  failed on a temp file that vanished between its listing and its removal
+  ("the group's snapshot files did not open", 9), and the lingering
+  runtime also held its port (`AddrInUse`) and its log ("the entry log did
+  not open").
+- The streamed store synced more than it needed: a finished file synced
+  the directory (a finished file a crash loses is one restart removes
+  anyway) and adoption synced it twice (an older adopted file a crash
+  keeps is passed over for the newest). b763382's save synced the file,
+  the directory, and the directory again after removals.
+
+Fix (solo): `SnapshotStore::close` (port), called first by
+`Member::shutdown`: a closed `GroupSnapshots` refuses creating, finishing
+and adopting, and a sink dropped after it leaves its temp file to the
+store opened next, so work in flight changes nothing once the member
+stops (a rename already under way is the one step it cannot stop, so
+`open` takes a file already gone as removed). A snapshot now costs one
+file sync and one directory sync. RED:
+`group_snapshots::a_closed_store_leaves_its_directory_as_it_was` failed
+(`finish` after close succeeded) with a no-op `close`, and passes. With
+the fix, captures over 1 s fell from 48 to 20 in the same 16x5 run.
+
+A/B on the same tests (`TESTS='replica(_trim)?'`, 16x10, run back to
+back): b763382 failed 2 replica runs (`replica_trim`, `Unavailable`: a
+leader lost under load fails its round, fail-stop), this change 2 (one
+such, one "no member serves"); the consensus tests failed 6 and 4 times
+with the load-only errors every run shows ("no leader took the write",
+`peer.rs:317`).
+
+The full run after the fix (16x10, every replica test): the snapshot
+tests failed 17 of 480 runs (install 6, frames 3, trim 8; 43 before), and
+"the group's snapshot files did not open" no longer shows. What remains
+is load: a leader lost mid-round (`Unavailable`, 5), "no member serves"
+(4), one `Timeout`, and 7 reopens racing the stopped member's runtime
+(`AddrInUse` 3, "the entry log did not open" 2, "the group member did not
+start" 2): the stop still gives up after 10 s while a disk sync holds a
+runtime thread, the class b763382's `STOP_WAIT` cut, more frequent now
+that the frames tests add their load. Not changed here; the next step
+would be closing the entry log on stop as the store now is.
+
+The gate's architecture check then asked for three things: `wire.rs`
+reached 407 lines, so `encode_append` moved to `wire/append.rs` (one
+responsibility, the parent's private encoders); the store's `format_args!`
+became `format!` (the reviewed macro set); and the peer tests name their
+directories under the temp dir and let the stores create them, as
+`machine::tests` does, instead of the M0-only `TestResources`.

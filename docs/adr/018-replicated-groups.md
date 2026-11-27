@@ -86,10 +86,26 @@ leaders do.
    snapshots, at an exact applied position: the export requests reach every
    shard before any later replay. A snapshot holds each shard's portable
    image (finished Flows read back from cold files and inlined), the group
-   keeps the newest on disk, sends it in one peer frame (at most the frame
-   limit; chunking later) to a member the leader's log no longer reaches,
-   and a restarted member starts from it. Members must share the shard
-   count. A leader trims its log too (26 Nov): once it applied
+   keeps the newest on disk, sends it to a member the leader's log no
+   longer reaches, and a restarted member starts from it. Members must
+   share the shard count. Since 27 Nov a snapshot is never in memory whole
+   (it was read, kept, sent and received as one byte vector, and sent in
+   one frame of at most 256 MiB): it is a file in the member's snapshot
+   store (`GroupSnapshots`: written as a stream, checked as it is read,
+   finished, then adopted; one file sync when finished and one directory
+   sync when adopted; a stopping member closes its store, so snapshot
+   work still waiting on its disk changes nothing more there). Each shard sends its image as blocks (its
+   head, each record, its trailer; `image::blocks`) over a channel of 16
+   blocks that the snapshot writer drains shard by shard, so a shard
+   waits while the writer catches up; a transfer streams the file in
+   frames of at most 1 MiB, a few chunks ahead of the connection, into the
+   receiver's store; an install feeds each shard its blocks as they are
+   read, the shard moving finished Flows to its cold files every 1,024
+   records, and every shard takes its new state only once the whole file
+   was read and its check held. An append whose entries do not fit one
+   frame goes as several appends, each following the one before. The
+   frame limit is a member setting (`max_frame_bytes`, 256 MiB by
+   default). A leader trims its log too (26 Nov): once it applied
    `snapshot_every` entries past its newest snapshot, it asks the other
    members for a newer snapshot than its own, at most at its applied
    position (peer kind 7), keeps the first one offered as its own (saved,

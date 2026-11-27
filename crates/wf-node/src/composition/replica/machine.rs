@@ -2,16 +2,21 @@
 //! the shards, promotion and demotion, and snapshots of the shards'
 //! portable images.
 
+use std::io::{Read, Write};
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::mpsc::{self, Receiver, SyncSender};
 use std::sync::{Arc, Mutex, PoisonError, Weak};
 
 use wf_application::commands::queue::ServiceError;
-use wf_ports::consensus::log::{Applied, Captured, ConsensusLogError, ReplicatedMachine};
 
-use crate::supervision::shard::Request;
+use wf_ports::consensus::log::{
+    Applied, Capture, Captured, ConsensusLogError, ReplicatedMachine, SnapshotSource,
+};
+
 use crate::supervision::shard::command::Logged;
 use crate::supervision::shard::role::Role;
 use crate::supervision::shard::sink;
+use crate::supervision::shard::{Part as Fed, Request};
 
 use super::super::replay::by_shard;
 use super::super::router::Router;
@@ -154,30 +159,17 @@ impl ReplicatedMachine for Replicas {
             return false;
         }
         match self.router.upgrade() {
-            Some(router) => export(&router, done),
+            Some(router) => done(Ok(Box::new(export(&router)))),
             None => done(Err(machine_error("the node is stopping"))),
         }
         true
     }
 
-    fn install(&self, snapshot: Vec<u8>, done: Applied) {
+    fn install(&self, snapshot: Box<dyn SnapshotSource>, done: Applied) {
         let Some(router) = self.router.upgrade() else {
             return done(Err(machine_error("the node is stopping")));
         };
-        let Some(images) = split(&snapshot).filter(|images| images.len() == router.shards.len())
-        else {
-            return done(Err(machine_error(
-                "the snapshot does not match this node's shards",
-            )));
-        };
-        let Some(countdown) = Countdown::new(images.len(), done) else {
-            return;
-        };
-        for (index, image) in images.into_iter().enumerate() {
-            let part = countdown.clone();
-            let done = Box::new(move |outcome| part.part(outcome));
-            router.send(index, Request::Install { image, done });
-        }
+        done(install(&router, snapshot));
     }
 
     fn demote(&self) {
@@ -195,59 +187,147 @@ impl ReplicatedMachine for Replicas {
     }
 }
 
-/// A snapshot's bytes: the shard count (`u16`), then each shard's image with
-/// its length (`u32`).
-fn join(images: &[Vec<u8>]) -> Option<Vec<u8>> {
-    let mut out = u16::try_from(images.len()).ok()?.to_be_bytes().to_vec();
-    for image in images {
-        out.extend_from_slice(&u32::try_from(image.len()).ok()?.to_be_bytes());
-        out.extend_from_slice(image);
-    }
-    Some(out)
+/// Blocks a shard sends ahead of the snapshot writer, or an installing
+/// shard is sent ahead of its reading.
+const BLOCKS_AHEAD: usize = 16;
+
+/// A shard's export: its blocks as they come, then its outcome.
+type Part = (Receiver<Vec<u8>>, Receiver<Result<(), ServiceError>>);
+
+/// Each shard's export, in shard order.
+struct Exported {
+    parts: Vec<Part>,
 }
 
-fn split(snapshot: &[u8]) -> Option<Vec<Vec<u8>>> {
-    let (count, mut rest) = snapshot.split_first_chunk::<2>()?;
-    let mut images = Vec::new();
-    for _ in 0..u16::from_be_bytes(*count) {
-        let (length, after) = rest.split_first_chunk::<4>()?;
-        let length = usize::try_from(u32::from_be_bytes(*length)).ok()?;
-        let (image, after) = after.split_at_checked(length)?;
-        images.push(image.to_vec());
-        rest = after;
-    }
-    rest.is_empty().then_some(images)
+/// Starts every shard's export at once, so each images the state every
+/// proposal applied so far left; a shard waits while the writer, reading
+/// the shards in order, catches up with it.
+fn export(router: &Router) -> Exported {
+    let parts = (0..router.shards.len())
+        .map(|index| {
+            let (blocks, arriving) = mpsc::sync_channel(BLOCKS_AHEAD);
+            let (outcome, answered) = mpsc::channel();
+            let done = Box::new(move |result| {
+                // The writer may have stopped waiting.
+                drop(outcome.send(result));
+            });
+            router.send(index, Request::Export { blocks, done });
+            (arriving, answered)
+        })
+        .collect();
+    Exported { parts }
 }
 
-/// Gathers every shard's portable image, in shard order.
-fn export(router: &Router, done: Captured) {
-    let shards = router.shards.len();
-    let images: Arc<Mutex<Vec<Vec<u8>>>> = Arc::new(Mutex::new(vec![Vec::new(); shards]));
-    let gathered = Arc::clone(&images);
-    let joined: Applied = Box::new(move |outcome| {
-        let images = gathered.lock().unwrap_or_else(PoisonError::into_inner);
-        let snapshot = join(&images).ok_or_else(|| machine_error("the snapshot is too large"));
-        done(outcome.and(snapshot));
-    });
-    let Some(countdown) = Countdown::new(shards, joined) else {
-        return;
-    };
-    for index in 0..shards {
-        let part = countdown.clone();
-        let images = Arc::clone(&images);
-        let done = Box::new(move |image: Result<Vec<u8>, ServiceError>| {
-            part.part(image.map(|bytes| keep(&images, index, bytes)));
+fn written(error: &std::io::Error) -> ConsensusLogError {
+    machine_error(&format!("the snapshot could not be written: {error}"))
+}
+
+/// A snapshot's machine bytes: the shard count (`u16`), then each shard's
+/// blocks in shard order, each a `u32` length and its bytes.
+impl Capture for Exported {
+    fn write_to(self: Box<Self>, out: &mut dyn Write) -> Result<(), ConsensusLogError> {
+        let count = u16::try_from(self.parts.len())
+            .map_err(|_| machine_error("too many shards for a snapshot"))?;
+        out.write_all(&count.to_be_bytes())
+            .map_err(|error| written(&error))?;
+        for (arriving, answered) in self.parts {
+            for block in arriving {
+                let length = u32::try_from(block.len())
+                    .map_err(|_| machine_error("a snapshot block is too large"))?;
+                out.write_all(&length.to_be_bytes())
+                    .and_then(|()| out.write_all(&block))
+                    .map_err(|error| written(&error))?;
+            }
+            answered
+                .recv()
+                .map_err(|_| machine_error("a shard did not answer its export"))?
+                .map_err(|error| machine_error(&error.to_string()))?;
+        }
+        Ok(())
+    }
+}
+
+fn read_block(source: &mut dyn Read) -> std::io::Result<Vec<u8>> {
+    let mut length = [0; 4];
+    source.read_exact(&mut length)?;
+    let length = usize::try_from(u32::from_be_bytes(length)).map_err(std::io::Error::other)?;
+    let mut block = vec![0; length];
+    source.read_exact(&mut block)?;
+    Ok(block)
+}
+
+/// Reads one shard's blocks from `source` and passes them to it: its
+/// head, its records up to the empty block, then its trailer.
+fn feed(source: &mut dyn Read, shard: &SyncSender<Fed>) -> std::io::Result<()> {
+    let stopped = |_| std::io::Error::other("an installing shard stopped");
+    let head = read_block(source)?;
+    shard.send(Fed::Block(head)).map_err(stopped)?;
+    loop {
+        let block = read_block(source)?;
+        let last = block.is_empty();
+        shard.send(Fed::Block(block)).map_err(stopped)?;
+        if last {
+            break;
+        }
+    }
+    let trailer = read_block(source)?;
+    shard.send(Fed::Block(trailer)).map_err(stopped)
+}
+
+/// Installs `source` into every shard, reading it once: each shard builds
+/// its new state from its blocks as they are read, and takes it once the
+/// whole snapshot was read and its check held (a read that fails, the
+/// check included, leaves every shard as it was).
+fn install(router: &Router, mut source: Box<dyn SnapshotSource>) -> Result<(), ConsensusLogError> {
+    let mut count = [0; 2];
+    source
+        .read_exact(&mut count)
+        .map_err(|error| written(&error))?;
+    if usize::from(u16::from_be_bytes(count)) != router.shards.len() {
+        return Err(machine_error(
+            "the snapshot does not match this node's shards",
+        ));
+    }
+    let mut shards = Vec::new();
+    for index in 0..router.shards.len() {
+        let (blocks, arriving) = mpsc::sync_channel(BLOCKS_AHEAD);
+        let (outcome, answered) = mpsc::channel();
+        let done = Box::new(move |result| {
+            // The installer may have stopped waiting.
+            drop(outcome.send(result));
         });
-        router.send(index, Request::Export { done });
+        router.send(
+            index,
+            Request::Install {
+                blocks: arriving,
+                done,
+            },
+        );
+        shards.push((blocks, answered));
     }
-}
-
-fn keep(images: &Mutex<Vec<Vec<u8>>>, index: usize, bytes: Vec<u8>) {
-    if let Some(slot) = images
-        .lock()
-        .unwrap_or_else(PoisonError::into_inner)
-        .get_mut(index)
-    {
-        *slot = bytes;
+    let read = shards
+        .iter()
+        .try_for_each(|(blocks, _)| feed(&mut source, blocks))
+        .and_then(|()| {
+            let mut after = [0; 1];
+            match source.read(&mut after)? {
+                0 => Ok(()),
+                _ => Err(std::io::Error::other(
+                    "bytes after the snapshot's last shard",
+                )),
+            }
+        });
+    let mut outcome = read.map_err(|error| written(&error));
+    for (blocks, answered) in shards {
+        if outcome.is_ok() && blocks.send(Fed::Commit).is_err() {
+            outcome = Err(machine_error("an installing shard stopped"));
+        }
+        // Dropped without a commit, a shard keeps its state.
+        drop(blocks);
+        let installed = answered.recv().ok().and_then(Result::ok);
+        if outcome.is_ok() && installed.is_none() {
+            outcome = Err(machine_error("a shard did not install its image"));
+        }
     }
+    outcome
 }

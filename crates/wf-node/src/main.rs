@@ -283,6 +283,7 @@ fn open(options: &Options) -> Result<QueueNode, String> {
         listener,
         snapshot_every: options.snapshot_every,
         keep_logs: options.keep_logs,
+        max_frame_bytes: wf_consensus::group::MAX_FRAME_BYTES,
     };
     QueueNode::open_replicated(&options.data_dir, options.config, replica)
         .map_err(|error| error.to_string())

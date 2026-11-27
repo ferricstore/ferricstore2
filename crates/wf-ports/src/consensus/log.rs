@@ -121,31 +121,80 @@ pub trait ReplicatedMachine: Send + Sync {
     fn demote(&self);
 
     /// Starts capturing the machine as it is now, every proposal handed to
-    /// [`Self::apply`] included, and calls `done` with its bytes; `false`,
-    /// without calling `done`, while the machine serves as the leader's
-    /// (its state may hold rounds not yet committed).
+    /// [`Self::apply`] included, and calls `done` with the capture, which
+    /// writes it out ([`Capture::write_to`]); `false`, without calling
+    /// `done`, while the machine serves as the leader's (its state may hold
+    /// rounds not yet committed).
     fn snapshot(&self, done: Captured) -> bool;
 
-    /// Replaces the machine's state with a captured one; `done` once it
-    /// holds it.
-    fn install(&self, snapshot: Vec<u8>, done: Applied);
+    /// Replaces the machine's state with the one `snapshot` holds, as a
+    /// capture wrote it, reading it as it goes; `done` once it holds it.
+    /// The new state takes effect only once the whole of `snapshot` was
+    /// read and checked; a read error leaves the machine as it was.
+    fn install(&self, snapshot: Box<dyn SnapshotSource>, done: Applied);
 }
 
-/// Called once with a machine's captured bytes, or why it failed.
-pub type Captured = Box<dyn FnOnce(Result<Vec<u8>, ConsensusLogError>) + Send>;
+/// A machine captured at one position, written out once.
+pub trait Capture: Send {
+    /// Writes the capture to `out`, a part at a time, so the whole machine
+    /// is never in memory at once.
+    ///
+    /// # Errors
+    /// A part that cannot be captured, and `out`'s failures.
+    fn write_to(self: Box<Self>, out: &mut dyn std::io::Write) -> Result<(), ConsensusLogError>;
+}
 
-/// Durable snapshots of a group's machine, newest kept.
+/// Called once with a machine's capture, or why it failed.
+pub type Captured = Box<dyn FnOnce(Result<Box<dyn Capture>, ConsensusLogError>) + Send>;
+
+/// A snapshot being written; nothing is visible until it is finished.
+pub trait SnapshotSink: std::io::Write + Send {
+    /// Makes what was written durable as a finished snapshot, not yet the
+    /// newest ([`SnapshotStore::adopt`]); returns its length in bytes.
+    ///
+    /// # Errors
+    /// The storage's refusal or failure; the snapshot is then dropped.
+    fn finish(self: Box<Self>) -> Result<u64, ConsensusLogError>;
+}
+
+/// A finished snapshot being read. Its bytes are checked as they are read:
+/// the read that reaches its end fails when they differ from what was
+/// written.
+pub trait SnapshotSource: std::io::Read + Send {
+    /// Its length in bytes.
+    fn length(&self) -> u64;
+}
+
+/// Durable snapshots of a group's machine, written and read as streams.
 pub trait SnapshotStore: Send + Sync {
-    /// Saves `parts`, joined, as snapshot `id` (ids grow), durably, and
-    /// removes earlier ones.
+    /// Starts writing snapshot `id` (its last log index).
     ///
     /// # Errors
     /// The storage's refusal or failure.
-    fn save(&self, id: u64, parts: &[&[u8]]) -> Result<(), ConsensusLogError>;
+    fn create(&self, id: u64) -> Result<Box<dyn SnapshotSink>, ConsensusLogError>;
 
-    /// The newest snapshot and its id, if any.
+    /// Makes finished snapshot `id` the newest and removes every other
+    /// snapshot; readers already open keep reading theirs.
+    ///
+    /// # Errors
+    /// The storage's refusal or failure, or no finished snapshot `id`.
+    fn adopt(&self, id: u64) -> Result<(), ConsensusLogError>;
+
+    /// The newest adopted snapshot's id, if any.
     ///
     /// # Errors
     /// The storage's refusal or failure.
-    fn newest(&self) -> Result<Option<(u64, Vec<u8>)>, ConsensusLogError>;
+    fn newest(&self) -> Result<Option<u64>, ConsensusLogError>;
+
+    /// Opens finished snapshot `id`, adopted or not.
+    ///
+    /// # Errors
+    /// The storage's refusal or failure, or no finished snapshot `id`.
+    fn open(&self, id: u64) -> Result<Box<dyn SnapshotSource>, ConsensusLogError>;
+
+    /// Closes the store as its member stops: from now on, creating,
+    /// finishing and adopting a snapshot are refused and change nothing,
+    /// so work still in flight leaves the storage as it was for whatever
+    /// opens it next. Reading goes on.
+    fn close(&self);
 }

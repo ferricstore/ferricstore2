@@ -16,4 +16,5 @@ mod state_keys;
 mod state_values;
 
 mod cold_files;
+mod group_snapshots;
 mod snapshot_files;

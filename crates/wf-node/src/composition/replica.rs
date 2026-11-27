@@ -20,7 +20,7 @@ use wf_application::commands::queue::{Route, SLOTS};
 use wf_consensus::group::{Member, MemberConfig};
 use wf_ports::consensus::log::{ConsensusLog, SnapshotStore};
 use wf_storage::log::EntryLog;
-use wf_storage::snapshot::files::SnapshotFiles;
+use wf_storage::snapshot::files::group::GroupSnapshots;
 
 use crate::supervision;
 use crate::supervision::shard::role::Role;
@@ -42,6 +42,9 @@ pub struct Replica {
     pub snapshot_every: u64,
     /// Entries kept in the log behind a snapshot.
     pub keep_logs: u64,
+    /// The largest frame between members (`wf_consensus::group::MAX_FRAME_BYTES`
+    /// unless set otherwise; every member is given the same).
+    pub max_frame_bytes: u32,
 }
 
 /// How long a stopping node waits for its group's work to stop.
@@ -117,8 +120,9 @@ impl QueueNode {
             listener: replica.listener,
             snapshot_every: replica.snapshot_every,
             keep_logs: replica.keep_logs,
+            max_frame_bytes: replica.max_frame_bytes,
         };
-        let snapshots = SnapshotFiles::open(&directory.join("group-snapshots"))
+        let snapshots = GroupSnapshots::open(&directory.join("group-snapshots"))
             .map_err(|_| NodeError::Group("the group's snapshot files did not open"))?;
         let stores = (
             Arc::new(log) as Arc<dyn ConsensusLog>,

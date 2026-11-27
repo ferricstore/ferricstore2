@@ -7,6 +7,7 @@
 
 mod cluster;
 mod machine;
+mod memory;
 mod network;
 mod peer;
 mod suite;

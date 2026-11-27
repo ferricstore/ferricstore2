@@ -42,6 +42,10 @@ pub struct MemberConfig {
     /// Entries kept in the log behind a snapshot, so a slightly late member
     /// catches up from the log instead of a snapshot.
     pub keep_logs: u64,
+    /// The largest frame this member sends or accepts from the others
+    /// ([`super::MAX_FRAME_BYTES`] unless set otherwise; every member is
+    /// given the same). An entry must fit one.
+    pub max_frame_bytes: u32,
 }
 
 /// A member that could not start.
@@ -66,6 +70,8 @@ pub struct Member {
     raft: Raft<Config, Bridge>,
     runtime: Handle,
     tasks: Vec<JoinHandle<()>>,
+    /// Closed first as the member stops.
+    store: Arc<dyn SnapshotStore>,
 }
 
 /// A process's epoch: the wall clock in nanoseconds when it starts, so a
@@ -99,11 +105,15 @@ const fn due(applied: u64, taken: u64, every: u64) -> bool {
     applied.saturating_sub(taken) >= every
 }
 
-/// The first newer snapshot a member `links` reaches holds: its last index
-/// past `after` and at most `upto`.
-async fn fetch(links: &mut [Link], after: u64, upto: u64) -> Option<Taken> {
+/// The first newer snapshot a member `links` reaches holds (its last index
+/// past `after` and at most `upto`), received into `store`.
+async fn fetch(
+    links: &mut [Link],
+    (after, upto): (u64, u64),
+    store: &Arc<dyn SnapshotStore>,
+) -> Option<Taken> {
     for link in links {
-        if let Ok(Some(snapshot)) = peer::newest(link, after, upto).await {
+        if let Ok(Some(snapshot)) = peer::newest(link, (after, upto), store).await {
             return Some(snapshot);
         }
     }
@@ -119,7 +129,7 @@ async fn fetch(links: &mut [Link], after: u64, upto: u64) -> Option<Taken> {
 /// opens no new connections.
 async fn snapshots(
     (raft, bridge): (Raft<Config, Bridge>, Bridge),
-    (peers, own): (BTreeMap<u64, String>, Recipient),
+    (peers, own, limit): (BTreeMap<u64, String>, Recipient, u32),
     every: u64,
 ) {
     if every == 0 {
@@ -128,8 +138,9 @@ async fn snapshots(
     let mut links: Vec<Link> = peers
         .into_iter()
         .filter(|(member, _)| *member != own.member)
-        .map(|(member, address)| Link::to(address, Recipient { member, ..own }))
+        .map(|(member, address)| Link::to(address, Recipient { member, ..own }, limit))
         .collect();
+    let store = bridge.store();
     // The last index fetched, so its build is not fetched again.
     let mut fetched = 0;
     loop {
@@ -147,7 +158,8 @@ async fn snapshots(
             continue;
         }
         if leads {
-            let Some(snapshot) = fetch(&mut links, taken.max(fetched), applied).await else {
+            let Some(snapshot) = fetch(&mut links, (taken.max(fetched), applied), &store).await
+            else {
                 continue;
             };
             fetched = snapshot.meta.last_log_id.map_or(0, |log_id| log_id.index);
@@ -178,6 +190,7 @@ impl Member {
             listener,
             snapshot_every,
             keep_logs,
+            max_frame_bytes,
         } = config;
         let raft_config = openraft::Config {
             heartbeat_interval: 100,
@@ -196,7 +209,8 @@ impl Member {
         }
         .validate()
         .map_err(|error| failed(&error))?;
-        let bridge = Bridge::new(Arc::clone(&machine), (id, epoch()), store);
+        let closing = Arc::clone(&store);
+        let bridge = Bridge::new(Arc::clone(&machine), (id, epoch()), Arc::clone(&store));
         runtime
             .block_on(bridge.restore())
             .map_err(|error| failed(&error))?;
@@ -204,7 +218,7 @@ impl Member {
             .block_on(Raft::new(
                 id,
                 Arc::new(raft_config),
-                Peers::new(peers.clone()),
+                Peers::limited(peers.clone(), max_frame_bytes),
                 LogStore::new(Arc::clone(&log)),
                 bridge.clone(),
             ))
@@ -226,10 +240,16 @@ impl Member {
         let tasks = vec![
             runtime.spawn(snapshots(
                 (raft.clone(), bridge),
-                (peers.clone(), own),
+                (peers.clone(), own, max_frame_bytes),
                 snapshot_every,
             )),
-            runtime.spawn(serve_member(listener, raft.clone(), peers, id, log)),
+            runtime.spawn(serve_member(
+                listener,
+                raft.clone(),
+                peers,
+                id,
+                (log, store, max_frame_bytes),
+            )),
             runtime.spawn(proposing),
             runtime.spawn(watch(raft.clone(), id, machine)),
         ];
@@ -239,6 +259,7 @@ impl Member {
                 raft,
                 runtime: runtime.clone(),
                 tasks,
+                store: closing,
             },
             proposer,
         ))
@@ -262,8 +283,11 @@ impl Member {
         self.leader() == Some(self.id)
     }
 
-    /// Stops the member: its Raft, listener, proposer and watcher.
+    /// Stops the member: its Raft, listener, proposer and watcher. Its
+    /// snapshot store closes first, so snapshot work still running (a
+    /// capture waiting on its disk) changes nothing more there.
     pub fn shutdown(self) {
+        self.store.close();
         // A failed shutdown leaves nothing to clean up.
         let _stopped = self.runtime.block_on(self.raft.shutdown());
         for task in self.tasks {

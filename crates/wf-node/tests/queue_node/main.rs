@@ -52,6 +52,7 @@ mod lifecycle;
 mod log_growth;
 mod reclaim;
 mod replica;
+mod replica_frames;
 mod replica_lease;
 mod replica_trim;
 mod restart;

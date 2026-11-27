@@ -54,6 +54,7 @@ fn open_with(
         listener: TcpListener::bind(address)?,
         snapshot_every,
         keep_logs: 0,
+        max_frame_bytes: wf_consensus::group::MAX_FRAME_BYTES,
     };
     Ok(QueueNode::open_replicated(
         &path.join(format!("n{id}")),

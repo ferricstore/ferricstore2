@@ -8,8 +8,8 @@ use wf_ports::consensus::log::EntryId;
 
 use super::super::{Proposal, codec};
 use super::{
-    Held, Recipient, Request, Response, decode_request, decode_response, encode_request,
-    encode_response, group_id,
+    Held, Recipient, Request, Response, decode_request, decode_response, encode_append,
+    encode_request, encode_response, group_id,
 };
 
 fn id(term: u64, index: u64) -> EntryId {
@@ -30,13 +30,6 @@ fn taken() -> SnapshotOf<super::Config, Vec<u8>> {
         },
         snapshot: b"image".to_vec(),
     }
-}
-
-fn same_snapshot(
-    sent: &SnapshotOf<super::Config, Vec<u8>>,
-    read: &SnapshotOf<super::Config, Vec<u8>>,
-) -> bool {
-    sent.meta == read.meta && sent.snapshot == read.snapshot
 }
 
 #[test]
@@ -69,7 +62,7 @@ fn requests_read_back_as_sent() {
         Request::Append(append),
         Request::Vote(vote.clone()),
         Request::PreVote(vote),
-        Request::Snapshot(Vote::new_committed(3, 2), taken()),
+        Request::Snapshot(Vote::new_committed(3, 2), taken().meta, 5),
         Request::Newest { after: 4, upto: 9 },
     ] {
         let bytes = encode_request(RECIPIENT, &request).unwrap_or_default();
@@ -83,9 +76,10 @@ fn requests_read_back_as_sent() {
             }
             (Request::Vote(sent), Some(Request::Vote(read)))
             | (Request::PreVote(sent), Some(Request::PreVote(read))) => sent == read,
-            (Request::Snapshot(vote, sent), Some(Request::Snapshot(read_vote, read))) => {
-                vote == read_vote && same_snapshot(sent, read)
-            }
+            (
+                Request::Snapshot(vote, meta, length),
+                Some(Request::Snapshot(read_vote, read_meta, read_length)),
+            ) => (vote, meta, length) == (read_vote, read_meta, read_length),
             (
                 Request::Newest { after, upto },
                 Some(Request::Newest {
@@ -168,7 +162,7 @@ fn responses_read_back_as_sent() {
             last_log: None,
             term: 2,
         }),
-        Response::Newest(Some(taken())),
+        Response::Newest(Some((taken().meta, 5))),
         Response::Newest(None),
     ];
     for response in responses {
@@ -179,9 +173,7 @@ fn responses_read_back_as_sent() {
             (Response::Vote(sent), Some(Response::Vote(read))) => sent == read,
             (Response::Failed(sent), Some(Response::Failed(read))) => sent == read,
             (Response::Status(sent), Some(Response::Status(read))) => sent == read,
-            (Response::Newest(Some(sent)), Some(Response::Newest(Some(read)))) => {
-                same_snapshot(sent, read)
-            }
+            (Response::Newest(Some(sent)), Some(Response::Newest(Some(read)))) => sent == read,
             (Response::Newest(None), Some(Response::Newest(None))) => true,
             _ => false,
         };
@@ -191,4 +183,78 @@ fn responses_read_back_as_sent() {
     // answer names whether one follows.
     assert!(decode_response(&[6, 2, 0, 0, 0, 0, 0, 0, 0, 0]).is_err());
     assert!(decode_response(&[7, 2]).is_err());
+}
+
+/// An append whose entries do not fit one frame goes as several, each at
+/// most the limit, its entries in order, each part's previous log id the
+/// last entry of the one before; one entry too large for the limit fails,
+/// and an append without entries stays one request.
+#[test]
+fn an_append_larger_than_a_frame_goes_in_parts_that_follow_each_other() {
+    let entries: Vec<_> = (5..15)
+        .map(|index| Entry {
+            log_id: codec::log_id(id(3, index)),
+            payload: EntryPayload::Normal(Proposal(vec![7; 100])),
+        })
+        .collect();
+    let append = AppendEntriesRequest {
+        vote: Vote::new_committed(3, 2),
+        prev_log_id: Some(codec::log_id(id(2, 4))),
+        entries,
+        leader_commit: Some(codec::log_id(id(3, 6))),
+    };
+    let limit = 400;
+    let parts = encode_append(RECIPIENT, &append, limit).unwrap_or_default();
+    assert!(parts.len() > 1, "{}", parts.len());
+    let mut prev = append.prev_log_id;
+    let mut sent = Vec::new();
+    for part in &parts {
+        assert!(part.len() <= limit, "{}", part.len());
+        let decoded = decode_request(part);
+        assert!(
+            matches!(decoded, Ok((_, Request::Append(_)))),
+            "not an append"
+        );
+        let Ok((recipient, Request::Append(read))) = decoded else {
+            return;
+        };
+        assert_eq!(recipient, RECIPIENT);
+        assert_eq!(read.prev_log_id, prev);
+        assert_eq!(read.vote, append.vote);
+        assert_eq!(read.leader_commit, append.leader_commit);
+        prev = read.entries.last().map(|entry| entry.log_id);
+        sent.extend(read.entries);
+    }
+    assert_eq!(format!("{sent:?}"), format!("{:?}", append.entries));
+    // The whole append fits a larger limit as one request, as encoded alone.
+    let whole = encode_append(RECIPIENT, &append, 1 << 20).unwrap_or_default();
+    let alone = encode_request(RECIPIENT, &Request::Append(append.clone())).unwrap_or_default();
+    assert_eq!(whole, vec![alone]);
+    assert!(encode_append(RECIPIENT, &append, 150).is_err());
+    // A limit exactly one entry's request fits it alone; exactly two
+    // entries' request takes both.
+    let alone = |entries: &[Entry<_, _>]| {
+        let append = AppendEntriesRequest {
+            entries: entries.to_vec(),
+            ..append.clone()
+        };
+        encode_request(RECIPIENT, &Request::Append(append)).map_or(0, |bytes| bytes.len())
+    };
+    let one = alone(&append.entries[..1]);
+    let parts = encode_append(RECIPIENT, &append, one).unwrap_or_default();
+    assert_eq!(parts.len(), append.entries.len());
+    assert!(parts.iter().all(|part| part.len() == one));
+    let two = alone(&append.entries[..2]);
+    let parts = encode_append(RECIPIENT, &append, two).unwrap_or_default();
+    assert_eq!(parts.len(), append.entries.len() / 2);
+    let heartbeat = AppendEntriesRequest {
+        entries: Vec::new(),
+        ..append
+    };
+    assert_eq!(
+        encode_append(RECIPIENT, &heartbeat, 100)
+            .map(|parts| parts.len())
+            .ok(),
+        Some(1)
+    );
 }

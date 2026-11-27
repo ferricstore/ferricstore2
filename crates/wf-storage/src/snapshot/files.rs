@@ -14,6 +14,8 @@ use std::path::{Path, PathBuf};
 
 use sha2::{Digest, Sha256};
 
+pub mod group;
+
 const MAGIC: &[u8; 8] = b"WFSNAP01";
 const SUFFIX: &str = ".snapshot";
 const TEMP_SUFFIX: &str = ".snapshot.tmp";
@@ -201,26 +203,4 @@ fn check(bytes: &[u8], id: u64) -> Option<&[u8]> {
     let length = u64::from_be_bytes(length.try_into().ok()?);
     let whole = magic == MAGIC && named == id && u64::try_from(body.len()).ok()? == length;
     whole.then_some(body)
-}
-
-/// Snapshot files as a replicated group's snapshot store (ADR-018).
-impl wf_ports::consensus::log::SnapshotStore for SnapshotFiles {
-    fn save(
-        &self,
-        id: u64,
-        parts: &[&[u8]],
-    ) -> Result<(), wf_ports::consensus::log::ConsensusLogError> {
-        let failed = |error: SnapshotError| {
-            wf_ports::consensus::log::ConsensusLogError::new(error.to_string())
-        };
-        self.write(id, parts).map_err(failed)?;
-        self.remove_before(id).map_err(failed)
-    }
-
-    fn newest(
-        &self,
-    ) -> Result<Option<(u64, Vec<u8>)>, wf_ports::consensus::log::ConsensusLogError> {
-        Self::newest(self)
-            .map_err(|error| wf_ports::consensus::log::ConsensusLogError::new(error.to_string()))
-    }
 }

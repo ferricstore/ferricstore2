@@ -17,6 +17,16 @@ use super::{TestResult, directory};
 /// Opens member `id`: a follower snapshots every 20 entries, and the log
 /// starts a segment every 4 KiB, so a trimmed log drops whole segments.
 fn open(path: &Path, id: u64, peers: &BTreeMap<u64, SocketAddr>) -> TestResult<QueueNode> {
+    open_framed(path, id, peers, wf_consensus::group::MAX_FRAME_BYTES)
+}
+
+/// As `open`, with frames between members of at most `max_frame_bytes`.
+pub(super) fn open_framed(
+    path: &Path,
+    id: u64,
+    peers: &BTreeMap<u64, SocketAddr>,
+    max_frame_bytes: u32,
+) -> TestResult<QueueNode> {
     let address = peers.get(&id).ok_or("unknown member")?;
     let replica = Replica {
         id,
@@ -27,6 +37,7 @@ fn open(path: &Path, id: u64, peers: &BTreeMap<u64, SocketAddr>) -> TestResult<Q
         listener: TcpListener::bind(address)?,
         snapshot_every: 20,
         keep_logs: 0,
+        max_frame_bytes,
     };
     let config = QueueNodeConfig {
         log: GroupLogLimits {
@@ -43,7 +54,7 @@ fn open(path: &Path, id: u64, peers: &BTreeMap<u64, SocketAddr>) -> TestResult<Q
 }
 
 /// Member `id`'s log segments, by number.
-fn segments(path: &Path, id: u64) -> TestResult<Vec<String>> {
+pub(super) fn segments(path: &Path, id: u64) -> TestResult<Vec<String>> {
     let mut names = Vec::new();
     for entry in std::fs::read_dir(path.join(format!("n{id}")).join("group"))? {
         names.push(entry?.file_name().to_string_lossy().into_owned());
@@ -69,7 +80,7 @@ fn trimmed(path: &Path, id: u64, first: &str) -> TestResult<bool> {
 /// keeps a snapshot and dropped log segment `first`: its snapshots follow
 /// its followers', which follow the entries they apply, so how many
 /// entries that takes depends on how the rounds were cut.
-fn trim(path: &Path, (id, node): (u64, &QueueNode), first: &str) -> TestResult {
+pub(super) fn trim(path: &Path, (id, node): (u64, &QueueNode), first: &str) -> TestResult {
     let until = Instant::now() + Duration::from_secs(30);
     let mut round = 0;
     while Instant::now() < until {

@@ -22,8 +22,9 @@ use openraft::{OptionalSend, impls};
 pub use join::serve_member;
 pub use log_store::LogStore;
 pub use member::{Member, MemberConfig, MemberError};
-pub use peer::{Link, Peers, serve};
+pub use peer::{Link, MAX_FRAME_BYTES, Peers, serve};
 pub use proposer::{Committed, Proposer};
+pub use snapshot::Stored;
 
 /// An entry's application bytes: one shard round's changes.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]

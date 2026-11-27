@@ -18,7 +18,7 @@ pub(crate) mod state;
 
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
-use std::sync::mpsc::{Receiver, RecvTimeoutError};
+use std::sync::mpsc::{Receiver, RecvTimeoutError, SyncSender};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use wf_application::commands::flow::cleanup::Cleaned;
@@ -155,10 +155,27 @@ pub(crate) enum Request {
     Quiet { done: Done<()> },
     /// The policies this shard holds.
     Policies { done: Done<Vec<Arc<Installed>>> },
-    /// This shard as a portable image, for a group snapshot (phase 3).
-    Export { done: Done<Vec<u8>> },
-    /// Replace this shard with an installed snapshot's image.
-    Install { image: Vec<u8>, done: Done<()> },
+    /// This shard as a portable image, for a group snapshot (phase 3): its
+    /// blocks go to `blocks` (`image::blocks`), the shard waiting while the
+    /// snapshot writer catches up.
+    Export {
+        blocks: SyncSender<Vec<u8>>,
+        done: Done<()>,
+    },
+    /// Replace this shard with the one an installed snapshot's blocks
+    /// carry, as they are read, once they end in a commit.
+    Install {
+        blocks: Receiver<Part>,
+        done: Done<()>,
+    },
+}
+
+/// What an installing shard reads: a block of its image, then the commit
+/// that lets the image replace it (sent once the whole snapshot was read
+/// and checked).
+pub(crate) enum Part {
+    Block(Vec<u8>),
+    Commit,
 }
 
 /// The thread's connections to the rest of the node.

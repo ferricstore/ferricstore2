@@ -43,7 +43,7 @@ impl Request {
         match self {
             Self::Create { done, .. } | Self::Complete { done, .. } => done(Err(error)),
             Self::Claim { done, .. } => done(Err(error)),
-            Self::Capture { done, .. } | Self::Export { done } => done(Err(error)),
+            Self::Capture { done, .. } => done(Err(error)),
             Self::Flow { done, .. } => done(Err(error)),
             Self::FlowBatch { done, .. }
             | Self::CreateBatch { done, .. }
@@ -59,7 +59,7 @@ impl Request {
                 done(Err(error));
             }
             Self::Policies { done } => done(Err(error)),
-            Self::Install { done, .. } => done(Err(error)),
+            Self::Install { done, .. } | Self::Export { done, .. } => done(Err(error)),
         }
     }
 }

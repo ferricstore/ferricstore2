@@ -16,7 +16,7 @@ use openraft::Raft;
 use openraft::storage::RaftStateMachine;
 use openraft::type_config::async_runtime::watch::WatchReceiver;
 use tokio::net::TcpListener;
-use wf_ports::consensus::log::ConsensusLog;
+use wf_ports::consensus::log::{ConsensusLog, SnapshotStore};
 
 use super::Config;
 use super::ballot::Ballot;
@@ -52,17 +52,19 @@ pub(super) fn settle(held: &[Held], id: u64, peers: &BTreeMap<u64, String>) -> S
     }
 }
 
-/// Serves Raft requests to `raft`, member `id` of `peers` keeping `log`,
-/// until the listener fails. A member whose log lacks the mark that it
-/// votes first settles whether it may vote, then saves the mark.
+/// Serves Raft requests to `raft`, member `id` of `peers` keeping `log`
+/// and its snapshots in `store`, in frames of at most `limit` bytes, until
+/// the listener fails. A member
+/// whose log lacks the mark that it votes first settles whether it may
+/// vote, then saves the mark.
 pub async fn serve_member<SM>(
     listener: TcpListener,
     raft: Raft<Config, SM>,
     peers: BTreeMap<u64, String>,
     id: u64,
-    log: Arc<dyn ConsensusLog>,
+    (log, store, limit): (Arc<dyn ConsensusLog>, Arc<dyn SnapshotStore>, u32),
 ) where
-    SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
+    SM: RaftStateMachine<Config, SnapshotData = super::Stored>,
 {
     let fresh = !log.voter();
     let ballot = Arc::new(Ballot::new(fresh));
@@ -81,7 +83,12 @@ pub async fn serve_member<SM>(
         }
     };
     futures_util::future::join(
-        peer::serving(listener, raft.clone(), Arc::clone(&ballot), own),
+        peer::serving(
+            listener,
+            raft.clone(),
+            (Arc::clone(&ballot), own),
+            (limit, store),
+        ),
         settling,
     )
     .await;
@@ -99,7 +106,7 @@ async fn join<SM>(
     own: Recipient,
     ballot: &Ballot,
 ) where
-    SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
+    SM: RaftStateMachine<Config, SnapshotData = super::Stored>,
 {
     let id = own.member;
     let mut held = BTreeMap::new();
@@ -146,7 +153,7 @@ async fn join<SM>(
 /// metrics, so it also looks again every tenth of a second.
 async fn caught_up<SM>(raft: &Raft<Config, SM>, ballot: &Ballot)
 where
-    SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
+    SM: RaftStateMachine<Config, SnapshotData = super::Stored>,
 {
     let mut metrics = raft.metrics();
     loop {

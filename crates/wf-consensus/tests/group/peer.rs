@@ -87,13 +87,18 @@ async fn start_as(
     )
     .await?;
     let server = match serving {
-        Serving::Voter => tokio::spawn(serve(listener, raft.clone(), names(addresses), id)),
+        Serving::Voter => tokio::spawn(serve(
+            listener,
+            raft.clone(),
+            (names(addresses), id),
+            machine.store(),
+        )),
         Serving::Joining { .. } => tokio::spawn(serve_member(
             listener,
             raft.clone(),
             names(addresses),
             id,
-            log,
+            (log, machine.store(), wf_consensus::group::MAX_FRAME_BYTES),
         )),
     };
     Ok(Member {
