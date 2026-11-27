@@ -43,6 +43,15 @@ leaders do.
   committed entry there only releases replies; followers decode and replay
   it. A leader that loses leadership drops its uncommitted in-memory state:
   its shards reload from its snapshot and committed log.
+- **A leader proposes while a quorum hears it** (27 Nov). OpenRaft refuses
+  a leader's writes once no quorum acknowledged it within its lease
+  (`election_timeout_max`), and the leader's shards applied a round before
+  proposing it, so a refused round stopped the node as a lost one. A
+  follower that pauses for a second (installing a snapshot, a stalled
+  disk) while the other is down did that. The proposer now holds rounds,
+  in order, until a quorum acknowledged the leader within half its lease,
+  up to 30 s, or until it no longer leads; a client then waits for the
+  quorum instead of the node stopping.
 - **Leader-only service.** Reads and writes go to the range's leader. A
   member that does not lead a request's slot answers status 5 `reroute`
   (retryable, safe to retry), and the client refreshes `SHARDS`. A leader
@@ -80,8 +89,24 @@ leaders do.
    keeps the newest on disk, sends it in one peer frame (at most the frame
    limit; chunking later) to a member the leader's log no longer reaches,
    and a restarted member starts from it. Members must share the shard
-   count. Not yet: compacting a leader's log while it leads (handing
-   leadership to a caught-up follower when its log grows too long).
+   count. A leader trims its log too (26 Nov): once it applied
+   `snapshot_every` entries past its newest snapshot, it asks the other
+   members for a newer snapshot than its own, at most at its applied
+   position (peer kind 7), keeps the first one offered as its own (saved,
+   sent to members its log no longer reaches, and restored from at
+   restart) and drops its log behind it as a follower does. Before, only
+   followers took snapshots, so a member that kept leading kept every
+   entry on disk and in memory. A follower's snapshot holds committed
+   entries only, which every member's log shares, so it stands for the
+   leader's state at that position. Handing leadership to a follower
+   whenever the log grew was the other way; it stops writes at every
+   handover, where a fetch costs one snapshot's transfer per
+   `snapshot_every` entries. A leader whose followers take no snapshots
+   (or that leads alone) still keeps its whole log. It asks over one kept
+   connection per member, and a snapshot is saved on a blocking thread, so
+   a save does not hold up the runtime that sends heartbeats; a stopping
+   member waits (up to 10 s) for such work, so a stopped node writes
+   nothing more to its directory.
 4. **Several groups per node** and the SDK's three-node failover test.
 
 ## Consequences

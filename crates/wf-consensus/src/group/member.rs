@@ -1,9 +1,13 @@
 //! One member of a replicated group (ADR-018), on the node's Tokio runtime:
 //! its Raft over the consensus log, the peer listener, the proposer and a
-//! watcher that demotes the machine when this member stops leading. A
+//! watcher that demotes the machine when this member stops leading, and
+//! the snapshots that let it drop its log behind them. A
 //! member whose log lacks the mark that it votes asks the others what they
 //! hold before it votes, and a fresh group is formed by its lowest-numbered
 //! member once every other member reports an empty log (`join`).
+
+#[cfg(test)]
+mod tests;
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -17,9 +21,10 @@ use tokio::task::JoinHandle;
 use wf_ports::consensus::log::{ConsensusLog, ReplicatedMachine, SnapshotStore};
 
 use super::join::serve_member;
-use super::machine::Bridge;
+use super::machine::{Bridge, Taken};
 use super::proposer::{self, Proposer};
-use super::{Config, LogStore, Peers};
+use super::wire::{self, Recipient};
+use super::{Config, Link, LogStore, Peers, peer};
 
 /// How a member reaches the others.
 pub struct MemberConfig {
@@ -31,7 +36,8 @@ pub struct MemberConfig {
     /// The bound listener for other members' Raft traffic.
     pub listener: std::net::TcpListener,
     /// Entries applied since the last snapshot at which a follower takes
-    /// the next (phase 3); 0 takes none.
+    /// the next, and a leader keeps a follower's newer one (phase 3); 0
+    /// takes none.
     pub snapshot_every: u64,
     /// Entries kept in the log behind a snapshot, so a slightly late member
     /// catches up from the log instead of a snapshot.
@@ -87,22 +93,67 @@ async fn watch(raft: Raft<Config, Bridge>, id: u64, machine: Arc<dyn ReplicatedM
     }
 }
 
-/// Takes a snapshot on this member while it follows, once `every` entries
-/// were applied since the last one; a leader's shards are ahead of the log.
-async fn snapshots(raft: Raft<Config, Bridge>, id: u64, every: u64) {
+/// Whether a member that applied entries up to `applied`, with its newest
+/// snapshot at `taken`, takes the next one when it takes one every `every`.
+const fn due(applied: u64, taken: u64, every: u64) -> bool {
+    applied.saturating_sub(taken) >= every
+}
+
+/// The first newer snapshot a member `links` reaches holds: its last index
+/// past `after` and at most `upto`.
+async fn fetch(links: &mut [Link], after: u64, upto: u64) -> Option<Taken> {
+    for link in links {
+        if let Ok(Some(snapshot)) = peer::newest(link, after, upto).await {
+            return Some(snapshot);
+        }
+    }
+    None
+}
+
+/// Takes snapshots on member `own` of `peers` once `every` entries were
+/// applied since its last one. A follower captures its machine; a
+/// leader's shards are ahead of the log, so a leader keeps the newer
+/// snapshot a follower took instead (one of entries it applied), and
+/// `OpenRaft` drops its log behind it as a follower's. It asks over one
+/// kept link per other member, so asking every few hundred milliseconds
+/// opens no new connections.
+async fn snapshots(
+    (raft, bridge): (Raft<Config, Bridge>, Bridge),
+    (peers, own): (BTreeMap<u64, String>, Recipient),
+    every: u64,
+) {
     if every == 0 {
         return;
     }
+    let mut links: Vec<Link> = peers
+        .into_iter()
+        .filter(|(member, _)| *member != own.member)
+        .map(|(member, address)| Link::to(address, Recipient { member, ..own }))
+        .collect();
+    // The last index fetched, so its build is not fetched again.
+    let mut fetched = 0;
     loop {
         tokio::time::sleep(Duration::from_millis(200)).await;
-        let due = {
+        let (leads, applied, taken) = {
             let metrics = raft.metrics();
             let metrics = metrics.borrow_watched();
-            let applied = metrics.last_applied.map_or(0, |log_id| log_id.index);
-            let taken = metrics.snapshot.map_or(0, |log_id| log_id.index);
-            metrics.current_leader != Some(id) && applied.saturating_sub(taken) >= every
+            (
+                metrics.current_leader == Some(own.member),
+                metrics.last_applied.map_or(0, |log_id| log_id.index),
+                metrics.snapshot.map_or(0, |log_id| log_id.index),
+            )
         };
-        if due && raft.trigger().snapshot().await.is_err() {
+        if !due(applied, taken, every) {
+            continue;
+        }
+        if leads {
+            let Some(snapshot) = fetch(&mut links, taken.max(fetched), applied).await else {
+                continue;
+            };
+            fetched = snapshot.meta.last_log_id.map_or(0, |log_id| log_id.index);
+            bridge.offer(snapshot);
+        }
+        if raft.trigger().snapshot().await.is_err() {
             return;
         }
     }
@@ -168,11 +219,19 @@ impl Member {
             tokio::net::TcpListener::from_std(listener).map_err(|error| failed(&error))?
         };
         let (proposer, proposing) = proposer::start(raft.clone(), bridge.epoch());
+        let own = Recipient {
+            group: wire::group_id(&peers),
+            member: id,
+        };
         let tasks = vec![
+            runtime.spawn(snapshots(
+                (raft.clone(), bridge),
+                (peers.clone(), own),
+                snapshot_every,
+            )),
             runtime.spawn(serve_member(listener, raft.clone(), peers, id, log)),
             runtime.spawn(proposing),
             runtime.spawn(watch(raft.clone(), id, machine)),
-            runtime.spawn(snapshots(raft.clone(), id, snapshot_every)),
         ];
         Ok((
             Self {

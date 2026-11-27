@@ -9,7 +9,11 @@
 //! promotes the machine once it is this member's, in the term it leads, so
 //! every earlier entry was applied first. A follower's machine is captured
 //! for snapshots (phase 3); a leader's is not, since its shards hold rounds
-//! not yet committed.
+//! not yet committed: a leader keeps a follower's snapshot it was offered
+//! instead, so it can drop its log behind it.
+
+#[cfg(test)]
+mod tests;
 
 use std::future::{Future, ready};
 use std::io;
@@ -21,6 +25,9 @@ use openraft::storage::{EntryResponder, RaftStateMachine};
 use openraft::type_config::alias::{
     EntryOf, LogIdOf, SnapshotMetaOf, SnapshotOf, StoredMembershipOf, WatchReceiverOf,
 };
+
+/// A snapshot as `OpenRaft` hands it around.
+pub(super) type Taken = SnapshotOf<Config, Vec<u8>>;
 use openraft::type_config::async_runtime::watch::WatchReceiver;
 use openraft::{EntryPayload, OptionalSend, RaftMetrics, Snapshot, SnapshotMeta, StoredMembership};
 use tokio::sync::oneshot;
@@ -60,6 +67,8 @@ pub(crate) struct Bridge {
     position: Arc<Mutex<Position>>,
     store: Arc<dyn SnapshotStore>,
     current: Current,
+    /// A follower's snapshot offered to this member while it leads.
+    offered: Arc<Mutex<Option<Taken>>>,
     /// The member's metrics, once its Raft runs.
     pub(super) metrics: Arc<OnceLock<WatchReceiverOf<Config, RaftMetrics<Config>>>>,
 }
@@ -90,6 +99,7 @@ impl Bridge {
             position: Arc::new(Mutex::new((None, StoredMembership::default()))),
             store,
             current: Arc::default(),
+            offered: Arc::default(),
             metrics: Arc::new(OnceLock::new()),
         }
     }
@@ -111,29 +121,65 @@ impl Bridge {
     ) -> io::Result<()> {
         let bytes = data.clone();
         machine_call(|done| self.machine.install(bytes, done)).await?;
+        let data = Arc::new(data);
         if keep {
-            snapshot::save(self.store.as_ref(), &meta, &data)?;
+            snapshot::save_aside(Arc::clone(&self.store), meta.clone(), Arc::clone(&data)).await?;
         }
         *self.position.lock().unwrap_or_else(PoisonError::into_inner) =
             (meta.last_log_id, meta.last_membership.clone());
-        *self.current.lock().unwrap_or_else(PoisonError::into_inner) = Some((meta, Arc::new(data)));
+        *self.current.lock().unwrap_or_else(PoisonError::into_inner) = Some((meta, data));
         Ok(())
     }
 
-    /// A builder of a snapshot at the applied position, or `None` while
-    /// the machine serves as the leader's.
+    /// Offers `snapshot`, which another member took of committed entries
+    /// this member applied, for this member to keep while it leads.
+    pub(super) fn offer(&self, snapshot: Taken) {
+        *self.offered.lock().unwrap_or_else(PoisonError::into_inner) = Some(snapshot);
+    }
+
+    /// Whether `meta` is past the newest snapshot this member holds: an
+    /// older one would leave it sending a snapshot its log no longer
+    /// follows.
+    fn newer(&self, meta: &SnapshotMetaOf<Config>) -> bool {
+        let held = self
+            .current
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .as_ref()
+            .and_then(|(held, _)| held.last_log_id.map(|log_id| log_id.index));
+        meta.last_log_id.map(|log_id| log_id.index) > held
+    }
+
+    /// A builder of a snapshot at the applied position; while the machine
+    /// serves as the leader's, one of the snapshot offered, if it is newer
+    /// than this member's.
     fn capture(&self) -> Option<Capture> {
+        let offered = self
+            .offered
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .take();
         let (sender, receiver) = oneshot::channel();
         let started = self.machine.snapshot(Box::new(move |captured| {
             // The builder may have been dropped; nothing waits then.
             let _sent = sender.send(captured);
         }));
-        let (last_log_id, last_membership) = self.position();
-        started.then(|| Capture {
-            meta: SnapshotMeta {
+        let (meta, receiver) = if started {
+            let (last_log_id, last_membership) = self.position();
+            let meta = SnapshotMeta {
                 last_log_id,
                 last_membership,
-            },
+            };
+            (meta, receiver)
+        } else {
+            let Snapshot { meta, snapshot } =
+                offered.filter(|offered| self.newer(&offered.meta))?;
+            let (sender, receiver) = oneshot::channel();
+            let _sent = sender.send(Ok(snapshot));
+            (meta, receiver)
+        };
+        Some(Capture {
+            meta,
             bytes: Some(receiver),
             store: Arc::clone(&self.store),
             current: Arc::clone(&self.current),

@@ -2,6 +2,8 @@ use std::collections::BTreeSet;
 
 use openraft::impls::{Entry, EntryPayload, Membership, Vote};
 use openraft::raft::{AppendEntriesRequest, AppendError, VoteRequest, VoteResponse};
+use openraft::type_config::alias::SnapshotOf;
+use openraft::{Snapshot, SnapshotMeta, StoredMembership};
 use wf_ports::consensus::log::EntryId;
 
 use super::super::{Proposal, codec};
@@ -16,6 +18,25 @@ fn id(term: u64, index: u64) -> EntryId {
         node: 2,
         index,
     }
+}
+
+/// A snapshot at index 9 of a three-member group, its membership from 4.
+fn taken() -> SnapshotOf<super::Config, Vec<u8>> {
+    let membership = Membership::new_with_defaults(vec![BTreeSet::from([1, 2, 3])], []);
+    Snapshot {
+        meta: SnapshotMeta {
+            last_log_id: Some(codec::log_id(id(3, 9))),
+            last_membership: StoredMembership::new(Some(codec::log_id(id(2, 4))), membership),
+        },
+        snapshot: b"image".to_vec(),
+    }
+}
+
+fn same_snapshot(
+    sent: &SnapshotOf<super::Config, Vec<u8>>,
+    read: &SnapshotOf<super::Config, Vec<u8>>,
+) -> bool {
+    sent.meta == read.meta && sent.snapshot == read.snapshot
 }
 
 #[test]
@@ -48,6 +69,8 @@ fn requests_read_back_as_sent() {
         Request::Append(append),
         Request::Vote(vote.clone()),
         Request::PreVote(vote),
+        Request::Snapshot(Vote::new_committed(3, 2), taken()),
+        Request::Newest { after: 4, upto: 9 },
     ] {
         let bytes = encode_request(RECIPIENT, &request).unwrap_or_default();
         let (recipient, read) = decode_request(&bytes).map_or((None, None), |(recipient, read)| {
@@ -60,6 +83,16 @@ fn requests_read_back_as_sent() {
             }
             (Request::Vote(sent), Some(Request::Vote(read)))
             | (Request::PreVote(sent), Some(Request::PreVote(read))) => sent == read,
+            (Request::Snapshot(vote, sent), Some(Request::Snapshot(read_vote, read))) => {
+                vote == read_vote && same_snapshot(sent, read)
+            }
+            (
+                Request::Newest { after, upto },
+                Some(Request::Newest {
+                    after: read_after,
+                    upto: read_upto,
+                }),
+            ) => (after, upto) == (read_after, read_upto),
             _ => false,
         };
         assert!(same, "{bytes:?}");
@@ -135,6 +168,8 @@ fn responses_read_back_as_sent() {
             last_log: None,
             term: 2,
         }),
+        Response::Newest(Some(taken())),
+        Response::Newest(None),
     ];
     for response in responses {
         let bytes = encode_response(&response).unwrap_or_default();
@@ -144,10 +179,16 @@ fn responses_read_back_as_sent() {
             (Response::Vote(sent), Some(Response::Vote(read))) => sent == read,
             (Response::Failed(sent), Some(Response::Failed(read))) => sent == read,
             (Response::Status(sent), Some(Response::Status(read))) => sent == read,
+            (Response::Newest(Some(sent)), Some(Response::Newest(Some(read)))) => {
+                same_snapshot(sent, read)
+            }
+            (Response::Newest(None), Some(Response::Newest(None))) => true,
             _ => false,
         };
         assert!(same, "{bytes:?}");
     }
-    // A status names whether a log is held as 0 or 1.
+    // A status names whether a log is held as 0 or 1, as a newest snapshot
+    // answer names whether one follows.
     assert!(decode_response(&[6, 2, 0, 0, 0, 0, 0, 0, 0, 0]).is_err());
+    assert!(decode_response(&[7, 2]).is_err());
 }

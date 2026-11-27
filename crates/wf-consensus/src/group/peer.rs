@@ -7,7 +7,8 @@
 //! [`wire`] body. A member serves each connection's requests in order. A
 //! failed connection is dropped and the next request reconnects. A snapshot
 //! for a member the log no longer reaches goes in one frame (phase 3; at
-//! most the frame limit), with a longer deadline. Each request names its
+//! most the frame limit), with a longer deadline, as does a follower's
+//! snapshot fetched by a leader that trims its log. Each request names its
 //! group and member; a member answers one meant for another with a
 //! refusal that names both.
 
@@ -32,6 +33,12 @@ use tokio::net::{TcpListener, TcpStream};
 use super::Config;
 use super::ballot::Ballot;
 use super::wire::{self, Held, Recipient, Request, Response};
+
+mod ask;
+#[cfg(test)]
+mod tests;
+
+pub(super) use ask::{newest, status};
 
 /// Largest frame a member accepts.
 const MAX_FRAME_BYTES: u32 = 256 * 1024 * 1024;
@@ -174,7 +181,39 @@ where
             .install_full_snapshot(vote, snapshot)
             .await
             .map_or_else(|error| failed(&error), Response::Snapshot),
+        Request::Newest { after, upto } => own_newest(raft, after, upto).await,
     }
+}
+
+/// Whether a snapshot whose last index is `index` answers a request for
+/// one past `after` and at most `upto`.
+fn wanted(index: Option<u64>, after: u64, upto: u64) -> bool {
+    index.is_some_and(|index| index > after && index <= upto)
+}
+
+/// This member's newest snapshot if its last index is past `after` and at
+/// most `upto`; its index is looked up first, so a request it declines
+/// copies nothing.
+async fn own_newest<SM>(raft: &Raft<Config, SM>, after: u64, upto: u64) -> Response
+where
+    SM: RaftStateMachine<Config, SnapshotData = Vec<u8>>,
+{
+    let taken = raft.metrics().borrow_watched().snapshot;
+    if !wanted(taken.map(|log_id| log_id.index), after, upto) {
+        return Response::Newest(None);
+    }
+    raft.get_snapshot().await.map_or_else(
+        |error| Response::Failed(error.to_string()),
+        |snapshot| {
+            Response::Newest(snapshot.filter(|snapshot| {
+                wanted(
+                    snapshot.meta.last_log_id.map(|log_id| log_id.index),
+                    after,
+                    upto,
+                )
+            }))
+        },
+    )
 }
 
 /// The members' Raft addresses: `OpenRaft`'s network factory.
@@ -262,26 +301,6 @@ impl Link {
                 Err(RPCError::Unreachable(unreachable(&elapsed)))
             }
         }
-    }
-}
-
-/// What `recipient`, at `address`, holds (ADR-019).
-///
-/// # Errors
-/// The member cannot be reached, refuses the request or answers something
-/// else.
-pub(super) async fn status(address: &str, recipient: Recipient) -> io::Result<Held> {
-    let mut link = Link {
-        address: Some(address.to_owned()),
-        recipient,
-        stream: None,
-    };
-    let answer = tokio::time::timeout(CONNECT_TIMEOUT, link.exchange(&Request::Status))
-        .await
-        .map_err(io::Error::other)??;
-    match answer {
-        Response::Status(held) => Ok(held),
-        _ => Err(io::Error::other("mismatched peer response")),
     }
 }
 

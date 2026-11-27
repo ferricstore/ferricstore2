@@ -11,26 +11,29 @@
 //! `3` a vote response, `4` a failure with its text, `5` a snapshot taken,
 //! with the receiver's vote). Kind `6` asks what a member holds (ADR-019);
 //! its answer is `6`, its last log index as a presence byte and the index,
-//! and the term it knows. A vote is its term, node
+//! and the term it knows. Kind `7` asks for the member's newest snapshot if
+//! its last index is past one index and at most another (a leader trimming
+//! its log, ADR-018 phase 3); its answer is `7`, a presence byte, then the
+//! snapshot's metadata and bytes. A vote is its term, node
 //! and committed byte; an optional log id is a presence byte and the id's
 //! term, node and index; an entry is its id, its payload length and payload
 //! (`codec::encode`). Conflict hints are not sent; they are optional.
 
+mod reader;
 #[cfg(test)]
 mod tests;
 
 use std::collections::BTreeMap;
 use std::io;
 
-use openraft::Snapshot;
 use openraft::raft::{
     AppendEntriesRequest, AppendError, AppendResult, SnapshotResponse, VoteRequest, VoteResponse,
 };
 use openraft::type_config::alias::{LogIdOf, SnapshotOf, VoteOf};
 use sha2::{Digest, Sha256};
-use wf_ports::consensus::log::EntryId;
 
 use super::{Config, codec, snapshot};
+use reader::Reader;
 
 /// Whom a request is for.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -77,6 +80,14 @@ pub(crate) enum Request {
     /// What the member holds, asked by a member that starts without a log
     /// (ADR-019).
     Status,
+    /// The member's newest snapshot, if its last index is past `after` and
+    /// at most `upto`.
+    Newest {
+        /// The index the snapshot must be past.
+        after: u64,
+        /// The highest last index the snapshot may have.
+        upto: u64,
+    },
 }
 
 /// What a member holds: its last log index and the term it knows.
@@ -100,6 +111,8 @@ pub(crate) enum Response {
     Snapshot(SnapshotResponse<Config>),
     /// To a status request.
     Status(Held),
+    /// To a request for the newest snapshot: none in the range asked.
+    Newest(Option<SnapshotOf<Config, Vec<u8>>>),
 }
 
 fn invalid() -> io::Error {
@@ -136,6 +149,11 @@ fn put_bytes(out: &mut Vec<u8>, bytes: &[u8]) -> io::Result<()> {
     Ok(())
 }
 
+fn put_snapshot(out: &mut Vec<u8>, snapshot: &SnapshotOf<Config, Vec<u8>>) -> io::Result<()> {
+    put_bytes(out, &snapshot::meta_bytes(&snapshot.meta)?)?;
+    put_bytes(out, &snapshot.snapshot)
+}
+
 /// A request for `recipient` as bytes.
 ///
 /// # Errors
@@ -160,10 +178,14 @@ pub(crate) fn encode_request(recipient: Recipient, request: &Request) -> io::Res
         Request::Snapshot(vote, snapshot) => {
             out.push(4);
             put_vote(&mut out, vote);
-            put_bytes(&mut out, &snapshot::meta_bytes(&snapshot.meta)?)?;
-            put_bytes(&mut out, &snapshot.snapshot)?;
+            put_snapshot(&mut out, snapshot)?;
         }
         Request::Status => out.push(6),
+        Request::Newest { after, upto } => {
+            out.push(7);
+            put_u64(&mut out, *after);
+            put_u64(&mut out, *upto);
+        }
         Request::Vote(vote) | Request::PreVote(vote) => {
             out.push(if matches!(request, Request::Vote(_)) {
                 2
@@ -221,70 +243,15 @@ pub(crate) fn encode_response(response: &Response) -> io::Result<Vec<u8>> {
             }
             put_u64(&mut out, held.term);
         }
+        Response::Newest(newest) => {
+            out.push(7);
+            out.push(u8::from(newest.is_some()));
+            if let Some(snapshot) = newest {
+                put_snapshot(&mut out, snapshot)?;
+            }
+        }
     }
     Ok(out)
-}
-
-struct Reader<'a>(&'a [u8]);
-
-impl<'a> Reader<'a> {
-    fn take(&mut self, length: usize) -> io::Result<&'a [u8]> {
-        if self.0.len() < length {
-            return Err(invalid());
-        }
-        let (head, rest) = self.0.split_at(length);
-        self.0 = rest;
-        Ok(head)
-    }
-
-    fn u8(&mut self) -> io::Result<u8> {
-        self.take(1)?.first().copied().ok_or_else(invalid)
-    }
-
-    fn u32(&mut self) -> io::Result<u32> {
-        Ok(u32::from_be_bytes(
-            self.take(4)?.try_into().map_err(|_| invalid())?,
-        ))
-    }
-
-    fn u64(&mut self) -> io::Result<u64> {
-        Ok(u64::from_be_bytes(
-            self.take(8)?.try_into().map_err(|_| invalid())?,
-        ))
-    }
-
-    fn vote(&mut self) -> io::Result<VoteOf<Config>> {
-        codec::vote(self.take(17)?)
-    }
-
-    fn entry_id(&mut self) -> io::Result<Option<EntryId>> {
-        match self.u8()? {
-            0 => Ok(None),
-            1 => Ok(Some(EntryId {
-                term: self.u64()?,
-                node: self.u64()?,
-                index: self.u64()?,
-            })),
-            _ => Err(invalid()),
-        }
-    }
-
-    fn log_id(&mut self) -> io::Result<Option<LogIdOf<Config>>> {
-        Ok(self.entry_id()?.map(codec::log_id))
-    }
-
-    fn bytes(&mut self) -> io::Result<&'a [u8]> {
-        let length = usize::try_from(self.u32()?).map_err(|_| invalid())?;
-        self.take(length)
-    }
-
-    fn done<T>(&self, value: T) -> io::Result<T> {
-        if self.0.is_empty() {
-            Ok(value)
-        } else {
-            Err(invalid())
-        }
-    }
 }
 
 /// A request and its recipient from their bytes.
@@ -315,19 +282,12 @@ pub(crate) fn decode_request(bytes: &[u8]) -> io::Result<(Recipient, Request)> {
                 leader_commit,
             })
         }
-        4 => {
-            let vote = reader.vote()?;
-            let meta = snapshot::parse_meta(reader.bytes()?)?;
-            let data = reader.bytes()?.to_vec();
-            Request::Snapshot(
-                vote,
-                Snapshot {
-                    meta,
-                    snapshot: data,
-                },
-            )
-        }
+        4 => Request::Snapshot(reader.vote()?, reader.snapshot()?),
         6 => Request::Status,
+        7 => Request::Newest {
+            after: reader.u64()?,
+            upto: reader.u64()?,
+        },
         kind @ (2 | 3) => {
             let vote = VoteRequest::new(reader.vote()?, reader.log_id()?);
             if kind == 2 {
@@ -372,6 +332,11 @@ pub(crate) fn decode_response(bytes: &[u8]) -> io::Result<Response> {
                 term: reader.u64()?,
             })
         }
+        7 => Response::Newest(match reader.u8()? {
+            0 => None,
+            1 => Some(reader.snapshot()?),
+            _ => return Err(invalid()),
+        }),
         _ => return Err(invalid()),
     };
     reader.done(response)

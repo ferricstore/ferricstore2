@@ -4,8 +4,10 @@
 //! state from the log. The leader's shards decide rounds and propose them;
 //! a follower's shards apply the leader's committed rounds and refuse client
 //! requests as not led here. A follower takes snapshots of its shards'
-//! portable images; a member the leader's log no longer reaches installs
-//! one, and a restarted member starts from its newest.
+//! portable images, and the leader keeps a follower's newer one, so every
+//! member drops its log behind a snapshot; a member the leader's log no
+//! longer reaches installs one, and a restarted member starts from its
+//! newest.
 
 mod machine;
 
@@ -36,11 +38,14 @@ pub struct Replica {
     /// The bound listener for other members' Raft traffic.
     pub listener: std::net::TcpListener,
     /// Entries applied since the last snapshot at which a follower takes
-    /// the next; 0 takes none.
+    /// the next, and the leader keeps a follower's newer one; 0 takes none.
     pub snapshot_every: u64,
     /// Entries kept in the log behind a snapshot.
     pub keep_logs: u64,
 }
+
+/// How long a stopping node waits for its group's work to stop.
+const STOP_WAIT: std::time::Duration = std::time::Duration::from_secs(10);
 
 /// The group member and the runtime it runs on.
 pub(crate) struct Group {
@@ -61,13 +66,15 @@ impl Group {
         })
     }
 
-    /// Stops the member, then its runtime.
+    /// Stops the member, then its runtime, waiting up to [`STOP_WAIT`] for
+    /// work still running there, such as a snapshot being saved: a stopped
+    /// node writes nothing more to its directory.
     pub(crate) fn stop(&mut self) {
         if let Some(member) = self.member.take() {
             member.shutdown();
         }
         if let Some(runtime) = self.runtime.take() {
-            runtime.shutdown_background();
+            runtime.shutdown_timeout(STOP_WAIT);
         }
     }
 }

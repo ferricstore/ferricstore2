@@ -14,9 +14,9 @@ use wf_node::composition::{QueueNode, QueueNodeConfig, Replica};
 
 use super::{TestResult, call, claim_request, completion, directory, flow as new_flow};
 
-const MEMBERS: [u64; 3] = [1, 2, 3];
+pub(super) const MEMBERS: [u64; 3] = [1, 2, 3];
 
-fn config() -> QueueNodeConfig {
+pub(super) fn config() -> QueueNodeConfig {
     QueueNodeConfig {
         shards: 4,
         snapshot_segments: 0,
@@ -28,7 +28,11 @@ fn config() -> QueueNodeConfig {
     }
 }
 
-fn open(path: &Path, id: u64, peers: &BTreeMap<u64, SocketAddr>) -> TestResult<QueueNode> {
+pub(super) fn open(
+    path: &Path,
+    id: u64,
+    peers: &BTreeMap<u64, SocketAddr>,
+) -> TestResult<QueueNode> {
     open_with(path, id, peers, 0)
 }
 
@@ -72,7 +76,7 @@ fn create(node: &QueueNode, ids: &[String]) -> TestResult<Result<(), ServiceErro
 
 /// The member whose shards serve, once one does: a probe create succeeds
 /// there and is refused as not led everywhere else.
-fn serving(nodes: &BTreeMap<u64, QueueNode>, probe: &str) -> TestResult<u64> {
+pub(super) fn serving(nodes: &BTreeMap<u64, QueueNode>, probe: &str) -> TestResult<u64> {
     let until = Instant::now() + Duration::from_secs(20);
     let mut refused = None;
     while Instant::now() < until {
@@ -268,7 +272,7 @@ fn a_group_keeps_its_flows_through_leader_loss_and_a_member_s_return() -> TestRe
     Ok(())
 }
 
-fn peers() -> TestResult<BTreeMap<u64, SocketAddr>> {
+pub(super) fn peers() -> TestResult<BTreeMap<u64, SocketAddr>> {
     let mut peers = BTreeMap::new();
     for id in MEMBERS {
         // Bound once to pick a free port; each member binds it again.
@@ -278,7 +282,7 @@ fn peers() -> TestResult<BTreeMap<u64, SocketAddr>> {
 }
 
 /// Waits until member `id` has taken a snapshot.
-fn snapshotted(path: &Path, id: u64) -> TestResult {
+pub(super) fn snapshotted(path: &Path, id: u64) -> TestResult {
     let directory = path.join(format!("n{id}")).join("group-snapshots");
     let until = Instant::now() + Duration::from_secs(20);
     while Instant::now() < until {
@@ -291,7 +295,12 @@ fn snapshotted(path: &Path, id: u64) -> TestResult {
 }
 
 /// Creates `prefix0..` through `node` and completes the Flows it claims.
-fn batch(node: &QueueNode, prefix: &str, count: usize, done: usize) -> TestResult<Vec<String>> {
+pub(super) fn batch(
+    node: &QueueNode,
+    prefix: &str,
+    count: usize,
+    done: usize,
+) -> TestResult<Vec<String>> {
     for chunk in ids(prefix, count).chunks(5) {
         create(node, chunk)??;
     }
@@ -307,7 +316,12 @@ fn batch(node: &QueueNode, prefix: &str, count: usize, done: usize) -> TestResul
         .collect())
 }
 
-fn assert_states(node: &QueueNode, prefix: &str, count: usize, completed: &[String]) -> TestResult {
+pub(super) fn assert_states(
+    node: &QueueNode,
+    prefix: &str,
+    count: usize,
+    completed: &[String],
+) -> TestResult {
     for id in ids(prefix, count) {
         let expected = if completed.contains(&id) {
             "completed"

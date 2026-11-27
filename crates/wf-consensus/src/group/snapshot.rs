@@ -88,6 +88,19 @@ pub(super) fn save(
         .map_err(|error| io::Error::other(error.to_string()))
 }
 
+/// Saves a snapshot as the newest on a blocking thread: a save writes and
+/// syncs the whole snapshot, which must not hold up the runtime that sends
+/// the member's heartbeats and votes.
+pub(super) async fn save_aside(
+    store: Arc<dyn SnapshotStore>,
+    meta: SnapshotMetaOf<Config>,
+    data: Arc<Vec<u8>>,
+) -> io::Result<()> {
+    tokio::task::spawn_blocking(move || save(store.as_ref(), &meta, &data))
+        .await
+        .map_err(io::Error::other)?
+}
+
 /// The newest stored snapshot's metadata and machine bytes.
 pub(super) fn newest(
     store: &dyn SnapshotStore,
@@ -126,12 +139,18 @@ impl RaftSnapshotBuilder<Config> for Capture {
             .await
             .map_err(io::Error::other)?
             .map_err(|error| io::Error::other(error.to_string()))?;
-        save(self.store.as_ref(), &self.meta, &data)?;
+        let data = Arc::new(data);
+        save_aside(
+            Arc::clone(&self.store),
+            self.meta.clone(),
+            Arc::clone(&data),
+        )
+        .await?;
         *self.current.lock().unwrap_or_else(PoisonError::into_inner) =
-            Some((self.meta.clone(), Arc::new(data.clone())));
+            Some((self.meta.clone(), Arc::clone(&data)));
         Ok(Snapshot {
             meta: self.meta.clone(),
-            snapshot: data,
+            snapshot: data.as_ref().clone(),
         })
     }
 }

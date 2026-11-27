@@ -67895,3 +67895,115 @@ changed code.
 
 After the fixes, `stress-replica.sh 4 10` (16 tests, four processes at
 once, ten rounds each) passed 640 of 640 runs.
+
+### A leader trims its log; a leader waits for its quorum (ADR-018) (26-27 Nov)
+
+Asked what is left after the workflow features, I named a leader's log
+first: only followers took snapshots (a leader's shards apply rounds when
+they decide them, ahead of the log, so they hold no exact position), and
+`OpenRaft` drops log entries only behind the member's own snapshot. A
+member that kept leading kept every entry, on disk and in memory (the
+entry log keeps the entries since its last purge for readers). The user
+said to go ahead.
+
+Decision (solo): a leader that applied `snapshot_every` entries past its
+newest snapshot asks the other members, in id order, for a snapshot newer
+than its own and at most at its applied position (peer kind 7; a member
+compares its snapshot's index from its metrics before copying any bytes).
+It offers the first one to its state machine bridge and asks `OpenRaft`
+for a snapshot; the bridge builds it from the offer while its machine
+serves as the leader's, and only when it is newer than the one it holds.
+`OpenRaft` then saves it, sends it to members its log no longer reaches,
+and purges the log behind it as on a follower; a restart restores from
+it. A follower's snapshot holds committed entries only, which every
+member's log holds alike, so it stands for the leader's state at that
+position. Handing leadership to a follower whenever the log grew (the
+earlier note in ADR-018) stops writes at each handover; a fetch costs one
+snapshot's transfer per `snapshot_every` entries.
+
+Guards: the follower answers only a snapshot past the index asked and at
+most the leader's applied position (`OpenRaft` requires a snapshot within
+the applied entries); the bridge drops an offer not newer than its own
+(saving an older one keeps the newer file, but the leader would send the
+older snapshot, whose next entries its log no longer has, again and
+again); an offer is taken once, and a follower's capture drops one left
+from when it led. The loop remembers the index it fetched, so the same
+snapshot is not fetched again while its build runs.
+
+RED: `replica_trim::a_leader_that_keeps_leading_trims_its_log` (three
+nodes, followers snapshot every 20 entries, 4 KiB log segments; C stops,
+Flows go through leader A) failed with "member 1 took no snapshot" after
+20 s. It passes: A keeps a snapshot and drops its first log segment, C
+(whose log ends before A's) installs A's snapshot, C then leads with every
+Flow, and A restarts from the snapshot it took. Unit tests:
+`machine::tests` (a leader builds only from a newer offer, once; a
+follower captures its own and drops an offer),
+`peer::tests::a_snapshot_answers_a_request_only_between_its_bounds`, and
+wire round trips of kinds 4 and 7.
+
+The replica stress run (`stress-replica.sh 16 10`, four times the load of
+the last clean run) then showed what the change set off. Baseline: the
+same run on 0a2410b in a separate worktree failed 7 of 2,560 test runs, 1
+of them a replica test. Rounds:
+
+1. **23 replica failures** (of 2,720). Kinds: "no member serves" (the new
+   leader known to both members, its shards refusing as not led), a
+   reopened member's "snapshot files did not open", and the trim test's
+   own timing. The leader asked for snapshots on a new connection every
+   200 ms. It now keeps one link per member (`Link::to`, `peer::newest`
+   over it). The trim test now writes until the leader keeps a snapshot
+   and dropped its first segment: when the purge lands depends on how many
+   entries the rounds were cut into, and `OpenRaft` purges a leader's log
+   only once no replication request still uses those entries.
+2. **4 replica failures.** A temporary diagnostic named the reopen error:
+   `SnapshotFiles::open` listed a temp file that was gone when it removed
+   it (`NotFound`), because the previous instance of that member, stopped
+   seconds before, was still saving a snapshot: `Group::stop` used
+   `shutdown_background`, which leaves running work to finish on its own.
+   It now waits up to 10 s (`shutdown_timeout`); the server never drops a
+   node inside an async context (`Member::shutdown` already blocks the
+   same way). Snapshot saves (install and build) now run on a blocking
+   thread (`snapshot::save_aside`, ADR-010's offloading rule): a save
+   writes and syncs the whole snapshot, which held one of the group
+   runtime's two threads.
+3. **17, then 37 replica failures**, all "Unavailable" or a poisoned
+   leader at term 1, with no election. A diagnostic on lost rounds showed
+   `ForwardToLeader { reason: LeaseExpired }` for every one: OpenRaft
+   0.10 refuses a leader's writes once no quorum acknowledged it within
+   its lease (`election_timeout_max`, 1 s), and the shards had already
+   applied the refused round, so the node stopped (fail-stop). It happened
+   when the only other live member paused for a second, here while it
+   installed a snapshot; with the leader now trimming its log, a member
+   that was away needs a snapshot more often. This is older than the
+   change: `replica_lease::a_leader_without_a_quorum_holds_its_rounds_until_one_returns`
+   (both followers stopped for 2 s, a create through the leader, one
+   follower back) failed with `Unavailable` and the diagnostic's
+   `LeaseExpired`. The proposer now holds rounds, in order, until a
+   quorum acknowledged the leader within half its lease (metrics'
+   `last_quorum_acked`), it no longer leads, or 30 s passed; the test
+   passes.
+4. **0 replica failures** of 640 replica runs (2,880 runs, 12 failures,
+   all in the consensus crate's in-process and TCP tests, which do not
+   run the member, the proposer or the bridge; the baseline had 6 of the
+   same kinds: "no leader took the write", "no leader", "write outcome
+   unknown").
+
+cargo-mutants on the diff (wire mutants against wf-consensus's tests, the
+rest also against the node's replica tests): 100 mutants; wire: 29
+caught, 3 timeouts (a reader returning empty bytes loops), 13 unviable,
+none missed; the rest: 36 caught, 12 unviable, 7 missed. The snapshot
+loop's due check (two) and the quorum check (four: the not-leading and
+lone-voter clauses, a group of two) were only reachable in cases the node
+tests do not stage, so both became functions with bound tests
+(`member::tests`, `proposer::tests`). `Group::stop` replaced by nothing
+survives: dropping the runtime also waits for its threads, and the race
+it closes needs a save under way at a stop. Second round (member.rs,
+proposer.rs): 28 mutants, 24 caught, 3 unviable, 1 missed, `elapsed() <
+FRESH` as `<=`, which differs only for an acknowledgment exactly 500 ms
+old.
+
+Code: `peer::own_newest` and `peer::ask` (the one-off asks moved there),
+wire kind 7 (the byte reader moved to `wire/reader.rs` to keep `wire.rs`
+under 400 lines), `Bridge::offer`/`capture`, `snapshot::save_aside`, the
+leader's branch of `member::snapshots`, `proposer::quorum_heard`, and
+`Group::stop`.
