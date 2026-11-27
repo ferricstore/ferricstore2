@@ -13,10 +13,12 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use wf_storage::log::{DirectoryStorage, GroupLog, GroupLogLimits};
 
 mod backlog;
+mod close;
 mod concurrency;
 mod crash;
 mod entries;
 mod faults;
+mod gated;
 mod recovery;
 mod rotation;
 

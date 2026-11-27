@@ -12,6 +12,7 @@ use wf_storage::snapshot::files::group::GroupSnapshots;
 
 use super::super::codec;
 use super::super::snapshot::{self, Source, Stored};
+use super::super::testing::Root;
 use super::{Bridge, Taken};
 
 /// A machine that leads or follows as told; a follower's capture writes
@@ -58,11 +59,7 @@ type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
 /// A store of a fresh directory.
 fn store() -> TestResult<Arc<dyn SnapshotStore>> {
-    let nanos = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_or(0, |since| since.as_nanos());
-    let path = std::env::temp_dir().join(format!("wf-bridge-tests-{}-{nanos}", std::process::id()));
-    Ok(Arc::new(GroupSnapshots::open(&path)?))
+    Ok(Arc::new(GroupSnapshots::open(Root::new().path())?))
 }
 
 /// A snapshot whose last index is `index`, named but not written.

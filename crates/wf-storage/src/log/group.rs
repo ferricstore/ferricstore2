@@ -129,7 +129,7 @@ impl fmt::Display for GroupLogError {
 impl std::error::Error for GroupLogError {}
 
 /// The open log. Dropping it writes and syncs every queued batch, then stops
-/// the writer.
+/// the writer; a closed log's writer stops on its own (`close`).
 pub struct GroupLog {
     shared: Arc<Shared>,
     limits: GroupLogLimits,
@@ -268,6 +268,16 @@ impl GroupLog {
         self.shared.segment()
     }
 
+    /// Closes the log for good, as its owner stops: queued records are
+    /// dropped unwritten, every append, rotation, removal and wait not yet
+    /// answered is refused with [`GroupLogError::Closed`] at once, and the
+    /// writer stops before its next step, so the segments stay as they are
+    /// for whatever opens them next. Only a write already under way
+    /// finishes; its records were never reported durable.
+    pub fn close(&self) {
+        self.shared.close();
+    }
+
     /// Syncs performed since open; fewer syncs than waited appends shows that
     /// appends were grouped.
     #[must_use]
@@ -278,7 +288,12 @@ impl GroupLog {
 
 impl Drop for GroupLog {
     fn drop(&mut self) {
-        self.shared.close();
+        if self.shared.closed() {
+            // A closed log's writer changes nothing more, but may still
+            // wait on its disk: dropping does not wait for it.
+            return;
+        }
+        self.shared.finish();
         if let Some(writer) = self.writer.take() {
             // The writer publishes its outcome before it exits; a join error
             // has nothing further to report from drop.

@@ -70,8 +70,10 @@ impl Group {
     }
 
     /// Stops the member, then its runtime, waiting up to [`STOP_WAIT`] for
-    /// work still running there, such as a snapshot being saved: a stopped
-    /// node writes nothing more to its directory.
+    /// work still running there. The member closes its log and snapshot
+    /// store first, so work still waiting on the disk (a vote, a snapshot
+    /// being saved) changes nothing more: a stopped node writes nothing
+    /// more to its directory.
     pub(crate) fn stop(&mut self) {
         if let Some(member) = self.member.take() {
             member.shutdown();

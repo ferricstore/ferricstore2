@@ -35,8 +35,10 @@ leaders do.
 - **Consensus:** OpenRaft 0.10.1 (the released line; MIT or Apache-2.0) in
   `wf-consensus`, its types private there. Storage adapters: the log store
   is the group log with each entry's log id (term, index) and vote kept
-  durably, follower suffix truncation and purge before a snapshot; the state
-  machine is the group's shards.
+  durably, follower suffix truncation and purge before a snapshot (a purge
+  removes the segments before its oldest kept entry, so opening replays
+  from the highest purge: an older purge's mark can outlive the entries
+  after it); the state machine is the group's shards.
 - **Commit, not sync, releases replies.** The completer waits for the
   entry's commit (a majority holds it durably) instead of the local sync.
   The leader applied its own entries when it decided them, so applying a
@@ -93,8 +95,13 @@ leaders do.
    one frame of at most 256 MiB): it is a file in the member's snapshot
    store (`GroupSnapshots`: written as a stream, checked as it is read,
    finished, then adopted; one file sync when finished and one directory
-   sync when adopted; a stopping member closes its store, so snapshot
-   work still waiting on its disk changes nothing more there). Each shard sends its image as blocks (its
+   sync when adopted; a stopping member closes its store and its entry
+   log, so work still waiting on the disk changes nothing more there: the
+   store refuses finishing and adopting, and the log refuses every change,
+   refuses at once a change still waiting on its sync (freeing the
+   runtime thread a vote, truncation or purge holds; it was never
+   reported durable) and its writer stops before its next write or
+   segment removal). Each shard sends its image as blocks (its
    head, each record, its trailer; `image::blocks`) over a channel of 16
    blocks that the snapshot writer drains shard by shard, so a shard
    waits while the writer catches up; a transfer streams the file in

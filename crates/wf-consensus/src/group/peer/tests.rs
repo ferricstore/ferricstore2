@@ -7,21 +7,17 @@ use openraft::type_config::async_runtime::watch::WatchReceiver;
 use openraft::{Raft, SnapshotMeta, SnapshotPolicy, StoredMembership};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::task::JoinHandle;
-use wf_ports::consensus::log::{
-    Applied, Capture, Captured, ConsensusLog, ConsensusLogError, EntryId, ReplicatedMachine,
-    SnapshotSource, SnapshotStore,
-};
+use wf_ports::consensus::log::{ConsensusLog, EntryId, SnapshotStore};
 use wf_storage::log::{EntryLog, GroupLogLimits};
 use wf_storage::snapshot::files::group::GroupSnapshots;
 
 use super::super::ballot::Ballot;
 use super::super::machine::Bridge;
+use super::super::testing::{Machine, Root, TestResult, runtime};
 use super::super::wire::{self, Recipient, Request, Response};
 use super::super::{Config, LogStore, codec, snapshot};
 use super::server::wanted;
 use super::{Link, Peers, frame, newest, serving};
-
-type TestResult<T = ()> = Result<T, Box<dyn std::error::Error>>;
 
 /// Frames of at most this many bytes, so a test snapshot spans several.
 const LIMIT: u32 = 64 * 1024;
@@ -43,13 +39,6 @@ fn a_snapshot_goes_in_frames_as_large_as_the_limit_allows() {
     assert_eq!(frame::chunk(LIMIT), 64 * 1024);
     assert_eq!(frame::chunk(u32::MAX), 1024 * 1024);
     assert_eq!(frame::chunk(0), 1);
-}
-
-fn runtime() -> TestResult<tokio::runtime::Runtime> {
-    Ok(tokio::runtime::Builder::new_multi_thread()
-        .worker_threads(2)
-        .enable_all()
-        .build()?)
 }
 
 /// Two ends of a loopback connection.
@@ -94,24 +83,6 @@ fn skipped_snapshot_bytes_leave_the_connection_in_step() -> TestResult {
     })
 }
 
-/// A fresh path for one test's directories; the stores create them.
-struct Root(std::path::PathBuf);
-
-impl Root {
-    fn new() -> Self {
-        let nanos = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map_or(0, |since| since.as_nanos());
-        let path =
-            std::env::temp_dir().join(format!("wf-peer-tests-{}-{nanos}", std::process::id()));
-        Self(path)
-    }
-
-    fn path(&self) -> &std::path::Path {
-        &self.0
-    }
-}
-
 /// A store in a fresh directory under `root`.
 fn store(root: &Root, name: &str) -> TestResult<Arc<dyn SnapshotStore>> {
     Ok(Arc::new(GroupSnapshots::open(&root.path().join(name))?))
@@ -144,39 +115,6 @@ fn received_snapshot_bytes_land_in_the_store_as_sent() -> TestResult {
         }
         Ok(())
     })
-}
-
-/// A machine whose snapshots hold `captured`.
-struct Machine;
-
-struct Written;
-
-impl Capture for Written {
-    fn write_to(self: Box<Self>, out: &mut dyn Write) -> Result<(), ConsensusLogError> {
-        out.write_all(b"captured")
-            .map_err(|error| ConsensusLogError::new(error.to_string()))
-    }
-}
-
-impl ReplicatedMachine for Machine {
-    fn apply(&self, _proposals: Vec<Arc<[u8]>>, done: Applied) {
-        done(Ok(()));
-    }
-
-    fn promote(&self, done: Applied) {
-        done(Ok(()));
-    }
-
-    fn demote(&self) {}
-
-    fn snapshot(&self, done: Captured) -> bool {
-        done(Ok(Box::new(Written)));
-        true
-    }
-
-    fn install(&self, _snapshot: Box<dyn SnapshotSource>, done: Applied) {
-        done(Ok(()));
-    }
 }
 
 /// A one-member group that leads, served over loopback.

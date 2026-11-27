@@ -10,9 +10,15 @@
 //! block on that. A failed write, sync or segment creation is published once
 //! and stops the writer, and later appends are refused. A failed removal is
 //! reported to its caller only: the extra segments are still valid.
+//!
+//! Dropping the log lets the writer handle what is queued, then stop.
+//! Closing it (its owner stopping) is final at once: queued items are
+//! dropped unwritten, appenders and waiters are refused, and the writer
+//! stops before its next write, rotation or removal; only a write already
+//! under way finishes.
 
 use std::collections::BTreeMap;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Condvar, Mutex, MutexGuard, PoisonError};
 use std::thread::JoinHandle;
 
@@ -65,6 +71,8 @@ pub(super) struct Shared {
     syncs: AtomicU64,
     /// The segment appends go to.
     segment: AtomicU64,
+    /// Closed for good: the writer touches the segments no more.
+    closed: AtomicBool,
 }
 
 /// Critical sections only move values, so a poisoned lock still holds
@@ -93,6 +101,7 @@ impl Shared {
             durable_changed: Condvar::new(),
             syncs: AtomicU64::new(0),
             segment: AtomicU64::new(segment),
+            closed: AtomicBool::new(false),
         }
     }
 
@@ -155,10 +164,37 @@ impl Shared {
         }
     }
 
-    pub(super) fn close(&self) {
+    /// Lets the writer handle what is queued, then stop.
+    pub(super) fn finish(&self) {
         lock(&self.queue).closing = true;
         self.queued.notify_one();
         self.drained.notify_all();
+    }
+
+    /// Closes the log for good: what is queued is dropped unwritten, every
+    /// appender and waiter not yet answered is refused, and the writer
+    /// stops before its next step.
+    pub(super) fn close(&self) {
+        self.closed.store(true, Ordering::Release);
+        let mut queue = lock(&self.queue);
+        queue.closing = true;
+        queue.items.clear();
+        queue.bytes = 0;
+        drop(queue);
+        self.fail(GroupLogError::Closed);
+        self.queued.notify_one();
+    }
+
+    pub(super) fn closed(&self) -> bool {
+        self.closed.load(Ordering::Acquire)
+    }
+
+    /// Refuses a step of the writer once the log is closed.
+    fn open(&self) -> Result<(), GroupLogError> {
+        if self.closed() {
+            return Err(GroupLogError::Closed);
+        }
+        Ok(())
     }
 
     pub(super) fn syncs(&self) -> u64 {
@@ -195,8 +231,14 @@ impl Shared {
         self.durable_changed.notify_all();
     }
 
+    /// Publishes the first failure; a later one (the close after a failed
+    /// write) leaves it.
     fn fail(&self, failure: GroupLogError) {
-        lock(&self.durable).failed = Some(failure);
+        let mut durable = lock(&self.durable);
+        if durable.failed.is_none() {
+            durable.failed = Some(failure);
+        }
+        drop(durable);
         self.durable_changed.notify_all();
         // Taking the queue lock orders this after any appender's check, so a
         // waiting appender sees the failure.
@@ -218,6 +260,7 @@ pub(super) struct Writer {
 
 impl Writer {
     fn rotate(&mut self, shared: &Shared) -> Result<u64, GroupLogError> {
+        shared.open()?;
         let next = self
             .segment
             .checked_add(1)
@@ -233,6 +276,7 @@ impl Writer {
     }
 
     fn write(&mut self, shared: &Shared, batches: &[Vec<Vec<u8>>]) -> Result<(), GroupLogError> {
+        shared.open()?;
         let bytes = block::encode(batches, self.max_block_bytes)?;
         let added = u64::try_from(bytes.len()).map_err(|_| GroupLogError::TooLarge)?;
         let grown = self
@@ -254,11 +298,12 @@ impl Writer {
         Ok(())
     }
 
-    fn remove_before(&mut self, before: u64) -> Result<u64, GroupLogError> {
+    fn remove_before(&mut self, shared: &Shared, before: u64) -> Result<u64, GroupLogError> {
         if before > self.segment {
             return Err(GroupLogError::InvalidCheckpoint);
         }
         while self.oldest < before {
+            shared.open()?;
             self.storage
                 .remove(self.oldest)
                 .map_err(|_| GroupLogError::Unavailable)?;
@@ -303,7 +348,7 @@ impl Writer {
                 }
                 Item::RemoveBefore(before) => {
                     self.flush(shared, &mut pending, last)?;
-                    self.remove_before(before)
+                    self.remove_before(shared, before)
                 }
             };
             shared.publish(sequence, Some(outcome));

@@ -71,7 +71,7 @@ pub struct Member {
     runtime: Handle,
     tasks: Vec<JoinHandle<()>>,
     /// Closed first as the member stops.
-    store: Arc<dyn SnapshotStore>,
+    stores: (Arc<dyn ConsensusLog>, Arc<dyn SnapshotStore>),
 }
 
 /// A process's epoch: the wall clock in nanoseconds when it starts, so a
@@ -209,7 +209,7 @@ impl Member {
         }
         .validate()
         .map_err(|error| failed(&error))?;
-        let closing = Arc::clone(&store);
+        let closing = (Arc::clone(&log), Arc::clone(&store));
         let bridge = Bridge::new(Arc::clone(&machine), (id, epoch()), Arc::clone(&store));
         runtime
             .block_on(bridge.restore())
@@ -259,7 +259,7 @@ impl Member {
                 raft,
                 runtime: runtime.clone(),
                 tasks,
-                store: closing,
+                stores: closing,
             },
             proposer,
         ))
@@ -283,11 +283,15 @@ impl Member {
         self.leader() == Some(self.id)
     }
 
-    /// Stops the member: its Raft, listener, proposer and watcher. Its
-    /// snapshot store closes first, so snapshot work still running (a
-    /// capture waiting on its disk) changes nothing more there.
+    /// Stops the member: its Raft, listener, proposer and watcher. Its log
+    /// and snapshot store close first, so work still running there (a vote
+    /// or a capture waiting on its disk) changes nothing more: a change
+    /// still waiting on the log is refused at once, which also frees the
+    /// runtime thread it holds.
     pub fn shutdown(self) {
-        self.store.close();
+        let (log, store) = &self.stores;
+        log.close();
+        store.close();
         // A failed shutdown leaves nothing to clean up.
         let _stopped = self.runtime.block_on(self.raft.shutdown());
         for task in self.tasks {

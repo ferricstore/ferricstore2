@@ -68204,3 +68204,92 @@ responsibility, the parent's private encoders); the store's `format_args!`
 became `format!` (the reviewed macro set); and the peer tests name their
 directories under the temp dir and let the stores create them, as
 `machine::tests` does, instead of the M0-only `TestResources`.
+
+### A stopping member closes its entry log; a log purged twice reopens (ADR-018) (27 Nov)
+
+The 7 reopen failures left from the streamed-snapshots stress run
+(`AddrInUse` 3, "the entry log did not open" 2, "the group member did not
+start" 2) had one cause. A vote, truncation or purge writes to the entry
+log and waits for its sync on a runtime thread (`LogStore::save_vote`,
+`truncate_after`, `purge` call the log directly), and under 16 copies a
+sync took up to 16 s. The group's stop waits 10 s (`STOP_WAIT`), so it
+gave up with that thread still blocked: its tasks were never dropped, so
+the old listener kept its port, and the old log's writer then finished
+its write and the purge's segment removals while the test had already
+reopened the same directory. The log's only way to stop was its drop,
+which writes everything queued first and never comes while the blocked
+thread holds the log. The user said go.
+
+Decision (solo), the snapshot store's close applied to the log:
+
+- `ConsensusLog::close` (port), called with `SnapshotStore::close` first
+  in `Member::shutdown`, before Raft's shutdown.
+- `GroupLog::close`: queued items are dropped unwritten; every append,
+  rotation, removal and wait not yet answered is refused with `Closed` at
+  once (it reuses the failure path, which keeps the first failure now);
+  the writer checks before each write, rotation and segment removal and
+  stops. Only a write already under way finishes. A dropped closed log
+  does not join its writer, which may still wait on its disk; a log
+  dropped without a close still writes what is queued first, as before.
+- `EntryLog::close` closes its group log; its notifier answers waiting
+  appends' completions with the refusal. Reads go on.
+- Safety: a change refused this way was never reported durable, so
+  Raft's rule (acknowledged means durable) holds even when its bytes reach
+  the disk later; recovery already takes a log cut anywhere.
+- Considered: moving the synchronous writes off the runtime threads
+  (`spawn_blocking`). It would free the port, but the blocking task would
+  still hold the log and write to the directory; close covers both. Not
+  done.
+
+RED, each with a no-op `close`:
+`group_log::close::a_closed_log_refuses_its_waiters_at_once_and_changes_nothing_more`
+(a wait on a held sync, a queued append and a queued removal; failed with
+a `Timeout` waiting for the refusal),
+`group_log::entries::a_closed_entry_log_refuses_every_change_and_still_answers_reads`
+(failed: a vote saved after close), and
+`group::member::tests::a_stopped_member_s_log_and_snapshot_store_take_no_more_changes`
+(failed: the stopped member's log took a vote). All pass. The held-sync
+storage moved from `backlog.rs` to `group_log/gated.rs` and reports when
+the writer drops a segment; the consensus in-crate tests share a runtime,
+a path and a machine in `group::testing`.
+
+Stress (16x10, every replica test) after the close: `AddrInUse` went
+from 3 to 0, but "the entry log did not open" (2) and "the group member
+did not start" (2) stayed, and the stops took microseconds, so they were
+no race. Temporary prints of the hidden open error (removed) showed
+`Gap { index: 93 }`, and the member's directory was still there: its one
+remaining segment held `P(80) E93..E98 P(92) E99..E102`. A real bug,
+older than this change: purge(80) wrote its mark at the start of a new
+segment, after entries 81..92 in the one before; purge(92) removed that
+segment (its oldest kept entry, 93, was in the newer one), leaving P(80)
+ahead of 93, and replay, which applied P(80) and then expected 81,
+refused the log. Any member whose log was purged twice with that
+layout could not restart. Fix: replay starts from the highest purge in
+the log and skips the entries up to it (they are purged; one can share a
+segment with later entries); a gap after it is still refused. RED:
+`group_log::entries::a_log_reopens_after_a_purge_removed_the_entries_after_an_older_purge`
+builds that layout (segment 1 holds 4..=6, the purge to 3 starts segment
+2 ahead of 7 and 8, the purge to 6 removes segment 1) and failed with
+`Gap { index: 7 }`; it passes.
+
+The full run with both fixes (16x10, every replica test): no "the entry
+log did not open", no "the group member did not start", no `AddrInUse`,
+and the install test 0 failures (3 to 6 before). The frames install test
+failed 13 times (`Unavailable` 11: a leader lost under load fails its
+round), against 3 to 8 in earlier runs, while only the two members that
+never close or reopen were running, so I ran it against 9201265 on the
+same tests (`TESTS=replica_frames`): 2 (base) and 6 (this change) of 160
+run base first, then 6 (this change) and 11 (base) of 240 run this
+change first. Level (12 and 13 of 400): machine load, which other work
+on the machine also varied.
+
+The gate's `cargo test` then failed
+`group::machine::tests::a_follower_s_snapshot_is_a_stored_file` ("snapshot
+0: No such file or directory"), a flake older than this change: under
+`cargo test` a crate's tests are threads of one process, the clock counts
+microseconds here, so two machine tests could name the same
+`wf-bridge-tests-{pid}-{nanos}` directory and share a store, one's adopt
+removing the other's snapshot. 9201265 failed 4 of 12 `cargo test -p
+wf-consensus --lib` runs. The in-crate tests' paths (`group::testing::Root`,
+which the machine tests now use too) add a per-process counter; 0 of 12
+fail.

@@ -5,7 +5,9 @@
 //! entry with its id, a truncation that drops the entries after an index (a
 //! follower overwriting an uncommitted suffix), a vote, a purge that drops
 //! the entries up to an id, and the mark that the member votes (ADR-019).
-//! Opening replays them in order. Appends report durability through a
+//! Opening replays them in order from the highest purge: an older purge's
+//! mark can outlive the entries after it, which a later purge removed with
+//! their segments. Appends report durability through a
 //! completion called by the notifier thread; truncations, votes, purges and
 //! the mark return once durable. A purge also removes the segments before
 //! the oldest kept entry, after writing the vote, the mark and the purge
@@ -14,6 +16,7 @@
 
 mod codec;
 mod notifier;
+mod port;
 
 use std::collections::VecDeque;
 use std::fmt;
@@ -26,7 +29,6 @@ use codec::Record;
 pub use notifier::Durable;
 use notifier::Notifier;
 pub use wf_ports::consensus::log::EntryId;
-use wf_ports::consensus::log::{ConsensusLog, ConsensusLogError};
 
 /// A refused open or change.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -147,9 +149,26 @@ impl EntryLog {
         limits: GroupLogLimits,
     ) -> Result<Self, EntryLogError> {
         let (log, recovered) = GroupLog::open_with(storage, limits)?;
-        let mut state = State::default();
+        // Replay starts from the highest purge. A purge removes the segments
+        // before its oldest kept entry, which can leave an older purge's
+        // mark ahead of entries whose predecessors went with them; its own
+        // mark comes after those entries.
+        let mut state = State {
+            purged: recovered
+                .records
+                .iter()
+                .filter_map(|record| match codec::decode(record) {
+                    Some(Record::Purge(upto)) => Some(upto),
+                    _ => None,
+                })
+                .max_by_key(|upto| upto.index),
+            ..State::default()
+        };
         for (position, record) in recovered.records.iter().enumerate() {
             match codec::decode(record).ok_or(EntryLogError::Malformed { record: position })? {
+                // Purged; it was kept in a segment with later entries.
+                Record::Entry(id, _)
+                    if state.purged.is_some_and(|purged| id.index <= purged.index) => {}
                 Record::Entry(id, bytes) => {
                     let segment = segment_of(&recovered.segments, &recovered.starts, position);
                     state.push(id, bytes.into(), segment)?;
@@ -339,55 +358,12 @@ impl EntryLog {
         self.log.remove_before(keep_from)?;
         Ok(())
     }
-}
 
-fn port_error(error: impl fmt::Display) -> ConsensusLogError {
-    ConsensusLogError::new(error.to_string())
-}
-
-impl ConsensusLog for EntryLog {
-    fn bounds(&self) -> (Option<EntryId>, Option<EntryId>) {
-        Self::bounds(self)
-    }
-
-    fn vote(&self) -> Option<Vec<u8>> {
-        Self::vote(self)
-    }
-
-    fn save_vote(&self, vote: &[u8]) -> Result<(), ConsensusLogError> {
-        Self::save_vote(self, vote).map_err(port_error)
-    }
-
-    fn voter(&self) -> bool {
-        Self::voter(self)
-    }
-
-    fn save_voter(&self) -> Result<(), ConsensusLogError> {
-        Self::save_voter(self).map_err(port_error)
-    }
-
-    fn append(
-        &self,
-        entries: Vec<(EntryId, Vec<u8>)>,
-        done: wf_ports::consensus::log::Durable,
-    ) -> Result<(), ConsensusLogError> {
-        Self::append(
-            self,
-            entries,
-            Box::new(move |durable| done(durable.map_err(port_error))),
-        )
-        .map_err(port_error)
-    }
-
-    fn entries(&self, range: Range<u64>) -> Vec<(EntryId, Arc<[u8]>)> {
-        Self::entries(self, range)
-    }
-
-    fn truncate_after(&self, after: Option<u64>) -> Result<(), ConsensusLogError> {
-        Self::truncate_after(self, after).map_err(port_error)
-    }
-
-    fn purge(&self, upto: EntryId) -> Result<(), ConsensusLogError> {
-        Self::purge(self, upto).map_err(port_error)
+    /// Closes the log as its member stops: every change from now on, and
+    /// every one still waiting on its sync, is refused, appends' completions
+    /// included, and nothing more reaches the segments; reading goes on
+    /// ([`GroupLog::close`]).
+    pub fn close(&self) {
+        self.log.close();
     }
 }

@@ -101,6 +101,14 @@ pub trait ConsensusLog: Send + Sync {
     /// # Errors
     /// The storage's refusal or failure.
     fn purge(&self, upto: EntryId) -> Result<(), ConsensusLogError>;
+
+    /// Closes the log as its member stops: from now on every change is
+    /// refused and changes nothing, and a change still waiting on its disk
+    /// is refused at once, so work still in flight leaves the storage as it
+    /// was for whatever opens it next. A change refused this way was never
+    /// reported durable, though it may still reach the disk. Reading goes
+    /// on.
+    fn close(&self);
 }
 
 /// Called once a machine applied what it was given, or failed to.

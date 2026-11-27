@@ -12,6 +12,8 @@ mod member;
 mod peer;
 mod proposer;
 mod snapshot;
+#[cfg(test)]
+mod testing;
 mod wire;
 
 use std::fmt;
