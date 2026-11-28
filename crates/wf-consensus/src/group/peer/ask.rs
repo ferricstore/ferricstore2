@@ -1,6 +1,8 @@
 //! Requests a member sends outside `OpenRaft`'s replication: what another
-//! member holds (ADR-019), once, and a follower's newest snapshot, which a
-//! leader that trims its log asks over a link it keeps (ADR-018 phase 3).
+//! member holds (ADR-019), once; a follower's newest snapshot, which a
+//! leader that trims its log asks over a link it keeps (ADR-018 phase 3);
+//! and the leader's read index, which a follower asks before it answers
+//! reads (ADR-018).
 
 use std::io;
 use std::sync::Arc;
@@ -52,6 +54,20 @@ pub(crate) async fn status(address: &str, recipient: Recipient) -> io::Result<He
     let mut link = Link::to(address.to_owned(), recipient, MAX_FRAME_BYTES);
     match ask(&mut link, &Request::Status, CONNECT_TIMEOUT).await? {
         Response::Status(held) => Ok(held),
+        _ => Err(mismatched_answer()),
+    }
+}
+
+/// The index the member `link` reaches, which leads, has a follower apply
+/// through before it answers a read.
+///
+/// # Errors
+/// The member cannot be reached within `deadline`, does not lead, or
+/// answers something else.
+pub(crate) async fn read_index(link: &mut Link, deadline: Duration) -> io::Result<u64> {
+    match ask(link, &Request::ReadIndex, deadline).await? {
+        Response::ReadIndex(index) => Ok(index),
+        Response::Failed(why) => Err(io::Error::other(why)),
         _ => Err(mismatched_answer()),
     }
 }

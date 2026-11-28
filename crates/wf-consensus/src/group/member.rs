@@ -14,8 +14,9 @@ use std::fmt;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use openraft::type_config::alias::WatchReceiverOf;
 use openraft::type_config::async_runtime::watch::WatchReceiver;
-use openraft::{Raft, SnapshotPolicy};
+use openraft::{Raft, RaftMetrics, SnapshotPolicy};
 use tokio::runtime::Handle;
 use tokio::task::JoinHandle;
 use wf_ports::consensus::log::{ConsensusLog, ReplicatedMachine, SnapshotStore};
@@ -23,6 +24,7 @@ use wf_ports::consensus::log::{ConsensusLog, ReplicatedMachine, SnapshotStore};
 use super::join::serve_member;
 use super::machine::{Bridge, Taken};
 use super::proposer::{self, Proposer};
+use super::reads::{self, Asking, Reader};
 use super::wire::{self, Recipient};
 use super::{Config, Link, LogStore, Peers, peer};
 
@@ -70,6 +72,8 @@ pub struct Member {
     raft: Raft<Config, Bridge>,
     runtime: Handle,
     tasks: Vec<JoinHandle<()>>,
+    /// Lets reads on this member wait until it is current.
+    reader: Reader,
     /// Closed first as the member stops.
     stores: (Arc<dyn ConsensusLog>, Arc<dyn SnapshotStore>),
 }
@@ -84,15 +88,19 @@ fn epoch() -> u64 {
         })
 }
 
-async fn watch(raft: Raft<Config, Bridge>, id: u64, machine: Arc<dyn ReplicatedMachine>) {
-    let mut metrics = raft.metrics();
-    let mut led = false;
+/// Demotes the machine on every change of what this member knows while it
+/// does not lead (the machine's demote does nothing while it follows).
+async fn watch(
+    mut metrics: WatchReceiverOf<Config, RaftMetrics<Config>>,
+    id: u64,
+    machine: Arc<dyn ReplicatedMachine>,
+) {
     loop {
-        let leads = metrics.borrow_watched().current_leader == Some(id);
-        if led && !leads {
+        // Whatever was seen before: a leadership too brief for this task to
+        // see may still have promoted the machine.
+        if metrics.borrow_watched().current_leader != Some(id) {
             machine.demote();
         }
-        led = leads;
         if metrics.changed().await.is_err() {
             return;
         }
@@ -233,6 +241,12 @@ impl Member {
             tokio::net::TcpListener::from_std(listener).map_err(|error| failed(&error))?
         };
         let (proposer, proposing) = proposer::start(raft.clone(), bridge.epoch());
+        let (reader, reading) = reads::start(Asking {
+            raft: raft.clone(),
+            peers: peers.clone(),
+            own: id,
+            limit: max_frame_bytes,
+        });
         let own = Recipient {
             group: wire::group_id(&peers),
             member: id,
@@ -251,7 +265,8 @@ impl Member {
                 (log, store, max_frame_bytes),
             )),
             runtime.spawn(proposing),
-            runtime.spawn(watch(raft.clone(), id, machine)),
+            runtime.spawn(reading),
+            runtime.spawn(watch(raft.metrics(), id, machine)),
         ];
         Ok((
             Self {
@@ -259,6 +274,7 @@ impl Member {
                 raft,
                 runtime: runtime.clone(),
                 tasks,
+                reader,
                 stores: closing,
             },
             proposer,
@@ -275,6 +291,13 @@ impl Member {
     #[must_use]
     pub fn term(&self) -> u64 {
         self.raft.metrics().borrow_watched().current_term
+    }
+
+    /// Lets a read on this member wait until the member applied everything
+    /// the leader had committed when the read arrived.
+    #[must_use]
+    pub fn reader(&self) -> Reader {
+        self.reader.clone()
     }
 
     /// Whether this member leads.

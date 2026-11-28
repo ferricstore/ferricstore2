@@ -1,10 +1,10 @@
 //! Routes requests to shard threads and splits claims over them.
 
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
-use std::sync::mpsc;
+use std::sync::{Arc, OnceLock, mpsc};
 
 use wf_application::commands::queue::{ClaimFlows, Partition, ServiceError, shard_for_slot};
+use wf_consensus::group::Reader;
 
 use crate::supervision::shard::Request;
 use crate::supervision::shard::role::Role;
@@ -43,7 +43,13 @@ pub(crate) struct Router {
     /// Turns claims take to start sharing their limit at another shard
     /// (audit gap G25).
     pub(crate) claim_turn: std::sync::atomic::AtomicUsize,
+    /// A group member's reader, set once the member started; none for a
+    /// node on its own (ADR-018).
+    pub(crate) reader: OnceLock<Reader>,
 }
+
+/// Called once with whether the shards may answer a read.
+pub(crate) type Readable = Box<dyn FnOnce(Result<(), ServiceError>) + Send>;
 
 pub(crate) fn shard_index(partition: &Partition, shards: u16) -> Option<usize> {
     shard_for_slot(partition.slot(), shards).map(usize::from)
@@ -67,6 +73,29 @@ impl Router {
             Ok(())
         } else {
             Err(ServiceError::Reroute)
+        }
+    }
+
+    /// Calls `then` once the shards may answer a read: at once where they
+    /// decide requests; on a follower once it applied what the leader had
+    /// committed when the read arrived, else refused as not led here
+    /// (ADR-018).
+    pub(crate) fn when_readable(&self, then: Readable) {
+        if self.poisoned.load(Ordering::Acquire) {
+            return then(Err(ServiceError::Unavailable));
+        }
+        if self.role.serves() {
+            return then(Ok(()));
+        }
+        match self.reader.get() {
+            Some(reader) => reader.when_current(Box::new(move |current| {
+                then(if current {
+                    Ok(())
+                } else {
+                    Err(ServiceError::Reroute)
+                });
+            })),
+            None => then(Err(ServiceError::Reroute)),
         }
     }
 

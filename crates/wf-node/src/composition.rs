@@ -19,6 +19,7 @@ mod governance;
 mod info;
 mod policy;
 mod queue;
+mod reads;
 mod replay;
 mod replica;
 mod router;

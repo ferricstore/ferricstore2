@@ -92,6 +92,9 @@ pub(crate) enum Request {
         /// The highest last index the snapshot may have.
         upto: u64,
     },
+    /// The index a follower must apply through before it answers a read
+    /// (ADR-018), from a leader that confirmed it still leads.
+    ReadIndex,
 }
 
 /// What a member holds: its last log index and the term it knows.
@@ -118,6 +121,8 @@ pub(crate) enum Response {
     /// To a request for the newest snapshot: its metadata and length in
     /// bytes, which follow, or none in the range asked.
     Newest(Option<(SnapshotMetaOf<Config>, u64)>),
+    /// To a read index request.
+    ReadIndex(u64),
 }
 
 fn invalid() -> io::Error {
@@ -187,6 +192,7 @@ pub(crate) fn encode_request(recipient: Recipient, request: &Request) -> io::Res
             put_snapshot(&mut out, meta, *length)?;
         }
         Request::Status => out.push(6),
+        Request::ReadIndex => out.push(8),
         Request::Newest { after, upto } => {
             out.push(7);
             put_u64(&mut out, *after);
@@ -256,6 +262,10 @@ pub(crate) fn encode_response(response: &Response) -> io::Result<Vec<u8>> {
                 put_snapshot(&mut out, meta, *length)?;
             }
         }
+        Response::ReadIndex(index) => {
+            out.push(8);
+            put_u64(&mut out, *index);
+        }
     }
     Ok(out)
 }
@@ -294,6 +304,7 @@ pub(crate) fn decode_request(bytes: &[u8]) -> io::Result<(Recipient, Request)> {
             Request::Snapshot(vote, meta, length)
         }
         6 => Request::Status,
+        8 => Request::ReadIndex,
         7 => Request::Newest {
             after: reader.u64()?,
             upto: reader.u64()?,
@@ -347,6 +358,7 @@ pub(crate) fn decode_response(bytes: &[u8]) -> io::Result<Response> {
             1 => Some(reader.snapshot()?),
             _ => return Err(invalid()),
         }),
+        8 => Response::ReadIndex(reader.u64()?),
         _ => return Err(invalid()),
     };
     reader.done(response)

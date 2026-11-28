@@ -9,7 +9,7 @@ use std::sync::Arc;
 use openraft::storage::RaftStateMachine;
 use openraft::type_config::alias::{SnapshotMetaOf, VoteOf};
 use openraft::type_config::async_runtime::watch::WatchReceiver;
-use openraft::{Raft, Snapshot};
+use openraft::{Raft, ReadPolicy, Snapshot};
 use tokio::net::{TcpListener, TcpStream};
 use wf_ports::consensus::log::SnapshotStore;
 
@@ -201,6 +201,15 @@ where
         // Read with its bytes by `connection`.
         Request::Snapshot(..) => failed(&"snapshot without its bytes"),
         Request::Newest { after, upto } => return own_newest(raft, after, upto).await,
+        // The leader confirms with a quorum that it still leads; a member
+        // that does not lead refuses.
+        Request::ReadIndex => raft
+            .get_read_log_id(ReadPolicy::ReadIndex)
+            .await
+            .map_or_else(
+                |error| failed(&error),
+                |(read, _)| Response::ReadIndex(read.index()),
+            ),
     };
     (response, None)
 }

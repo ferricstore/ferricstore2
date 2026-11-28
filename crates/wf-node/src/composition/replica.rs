@@ -133,6 +133,7 @@ impl QueueNode {
         let (member, proposing) = Member::start(runtime.handle(), member, stores, machine)
             .map_err(|_| NodeError::Group("the group member did not start"))?;
         let _set = proposer.set(proposing);
+        let _set = started.router.reader.set(member.reader());
         let (schedule_jobs, scheduling) = start_schedules(&started.router, config.schedule_poll)?;
         Ok(Self {
             credit_cache: credit::Cache::default(),

@@ -125,7 +125,8 @@ pub trait ReplicatedMachine: Send + Sync {
     /// `done` once it serves.
     fn promote(&self, done: Applied);
 
-    /// This member no longer leads.
+    /// This member does not lead: called on every change of what it knows
+    /// while it does not, so it does nothing when already following.
     fn demote(&self);
 
     /// Starts capturing the machine as it is now, every proposal handed to

@@ -54,6 +54,7 @@ mod reclaim;
 mod replica;
 mod replica_frames;
 mod replica_lease;
+mod replica_reads;
 mod replica_trim;
 mod restart;
 mod retention;

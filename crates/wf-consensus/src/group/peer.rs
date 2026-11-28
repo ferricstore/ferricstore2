@@ -32,7 +32,7 @@ mod server;
 #[cfg(test)]
 mod tests;
 
-pub(super) use ask::{newest, status};
+pub(super) use ask::{newest, read_index, status};
 pub use link::Link;
 pub use server::serve;
 pub(super) use server::serving;

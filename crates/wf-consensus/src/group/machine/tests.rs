@@ -1,3 +1,5 @@
+use openraft::type_config::TypeConfigExt;
+use openraft::type_config::async_runtime::watch::WatchSender;
 use std::io::{Read, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, PoisonError};
@@ -150,5 +152,117 @@ fn a_follower_s_snapshot_is_a_stored_file() -> TestResult {
     source.read_to_end(&mut rest)?;
     assert_eq!(rest, b"captured");
     assert!(bridge.current.lock().is_ok_and(|current| current.is_some()));
+    Ok(())
+}
+
+/// A machine whose promotion ends when the test lets it, and which counts
+/// its demotions.
+#[derive(Default)]
+struct Slow {
+    promoting: std::sync::Mutex<Option<Applied>>,
+    demoted: std::sync::atomic::AtomicUsize,
+}
+
+impl ReplicatedMachine for Slow {
+    fn apply(&self, _proposals: Vec<Arc<[u8]>>, done: Applied) {
+        done(Ok(()));
+    }
+
+    fn promote(&self, done: Applied) {
+        *self
+            .promoting
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner) = Some(done);
+    }
+
+    fn demote(&self) {
+        self.demoted.fetch_add(1, Ordering::SeqCst);
+    }
+
+    fn snapshot(&self, _done: Captured) -> bool {
+        false
+    }
+
+    fn install(&self, _snapshot: Box<dyn SnapshotSource>, done: Applied) {
+        done(Ok(()));
+    }
+}
+
+/// A member promotes its machine when it applies its own term's first
+/// entry; a promotion that ends after another member took over is undone,
+/// so the machine does not serve as a leader it no longer is.
+#[test]
+fn a_promotion_that_ends_after_leadership_moved_is_undone() -> TestResult {
+    let machine = Arc::new(Slow::default());
+    let bridge = Bridge::new(Arc::clone(&machine) as _, (1, 7), store()?);
+    let mut metrics = openraft::RaftMetrics::new_initial(1);
+    metrics.current_leader = Some(1);
+    metrics.current_term = 3;
+    let (publish, watched) =
+        <super::super::Config as TypeConfigExt>::watch_channel(metrics.clone());
+    let _set = bridge.metrics.set(watched);
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .worker_threads(1)
+        .enable_all()
+        .build()?;
+    let entry = openraft::Entry {
+        log_id: codec::log_id(EntryId {
+            term: 3,
+            node: 1,
+            index: 5,
+        }),
+        payload: openraft::EntryPayload::Blank,
+    };
+    let taking = runtime.spawn(async move {
+        let mut pending = Vec::new();
+        bridge.take(entry, &mut pending).await
+    });
+    let until = std::time::Instant::now() + std::time::Duration::from_secs(5);
+    let done = loop {
+        let held = machine
+            .promoting
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .take();
+        if let Some(done) = held {
+            break done;
+        }
+        if std::time::Instant::now() > until {
+            return Err("the machine was not promoted".into());
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    };
+    metrics.current_leader = Some(2);
+    metrics.current_term = 4;
+    publish.send(metrics)?;
+    done(Ok(()));
+    runtime.block_on(taking)??;
+    assert_eq!(machine.demoted.load(Ordering::SeqCst), 1);
+    Ok(())
+}
+
+/// Members started at once can share an epoch (the wall clock when each
+/// started): a member skips only proposals it made itself in this process,
+/// so another member's round with the same epoch is applied.
+#[test]
+fn another_member_s_round_with_the_same_epoch_is_applied() -> TestResult {
+    let machine = Arc::new(Machine::default());
+    let bridge = Bridge::new(Arc::clone(&machine) as _, (2, 7), store()?);
+    let proposed_by = |node: u64| openraft::Entry {
+        log_id: codec::log_id(EntryId {
+            term: 2,
+            node,
+            index: 4,
+        }),
+        payload: openraft::EntryPayload::Normal(super::super::Proposal(super::wrap(7, b"round"))),
+    };
+    let runtime = tokio::runtime::Builder::new_current_thread().build()?;
+    let mut pending = Vec::new();
+    runtime.block_on(bridge.take(proposed_by(3), &mut pending))?;
+    assert_eq!(pending, vec![Arc::<[u8]>::from(b"round".as_slice())]);
+    // Its own round was applied when its shards decided it.
+    let mut own = Vec::new();
+    runtime.block_on(bridge.take(proposed_by(2), &mut own))?;
+    assert_eq!(own, Vec::<Arc<[u8]>>::new());
     Ok(())
 }

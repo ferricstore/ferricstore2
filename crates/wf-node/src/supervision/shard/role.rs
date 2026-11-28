@@ -1,7 +1,8 @@
 //! What a node's shards do (ADR-018): a single node decides requests and
 //! logs them itself; in a replicated group the leader decides and proposes,
-//! and a follower only applies the leader's committed rounds and refuses
-//! client requests as not led here. The node's shards share one role.
+//! and a follower applies the leader's committed rounds, answers reads once
+//! the node made sure it is current, and refuses other client requests as
+//! not led here. The node's shards share one role.
 
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU8, Ordering};

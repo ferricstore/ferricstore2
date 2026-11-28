@@ -298,7 +298,8 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
             links.backlog.fetch_sub(taken, Ordering::Relaxed);
         }
         now = committed_now(now);
-        // A follower only applies its leader's rounds (ADR-018).
+        // A follower applies its leader's rounds and answers reads
+        // (ADR-018).
         let serving = links.role.serves();
         let mut logged = Vec::new();
         if !failed && serving {
@@ -313,7 +314,7 @@ pub(crate) fn run(mut state: ShardState, requests: &Receiver<Request>, links: &L
         let mut finishes: Vec<Finish> = round
             .into_iter()
             .filter_map(|request| {
-                if !serving && !request.internal() {
+                if !serving && !request.internal() && !request.reads_only() {
                     request.fail(ServiceError::Reroute);
                     return None;
                 }

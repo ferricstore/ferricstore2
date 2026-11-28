@@ -1,10 +1,10 @@
 //! What every shard request shares: its weight in the backlog (ADR-017),
-//! whether the node sends it itself, and its refusal.
+//! whether the node sends it itself or it only reads, and its refusal.
 
 use wf_application::commands::queue::ServiceError;
 
 use super::Request;
-use super::state::Peeked;
+use super::state::{Peeked, PolicyCommand};
 
 impl Request {
     /// The items it carries, at least one: its weight in the shard's
@@ -36,6 +36,17 @@ impl Request {
                 | Self::Install { .. }
                 | Self::Capture { .. }
         )
+    }
+
+    /// Whether it only reads, changing nothing: a follower answers it,
+    /// once the node made sure the follower is current (ADR-018).
+    pub(crate) fn reads_only(&self) -> bool {
+        match self {
+            Self::Flow { command, .. } => command.reads_only(),
+            Self::Policy { command, .. } => matches!(command, PolicyCommand::Get(_)),
+            Self::Read { .. } | Self::GovernanceList { .. } | Self::ValueRead { .. } => true,
+            _ => false,
+        }
     }
 
     /// Answers it with `error` without running it.

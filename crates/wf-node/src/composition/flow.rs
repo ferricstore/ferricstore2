@@ -10,7 +10,6 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use wf_application::commands::flow::create_many::{self, CreateMany};
 use wf_application::commands::flow::keys;
 use wf_application::commands::flow::many::{self, ManyMutation};
-use wf_application::commands::flow::query;
 use wf_application::commands::flow::schedule::Command as ScheduleCommand;
 use wf_application::commands::flow::start::RunSteps;
 use wf_application::commands::flow::value::{self, ValueMget};
@@ -28,28 +27,29 @@ use super::QueueNode;
 use super::admission::{Class, occupied};
 use super::gather::ItemGather;
 use super::router::Router;
-use super::{cleanup, governance, info, policy};
+use super::{cleanup, policy, reads};
 
 impl FlowService for QueueNode {
     fn execute(&self, command: FlowCommand, reply: Reply<Term>) {
         let Some(router) = self.router.as_ref() else {
             return reply(Err(ServiceError::Unavailable));
         };
+        if command.reads_only() {
+            let reading = Arc::clone(router);
+            return router.when_readable(Box::new(move |readable| match readable {
+                Ok(()) => reads::read(&reading, command, reply),
+                Err(error) => reply(Err(error)),
+            }));
+        }
         if let Err(error) = router.serving() {
             return reply(Err(error));
         }
         let command = match command {
             FlowCommand::Many(batch) => return batch_mutation(router, *batch, reply),
             FlowCommand::CreateMany(batch) => return batch_create(router, *batch, reply),
-            FlowCommand::ValueMget(read) => return value_read(router, read, reply),
             FlowCommand::RunSteps(spec) => return run_steps(router, *spec, reply),
             FlowCommand::PolicySet(set) => return policy::set(router, set, reply),
-            FlowCommand::PolicyGet(get) => return policy::get(router, get, reply),
             FlowCommand::RetentionCleanup(request) => return cleanup::run(router, &request, reply),
-            FlowCommand::Info(read) => return info::read(router, *read, reply),
-            FlowCommand::Governance(command) if !command.listed().is_empty() => {
-                return governance::list(router, *command, reply);
-            }
             FlowCommand::Governance(mut command) => {
                 if let Err(error) = command.admit(router.shards.len()) {
                     return reply(Err(error));
@@ -57,14 +57,6 @@ impl FlowService for QueueNode {
                 FlowCommand::Governance(command)
             }
             FlowCommand::Schedule(command) => return self.schedule(router, *command, reply),
-            FlowCommand::QueryIndexes(request) => {
-                let now_ms = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .map_or(0, |elapsed| {
-                        u64::try_from(elapsed.as_millis()).unwrap_or(u64::MAX)
-                    });
-                return reply(query::indexes::reply(&request, router.shards.len(), now_ms));
-            }
             FlowCommand::SpawnChildren(spawn) => {
                 // A spawn is decided on the parent's shard, so its children
                 // share the parent's slot: then they stay together under
@@ -102,23 +94,28 @@ impl FlowService for QueueNode {
             }
             command => command,
         };
-        let Some((id, explicit)) = command.target() else {
-            return reply(Err(ServiceError::Unavailable));
-        };
-        let partition = Partition::for_new_flow(id, explicit);
-        let index = router.route(&partition);
-        if let Err(error) = router.admit([index], Class::of(&command)) {
-            return reply(Err(error));
-        }
-        router.send(
-            index,
-            Request::Flow {
-                command: Box::new(command),
-                partition,
-                done: reply,
-            },
-        );
+        single(router, command, reply);
     }
+}
+
+/// A command for one Flow, on the shard that owns it.
+pub(super) fn single(router: &Router, command: FlowCommand, reply: Reply<Term>) {
+    let Some((id, explicit)) = command.target() else {
+        return reply(Err(ServiceError::Unavailable));
+    };
+    let partition = Partition::for_new_flow(id, explicit);
+    let index = router.route(&partition);
+    if let Err(error) = router.admit([index], Class::of(&command)) {
+        return reply(Err(error));
+    }
+    router.send(
+        index,
+        Request::Flow {
+            command: Box::new(command),
+            partition,
+            done: reply,
+        },
+    );
 }
 
 impl QueueNode {
@@ -245,7 +242,7 @@ fn entropy() -> Vec<u8> {
 
 /// Reads values by reference: each reference goes to the shard its hash tag
 /// routes to; one that is not a value reference reads as nil.
-fn value_read(router: &Router, read: ValueMget, reply: Reply<Term>) {
+pub(super) fn value_read(router: &Router, read: ValueMget, reply: Reply<Term>) {
     let total = read.refs.len();
     let mut per_shard: Vec<Vec<(usize, Vec<u8>)>> =
         (0..router.shards.len()).map(|_| Vec::new()).collect();

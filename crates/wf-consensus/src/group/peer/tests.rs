@@ -17,7 +17,7 @@ use super::super::testing::{Machine, Root, TestResult, runtime};
 use super::super::wire::{self, Recipient, Request, Response};
 use super::super::{Config, LogStore, codec, snapshot};
 use super::server::wanted;
-use super::{Link, Peers, frame, newest, serving};
+use super::{Link, Peers, frame, newest, read_index, serving};
 
 /// Frames of at most this many bytes, so a test snapshot spans several.
 const LIMIT: u32 = 64 * 1024;
@@ -127,11 +127,12 @@ struct Served {
 }
 
 async fn served(root: &Root) -> TestResult<Served> {
+    // The store makes the root; the log makes only its own directory.
+    let store = store(root, "served")?;
     let log: Arc<dyn ConsensusLog> = Arc::new(EntryLog::open(
         &root.path().join("log"),
         GroupLogLimits::default(),
     )?);
-    let store = store(root, "served")?;
     let listener = TcpListener::bind("127.0.0.1:0").await?;
     let address = listener.local_addr()?.to_string();
     let peers = BTreeMap::from([(1, address.clone())]);
@@ -283,6 +284,21 @@ fn a_snapshot_for_another_member_is_refused_and_read_past() -> TestResult {
         let status = wire::encode_request(served.own, &Request::Status)?;
         let answer = link.exchange(&status, None).await?;
         assert!(matches!(answer, Response::Status(_)));
+        served.stop().await
+    })
+}
+
+/// A leader answers a read index request with an index no lower than what
+/// it applied, after it confirmed it still leads (its own group here).
+#[test]
+fn a_leader_answers_a_read_index_request() -> TestResult {
+    let root = Root::new();
+    runtime()?.block_on(async {
+        let served = served(&root).await?;
+        let applied = served.snapshot().await?;
+        let mut link = Link::to(served.address.clone(), served.own, LIMIT);
+        let index = read_index(&mut link, Duration::from_secs(5)).await?;
+        assert!(index >= applied);
         served.stop().await
     })
 }

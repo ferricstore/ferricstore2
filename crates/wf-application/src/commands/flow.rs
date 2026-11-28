@@ -94,6 +94,23 @@ pub enum FlowCommand {
 }
 
 impl FlowCommand {
+    /// Whether it only reads: a group member that does not lead answers it
+    /// once it applied what the leader had committed (ADR-018).
+    #[must_use]
+    pub const fn reads_only(&self) -> bool {
+        match self {
+            Self::Get(_)
+            | Self::History(_)
+            | Self::Query(_)
+            | Self::QueryIndexes(_)
+            | Self::ValueMget(_)
+            | Self::PolicyGet(_)
+            | Self::Info(_) => true,
+            Self::Governance(command) => !command.listed().is_empty(),
+            _ => false,
+        }
+    }
+
     /// The one Flow the command addresses, its id and explicit partition;
     /// `None` for a command over several Flows.
     #[must_use]

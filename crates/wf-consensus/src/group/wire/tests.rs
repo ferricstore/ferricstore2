@@ -64,6 +64,7 @@ fn requests_read_back_as_sent() {
         Request::PreVote(vote),
         Request::Snapshot(Vote::new_committed(3, 2), taken().meta, 5),
         Request::Newest { after: 4, upto: 9 },
+        Request::ReadIndex,
     ] {
         let bytes = encode_request(RECIPIENT, &request).unwrap_or_default();
         let (recipient, read) = decode_request(&bytes).map_or((None, None), |(recipient, read)| {
@@ -87,6 +88,7 @@ fn requests_read_back_as_sent() {
                     upto: read_upto,
                 }),
             ) => (after, upto) == (read_after, read_upto),
+            (Request::ReadIndex, Some(Request::ReadIndex)) => true,
             _ => false,
         };
         assert!(same, "{bytes:?}");
@@ -164,6 +166,7 @@ fn responses_read_back_as_sent() {
         }),
         Response::Newest(Some((taken().meta, 5))),
         Response::Newest(None),
+        Response::ReadIndex(41),
     ];
     for response in responses {
         let bytes = encode_response(&response).unwrap_or_default();
@@ -175,6 +178,7 @@ fn responses_read_back_as_sent() {
             (Response::Status(sent), Some(Response::Status(read))) => sent == read,
             (Response::Newest(Some(sent)), Some(Response::Newest(Some(read)))) => sent == read,
             (Response::Newest(None), Some(Response::Newest(None))) => true,
+            (Response::ReadIndex(sent), Some(Response::ReadIndex(read))) => sent == read,
             _ => false,
         };
         assert!(same, "{bytes:?}");

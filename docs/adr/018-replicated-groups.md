@@ -28,9 +28,21 @@ of slots, all its shards and one log. Its members (three by default) each
 keep a full copy: the leader's shard threads decide every request as today
 and append the round's changes as one Raft entry; followers apply committed
 entries through the replay path, so their shards are a hot copy and a new
-leader serves at once. A node can be a member of several groups, each with
-its own log and shards, so leaders spread over nodes as Elixir's per-shard
-leaders do.
+leader serves at once.
+
+**A cluster is one group** (27 Nov; this replaces "a node can be a member
+of several groups"). Shards stay inside a node: one thread each owns its
+records, so a node uses its cores without locks (ADR-011), but a shard is
+not a unit of replication or placement. Elixir made each shard a Raft
+group so leaders spread over nodes. Here that would need every node to
+forward a shard's request to the node that leads it (Elixir's `:erpc`
+forwarding), because queries over every shard, and parents and children in
+different partitions, span shards; the one gain would be writes spread
+over machines. One Rust leader serves about 25 times an Elixir node's
+creates (ADR-011, one node, not replicated), so this waits until a
+measured leader is the limit. Members share the shard count (an entry is
+one shard's round), so it stays a setting rather than following each
+machine's cores.
 
 - **Consensus:** OpenRaft 0.10.1 (the released line; MIT or Apache-2.0) in
   `wf-consensus`, its types private there. Storage adapters: the log store
@@ -54,15 +66,24 @@ leaders do.
   in order, until a quorum acknowledged the leader within half its lease,
   up to 30 s, or until it no longer leads; a client then waits for the
   quorum instead of the node stopping.
-- **Leader-only service.** Reads and writes go to the range's leader. A
-  member that does not lead a request's slot answers status 5 `reroute`
-  (retryable, safe to retry), and the client refreshes `SHARDS`. A leader
-  serves reads while its leadership lease holds (OpenRaft's leader lease);
-  without it, it refuses as unavailable rather than risk a stale read.
-- **Slot map.** Groups and their slot ranges are cluster configuration with
-  a version (`route_epoch`); `SHARDS` lists each range with its group's
-  current leader. Static configuration first; moving slots between groups
-  is a later decision.
+- **Writes on the leader, reads on any member** (reads since 28 Nov).
+  Writes go to the range's leader: a member that does not lead answers
+  status 5 `reroute` (retryable, safe to retry), and the client refreshes
+  `SHARDS`. A read-only command (queries, explain, query indexes, gets,
+  history, info, policy gets, value reads, governance listings) is
+  answered by any member: a follower asks the leader for its read index
+  (the leader first confirms with a quorum that it still leads,
+  OpenRaft's `ReadPolicy::ReadIndex`), waits until it applied through it,
+  then reads its own shards, so it sees every write acknowledged before
+  the read arrived; reads that arrive during one ask share the next. A
+  member that cannot get a read index (no leader known, the leader
+  unreachable, too far behind for 5 s) answers `reroute` as before,
+  never a stale read. The SDKs send a query without a routing key to any
+  member, as Elixir answers queries on any node. A leader answers its own
+  reads at once.
+- **Slot map.** The group holds every slot; `SHARDS` lists each shard's
+  range with the group's current leader, and the leader's term is the
+  route epoch, so a new leader is a new table.
 - **Clocks.** Committed time stays the leader's wall clock, never earlier
   than the entry before it (`committed_now`), so a new leader whose clock
   is behind does not move time backwards for leases and due times.
@@ -130,7 +151,18 @@ leaders do.
    a save does not hold up the runtime that sends heartbeats; a stopping
    member waits (up to 10 s) for such work, so a stopped node writes
    nothing more to its directory.
-4. **Several groups per node** and the SDK's three-node failover test.
+4. **The SDK's three-node failover test** (several groups per node
+   dropped, see the decision above). `tests/cluster/failover.py` runs the
+   SDK's failover steps (less KV, which the node lacks) against three
+   member processes: writes on the old route fail, sync and async clients
+   reroute, acknowledged Flows and a query over them survive, and the
+   stopped member rejoins. It needed reads on any member (above), and it
+   found two older faults: a member whose promotion ended after another
+   member took over stayed marked as leading (it now re-checks after the
+   promotion, and the watcher demotes on every change while the member
+   does not lead), and members started at once could share an epoch, so
+   one skipped the other's rounds as its own (only rounds this member
+   proposed in this process are skipped).
 
 ## Consequences
 
@@ -139,5 +171,4 @@ fsync, in parallel with the leader's own; throughput keeps group commit
 because one entry carries a whole shard round. A cluster of three members
 survives one member's loss with no acknowledged write lost.
 
-Not decided here: membership changes of a running group, moving slots
-between groups, and follower reads.
+Not decided here: membership changes of a running group.

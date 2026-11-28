@@ -68293,3 +68293,97 @@ removing the other's snapshot. 9201265 failed 4 of 12 `cargo test -p
 wf-consensus --lib` runs. The in-crate tests' paths (`group::testing::Root`,
 which the machine tests now use too) add a per-process counter; 0 of 12
 fail.
+
+### One group per cluster; reads on any member; two failover faults (ADR-018 phase 4) (27-28 Nov)
+
+Phase 4 was "several groups per node and the SDK's three-node failover
+test". Reading it against the code showed two things. Several groups per
+node means shards led on different nodes, so queries over every shard and
+parents and children in different partitions would need every node to
+forward a shard's request to its leader (Elixir's `:erpc` forwarding in
+`router/part_01.ex`); and the SDK's failover test needs KV, which the node
+does not have. The user asked whether shards still make sense in Rust:
+inside a node yes (one thread per shard owning its records is what gives
+265k creates/s at 4 ms of CPU per 1,000, ADR-011), as a unit of replication
+or placement no. User: one group per cluster, then the failover test.
+
+Decision (solo, with the user): ADR-018 now says a cluster is one group;
+shards stay a node's internal threads; spreading leaders waits until a
+measured leader is the limit. Members share the shard count (an entry is
+one shard's round), so it does not follow each machine's cores.
+
+The failover test (`tests/cluster/failover.py`, the SDK's steps less KV,
+three member processes, the leader stopped as `docker compose stop -t 1`
+does) then failed at its query: a query string carries no routing key, the
+SDK sends it to any member, and a follower answered `REROUTE`, which the
+SDK does not retry. Elixir answers queries on any node from its local copy.
+The user chose follower reads by read index over forwarding to the leader.
+
+Design (solo):
+
+- Peer kind 8 `ReadIndex`: the leader answers `get_read_log_id(ReadIndex)`
+  (it confirms with a quorum that it still leads; the index is the larger
+  of its commit point and its term's first entry), a member that does not
+  lead refuses.
+- `wf_consensus::group::Reader`, one task per member: reads that arrive
+  while an ask is under way share the next ask, then wait (up to 5 s)
+  until the member applied through the index. The bridge's apply reports
+  done only after every shard replayed its part, so applied means the
+  shards hold it.
+- `FlowCommand::reads_only` (gets, history, queries, query indexes, value
+  reads, policy gets, info, governance listings) and the shard requests
+  they become (`Request::reads_only`: those `Flow` commands, `Read`,
+  `GovernanceList`, `ValueRead`, a policy get), each of which returns no
+  change by construction, so a follower never proposes from a read. The
+  router runs a read at once where the shards serve, and on a follower
+  once the reader says it is current; otherwise `REROUTE` as before.
+- Considered: forwarding from a follower to the leader (simpler, the
+  leader does all reads) and stale local reads (Elixir's); read index keeps
+  ADR-018's no-stale-read rule and spreads reads over the members.
+
+RED: `replica_reads::a_follower_answers_reads_with_every_acknowledged_write`
+(the leader acknowledges a create, the follower reads it at once by
+`FLOW.GET` and the SDK's query; failed with `Reroute`), with
+`a_member_without_a_quorum_answers_no_read` (the last member of three
+refuses rather than answer from its copy), the peer test
+`a_leader_answers_a_read_index_request` and the wire round trip.
+
+The failover test then failed about 1 run in 15: follower 2 answered the
+query for 60 s without the two Flows written after the failover. Member 2's
+log held both entries and its commit; temporary prints (removed) showed it
+took the read index path every time (read index 5 from leader 3, applied
+5), so it had applied them without its shards getting them. Prints of each
+member's epoch then showed members 2 and 3 with the same epoch
+(`0x18ec07f9e76c8408`) and member 2 skipping member 3's entries 4 and 5 as
+its own. A proposal carries its process's epoch, the wall clock when the
+member started, and a member skips entries with its own epoch because its
+shards applied them as decided; three processes started together collided
+in about 3% of runs. Any members started at once (compose `up`, a
+StatefulSet's parallel pods) could do this: a follower silently missing
+another member's rounds, lost from it if it later leads. Fix: a member
+skips only entries whose leader is itself and whose epoch is its own. RED:
+`machine::tests::another_member_s_round_with_the_same_epoch_is_applied`
+failed (the round was skipped) and passes.
+
+On the way, a second older fault: promotion is asynchronous (shard 0's
+policies, `Live` on every shard, then the role), so a member whose
+leadership ended while it was being promoted, demoted first by the
+watcher, ended marked as leading and answered reads from its own shards.
+The watcher also demoted only after it had seen the member lead, and
+`OpenRaft`'s metrics channel keeps only the latest value, so a brief
+leadership could be missed. Fix: the bridge re-checks leadership after a
+promotion ends and demotes if it moved; the watcher demotes on every change
+while the member does not lead (the node's demote does nothing while it
+follows). RED: `machine::tests::a_promotion_that_ends_after_leadership_moved_is_undone`
+(left 0 demotions) and `member::tests::a_member_that_does_not_lead_keeps_its_machine_demoted`
+both failed and pass. The failed member's log showed it never led, so this
+was not the cause of the failover failure, but it can serve stale reads.
+
+After the fixes the failover test passed 60 of 60 runs (about 2 would
+have failed before). Stress (16x10 with `replica_reads`): the reads tests
+never failed; the other replica tests failed 28 then 12 times in two runs
+of the same build, so an A/B on the same tests (`TESTS` without
+`replica_reads`, this change first): 13 replica and 4 consensus failures
+against 433482e's 16 and 9, both mostly `Unavailable` (a leader lost under
+load fails its round). `AddrInUse` (2 each) and "the group member did not
+start" (1, on 433482e) remain on both sides: older, not explained yet.

@@ -173,6 +173,10 @@ impl ReplicatedMachine for Replicas {
     }
 
     fn demote(&self) {
+        // Called on every change while this member does not lead.
+        if !self.role.serves() {
+            return;
+        }
         self.role.follow();
         if let Some(router) = self.router.upgrade() {
             for index in 0..router.shards.len() {

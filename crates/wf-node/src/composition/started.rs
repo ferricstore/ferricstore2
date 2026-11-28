@@ -70,6 +70,7 @@ impl Started {
             role,
             poisoned,
             claim_turn: std::sync::atomic::AtomicUsize::new(0),
+            reader: OnceLock::new(),
         });
         let _set = release_router.set(Arc::downgrade(&router));
         Ok(Self {

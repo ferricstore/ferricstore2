@@ -3,9 +3,11 @@
 //! must change.
 //!
 //! A proposal carries the epoch of the process that proposed it; a leader's
-//! shards applied its own rounds when they decided them, so entries with
-//! this process's epoch only advance the applied position. Other proposals
-//! go to the machine in commit order. The blank entry a new leader commits
+//! shards applied its own rounds when they decided them, so entries this
+//! member proposed with this process's epoch only advance the applied
+//! position (members started at once can share an epoch, so the entry's
+//! leader must be this member too). Other proposals go to the machine in
+//! commit order. The blank entry a new leader commits
 //! promotes the machine once it is this member's, in the term it leads, so
 //! every earlier entry was applied first. A follower's machine is captured
 //! for snapshots (phase 3); a leader's is not, since its shards hold rounds
@@ -227,6 +229,18 @@ impl Bridge {
         })
     }
 
+    /// Promotes the machine for `term`, every earlier entry applied. A
+    /// promotion that ends after another member took over is undone: the
+    /// watcher may have demoted the machine before it ended.
+    async fn promote(&self, term: u64, pending: &mut Vec<Arc<[u8]>>) -> io::Result<()> {
+        self.flush(pending).await?;
+        machine_call(|done| self.machine.promote(done)).await?;
+        if !self.leads_in(term) {
+            self.machine.demote();
+        }
+        Ok(())
+    }
+
     async fn flush(&self, pending: &mut Vec<Arc<[u8]>>) -> io::Result<()> {
         if pending.is_empty() {
             return Ok(());
@@ -244,15 +258,17 @@ impl Bridge {
             EntryPayload::Normal(proposal) => {
                 let (epoch, body) =
                     split(&proposal.0).ok_or_else(|| failed(&"malformed proposal"))?;
-                if epoch != self.epoch {
+                // Only this process's own rounds were applied as decided:
+                // members started at once can share an epoch.
+                let own = entry.log_id.leader_id.node_id == self.id && epoch == self.epoch;
+                if !own {
                     pending.push(body.into());
                 }
             }
             EntryPayload::Blank => {
                 let leader = entry.log_id.leader_id;
                 if leader.node_id == self.id && self.leads_in(leader.term) {
-                    self.flush(pending).await?;
-                    machine_call(|done| self.machine.promote(done)).await?;
+                    self.promote(leader.term, pending).await?;
                 }
             }
             EntryPayload::Membership(membership) => {
