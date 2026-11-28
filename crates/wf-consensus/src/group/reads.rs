@@ -84,7 +84,9 @@ async fn run(asking: Asking, mut waiting: mpsc::UnboundedReceiver<Current>) {
 }
 
 /// The leader's read index: asked over a link kept per leader, or this
-/// member's own when it leads.
+/// member's own when it leads. A kept connection is dead once the leader's
+/// process restarted, and an exchange that fails drops it, so a failure on
+/// one is asked again over a new one.
 async fn read_point(asking: &Asking, group: u64, links: &mut BTreeMap<u64, Link>) -> Option<u64> {
     let leader = asking.raft.metrics().borrow_watched().current_leader?;
     if leader == asking.own {
@@ -103,5 +105,10 @@ async fn read_point(asking: &Asking, group: u64, links: &mut BTreeMap<u64, Link>
         };
         Link::to(address.clone(), recipient, asking.limit)
     });
-    read_index(link, ASK).await.ok()
+    let kept = link.connected();
+    match read_index(link, ASK).await {
+        Ok(index) => Some(index),
+        Err(_) if kept => read_index(link, ASK).await.ok(),
+        Err(_) => None,
+    }
 }

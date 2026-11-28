@@ -53,7 +53,16 @@ pub enum Opcode {
     CommandExec,
     /// Any other Flow command with a typed-map body, by name (ADR-014).
     Flow(&'static str),
+    /// A member role command with an `args` list body, by name (ADR-020).
+    Cluster(&'static str),
 }
+
+/// Member role commands whose `args` list the session reads (ADR-020).
+const CLUSTER_COMMANDS: [(&str, u16); 3] = [
+    ("CLUSTER.PROMOTE", 0x0309),
+    ("CLUSTER.DEMOTE", 0x030A),
+    ("CLUSTER.ROLE", 0x030B),
+];
 
 /// Flow commands whose typed-map body the application reads (ADR-014).
 const FLOW_COMMANDS: [(&str, u16); 62] = [
@@ -140,9 +149,10 @@ impl Opcode {
     /// The native protocol code.
     #[must_use]
     pub fn code(self) -> u16 {
-        if let Self::Flow(name) = self {
+        if let Self::Flow(name) | Self::Cluster(name) = self {
             return FLOW_COMMANDS
                 .iter()
+                .chain(&CLUSTER_COMMANDS)
                 .find(|(known, _)| *known == name)
                 .map_or(0, |(_, code)| *code);
         }
@@ -164,6 +174,12 @@ impl Opcode {
                     .iter()
                     .find(|(_, known)| *known == code)
                     .map(|(name, _)| Self::Flow(name))
+            })
+            .or_else(|| {
+                CLUSTER_COMMANDS
+                    .iter()
+                    .find(|(_, known)| *known == code)
+                    .map(|(name, _)| Self::Cluster(name))
             })
     }
 }

@@ -1,8 +1,9 @@
 //! Requests a member sends outside `OpenRaft`'s replication: what another
 //! member holds (ADR-019), once; a follower's newest snapshot, which a
 //! leader that trims its log asks over a link it keeps (ADR-018 phase 3);
-//! and the leader's read index, which a follower asks before it answers
-//! reads (ADR-018).
+//! the leader's read index, which a follower asks before it answers
+//! reads (ADR-018); and a role change, which a member that does not lead
+//! asks of the leader (ADR-020).
 
 use std::io;
 use std::sync::Arc;
@@ -13,6 +14,7 @@ use openraft::type_config::alias::SnapshotOf;
 use wf_ports::consensus::log::SnapshotStore;
 
 use super::super::Config;
+use super::super::roles::Role;
 use super::super::snapshot::{self, Stored, aside};
 use super::super::wire::{self, Held, Recipient, Request, Response};
 use super::{CONNECT_TIMEOUT, Link, MAX_FRAME_BYTES, SNAPSHOT_TIMEOUT};
@@ -68,6 +70,24 @@ pub(crate) async fn read_index(link: &mut Link, deadline: Duration) -> io::Resul
     match ask(link, &Request::ReadIndex, deadline).await? {
         Response::ReadIndex(index) => Ok(index),
         Response::Failed(why) => Err(io::Error::other(why)),
+        _ => Err(mismatched_answer()),
+    }
+}
+
+/// Asks the member `link` reaches, which leads, to give member `member`
+/// `role`; the refusal's reply text when it refuses.
+///
+/// # Errors
+/// The member cannot be reached within `deadline` or answers something
+/// else.
+pub(crate) async fn change(
+    link: &mut Link,
+    (member, role): (u64, Role),
+    deadline: Duration,
+) -> io::Result<Result<(), String>> {
+    match ask(link, &Request::Change(member, role), deadline).await? {
+        Response::Changed => Ok(Ok(())),
+        Response::Failed(why) => Ok(Err(why)),
         _ => Err(mismatched_answer()),
     }
 }

@@ -32,7 +32,8 @@ and answers `GET /health/live` and `GET /health/ready` on
   Consul and etcd wait for changing the size of a running group.
 - **Names resolve per connection:** peers are `host:port` strings resolved
   on each connection.
-- **Formation:** the lowest member forms the group once every other member
+- **Formation:** the lowest member (the lowest voter, with the voters alone,
+  since ADR-020) forms the group once every other member
   answers a status request (`Status`, peer kind 6) that it holds no log; if
   one holds a log, the group exists and this member waits to be replicated
   to. This keeps a member that lost its data, with a member list that

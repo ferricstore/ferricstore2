@@ -33,7 +33,18 @@ pub(super) fn open(
     id: u64,
     peers: &BTreeMap<u64, SocketAddr>,
 ) -> TestResult<QueueNode> {
-    open_with(path, id, peers, 0)
+    open_with(path, id, peers, (0, true))
+}
+
+/// Opens member `id`, joining as a voter when `voter` and as a replica
+/// otherwise (ADR-020).
+pub(super) fn open_as(
+    path: &Path,
+    id: u64,
+    peers: &BTreeMap<u64, SocketAddr>,
+    voter: bool,
+) -> TestResult<QueueNode> {
+    open_with(path, id, peers, (0, voter))
 }
 
 /// Opens member `id`; a follower snapshots every `snapshot_every` entries
@@ -42,7 +53,7 @@ fn open_with(
     path: &Path,
     id: u64,
     peers: &BTreeMap<u64, SocketAddr>,
-    snapshot_every: u64,
+    (snapshot_every, voter): (u64, bool),
 ) -> TestResult<QueueNode> {
     let address = peers.get(&id).ok_or("unknown member")?;
     let replica = Replica {
@@ -51,6 +62,7 @@ fn open_with(
             .iter()
             .map(|(id, address)| (*id, address.to_string()))
             .collect(),
+        voter,
         listener: TcpListener::bind(address)?,
         snapshot_every,
         keep_logs: 0,
@@ -340,7 +352,7 @@ fn a_member_the_leader_s_log_no_longer_reaches_installs_a_snapshot() -> TestResu
     let peers = peers()?;
     let mut nodes = BTreeMap::new();
     for id in MEMBERS {
-        nodes.insert(id, open_with(&path, id, &peers, 20)?);
+        nodes.insert(id, open_with(&path, id, &peers, (20, true))?);
     }
     let a = serving(&nodes, "probe-a")?;
     let mut followers = MEMBERS.iter().copied().filter(|id| *id != a);
@@ -357,7 +369,7 @@ fn a_member_the_leader_s_log_no_longer_reaches_installs_a_snapshot() -> TestResu
     snapshotted(&path, b)?;
     // Without A, only B is up to date, so it leads, and C needs B's snapshot.
     drop(nodes.remove(&a));
-    nodes.insert(c, open_with(&path, c, &peers, 20)?);
+    nodes.insert(c, open_with(&path, c, &peers, (20, true))?);
     let led = serving(&nodes, "probe-b")?;
     assert_eq!(led, b);
     // B applied A's round, whose three after-images shared one record.
@@ -365,7 +377,7 @@ fn a_member_the_leader_s_log_no_longer_reaches_installs_a_snapshot() -> TestResu
     let second = batch(nodes.get(&b).ok_or("no b")?, "w2-", 10, 2)?;
     // Without B, A lacks the second batch, so C leads with all of it.
     drop(nodes.remove(&b));
-    nodes.insert(a, open_with(&path, a, &peers, 20)?);
+    nodes.insert(a, open_with(&path, a, &peers, (20, true))?);
     let led = serving(&nodes, "probe-c")?;
     assert_eq!(led, c);
     let leader = nodes.get(&c).ok_or("no c")?;
@@ -379,11 +391,11 @@ fn a_member_the_leader_s_log_no_longer_reaches_installs_a_snapshot() -> TestResu
     // B restarts from its snapshot and log and takes a third batch; without
     // C, only B has it, so B leads with everything.
     drop(nodes.remove(&a));
-    nodes.insert(b, open_with(&path, b, &peers, 20)?);
+    nodes.insert(b, open_with(&path, b, &peers, (20, true))?);
     let third = batch(nodes.get(&c).ok_or("no c")?, "w3-", 10, 0)?;
     assert_eq!(third, Vec::<String>::new());
     drop(nodes.remove(&c));
-    nodes.insert(a, open_with(&path, a, &peers, 20)?);
+    nodes.insert(a, open_with(&path, a, &peers, (20, true))?);
     let led = serving(&nodes, "probe-d")?;
     assert_eq!(led, b);
     let leader = nodes.get(&b).ok_or("no b")?;

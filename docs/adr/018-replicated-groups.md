@@ -171,4 +171,5 @@ fsync, in parallel with the leader's own; throughput keeps group commit
 because one entry carries a whole shard round. A cluster of three members
 survives one member's loss with no acknowledged write lost.
 
-Not decided here: membership changes of a running group.
+Not decided here: membership changes of a running group. Roles of the
+listed members, and changing them while the group runs: ADR-020.

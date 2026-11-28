@@ -1,7 +1,8 @@
 //! `COMMAND_EXEC` frames (ADR-014 step 9c): a FLOW command sent as text, with
 //! its arguments, runs exactly as its typed form would; the reply is the
-//! same term. `PING` answers as its own opcode does; other commands are not
-//! part of this workflow server.
+//! same term. `PING` answers as its own opcode does, and the member role
+//! commands as theirs do (ADR-020); other commands are not part of this
+//! workflow server.
 
 use wf_application::commands::flow::text::{self, Parsed};
 use wf_application::commands::flow::{Term, claim};
@@ -9,6 +10,7 @@ use wf_application::commands::queue::ServiceError;
 
 use crate::request;
 
+use super::cluster;
 use super::connection::ReplyTo;
 use super::deadline;
 use super::dispatch::{Context, refuse_request};
@@ -67,6 +69,9 @@ pub(super) fn run(context: &Context, payload: &Term, done: Done) {
                 "ERR wrong number of arguments for 'ferricstore.capabilities' command",
             ))
         });
+    }
+    if cluster::is_cluster(&upper) {
+        return cluster::run(context, &upper, args, done);
     }
     if !upper.starts_with(b"FLOW.") {
         return done(Err(rejected(format!(

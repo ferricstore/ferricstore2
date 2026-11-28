@@ -34,6 +34,7 @@ pub(super) fn open_framed(
             .iter()
             .map(|(id, address)| (*id, address.to_string()))
             .collect(),
+        voter: true,
         listener: TcpListener::bind(address)?,
         snapshot_every: 20,
         keep_logs: 0,

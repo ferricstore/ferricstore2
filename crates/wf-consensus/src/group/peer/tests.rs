@@ -17,7 +17,7 @@ use super::super::testing::{Machine, Root, TestResult, runtime};
 use super::super::wire::{self, Recipient, Request, Response};
 use super::super::{Config, LogStore, codec, snapshot};
 use super::server::wanted;
-use super::{Link, Peers, frame, newest, read_index, serving};
+use super::{Answering, Link, Peers, frame, newest, read_index, serving};
 
 /// Frames of at most this many bytes, so a test snapshot spans several.
 const LIMIT: u32 = 64 * 1024;
@@ -157,11 +157,15 @@ async fn served(root: &Root) -> TestResult<Served> {
         group: wire::group_id(&peers),
         member: 1,
     };
-    let ballot = Arc::new(Ballot::new(false));
+    let answering = Answering {
+        ballot: Arc::new(Ballot::new(false)),
+        own,
+        voter: true,
+    };
     let serving = serving(
         listener,
         raft.clone(),
-        (ballot, own),
+        answering,
         (LIMIT, Arc::clone(&store)),
     );
     Ok(Served {

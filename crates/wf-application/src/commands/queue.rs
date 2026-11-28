@@ -269,6 +269,43 @@ pub trait QueueService: Send + Sync {
     fn route(&self) -> Option<Route> {
         None
     }
+
+    /// This member's role in its group's membership as it knows it, or the
+    /// role it joins with before it is in it (`CLUSTER.ROLE`, ADR-020); a
+    /// node without a group is its own voter.
+    fn role(&self) -> MemberRole {
+        MemberRole::Voter
+    }
+
+    /// Gives member `member` of this node's group `role`
+    /// (`CLUSTER.PROMOTE`, `CLUSTER.DEMOTE`, ADR-020); `reply` once the
+    /// change is committed. A node without a group refuses.
+    fn change_role(&self, _member: u64, _role: MemberRole, reply: Reply<()>) {
+        reply(Err(ServiceError::rejected(
+            "ERR this node is not in a group".to_owned(),
+        )));
+    }
+}
+
+/// A member's role in its group (ADR-020).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MemberRole {
+    /// Votes, may lead and counts toward every quorum.
+    Voter,
+    /// Takes and applies every committed entry and answers reads, but
+    /// never votes, never leads and counts toward no quorum.
+    Replica,
+}
+
+impl MemberRole {
+    /// The name `CLUSTER.ROLE` answers.
+    #[must_use]
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::Voter => "voter",
+            Self::Replica => "replica",
+        }
+    }
 }
 
 /// A replicated group's leadership as one member knows it (ADR-018).

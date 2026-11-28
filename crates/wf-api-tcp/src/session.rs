@@ -6,6 +6,7 @@
 //! request order; lanes are independent. The service calls back after the
 //! decision is durable, from any thread.
 
+mod cluster;
 mod connection;
 mod deadline;
 mod dispatch;

@@ -68387,3 +68387,79 @@ of the same build, so an A/B on the same tests (`TESTS` without
 against 433482e's 16 and 9, both mostly `Unavailable` (a leader lost under
 load fails its round). `AddrInUse` (2 each) and "the group member did not
 start" (1, on 433482e) remain on both sides: older, not explained yet.
+
+### Voters and replicas; role changes on a running group (ADR-020) (28 Nov)
+
+The user asked whether a member can follow without voting ("we have more
+nodes in cluster but we don't want all to vote"), then "do 1 and 2": roles
+at start, then changing them while the group runs. Every listed member
+voted (ADR-019), so each member added for reads (ADR-018 phase 4) also
+made every write wait for one more acknowledgement. Elixir has
+`FERRICSTORE_CLUSTER_ROLE` (`voter`, `replica`, `readonly`; the last two
+the same non-voting WARaft membership) and `CLUSTER.PROMOTE`,
+`CLUSTER.DEMOTE`, `CLUSTER.ROLE` (which answers the setting even after a
+promotion).
+
+Design (solo, ADR-020): a replica is an `OpenRaft` learner. The setting is
+the role a member joins with; after that the membership decides.
+`Status` (peer kind 6) carries the role, the lowest voter forms the group
+with the voters alone, and a leader adds every listed member missing from
+the membership as a learner (`roles::keep`, every 200 ms). `CLUSTER.PROMOTE`/`DEMOTE` change one member at a time
+(no joint configuration), from any member: one that does not lead asks the
+leader (peer kind 9). Demoting the last voter is refused; promoting a voter
+or demoting a replica answers `OK` without a change; changes refused for
+now are tried again for 5 s. `CLUSTER.ROLE` answers the membership's role,
+not the setting. One name, `replica`, for Elixir's two.
+
+RED: `configuration::a_member_joins_with_the_role_its_setting_names`,
+`join::the_lowest_voter_forms_a_new_group_with_the_voters_alone` and the
+wire round trips (compile failures, then pass);
+`replica_roles::replicas_take_every_write_but_never_lead` (one voter, two
+replicas: the replicas read every acknowledged write, refuse writes, and
+elect nobody once the voter is gone; failed with `Reroute` on the replica's
+first read until the leader added the replicas),
+`promoted_replicas_vote` (promoted by a replica and by the other replica,
+then the two elect a leader without the first voter) and
+`demoted_voters_stop_voting_and_the_last_voter_stays` (failed while role
+changes were the trait's refusal), and the session tests
+`cluster_role_answers_this_member_s_role`,
+`promote_and_demote_name_a_member_of_the_group` and
+`promote_and_demote_refuse_what_names_no_member` (ports of Elixir's
+`cluster_commands_test.exs` role case and
+`cluster_membership_validation_test.exs`; failed with the opcodes
+unsupported).
+
+Found while testing:
+
+- A demoted leader led on: `OpenRaft` steps down only a leader removed from
+  the membership, and one kept as a learner keeps leading (its
+  step-down watcher checks the membership's nodes, not its voters), so a
+  member that no longer voted stayed the leader for good. The leader now
+  hands leadership to the most up-to-date voter itself. Handing it on at
+  once then stopped the demoted member (`poisoned`): rounds its shards had
+  already decided were refused when leadership moved, and a member that
+  loses a round stops until restarted (ADR-018). Now its shards stop taking
+  writes as soon as it no longer votes (the watcher demotes the machine of
+  a leader without a vote), it leads on until its demotion and every entry
+  it appended are committed, and hands leadership on 200 ms after that.
+  RED: `a_leader_demoted_under_writes_loses_no_round` (a writer on whichever
+  member leads while the leader is demoted) failed 3 of 3 with the demoted
+  member poisoned with the hand-off at once, and passes with every
+  acknowledged write on the new leader.
+- The role stress run (8x10) then failed 2 of 80 with "ERR no leader is
+  known; try again": a member asked right after an election did not know
+  the new leader yet. A member now asks again for up to 5 s while no leader
+  is known, or the leader it asked no longer leads or does not answer.
+  The same run failed `a_leader_demoted_under_writes_loses_no_round` on its
+  own floor of ten writes in three seconds (2 to 5 under load, no member
+  poisoned); it now writes until three writes were acknowledged on each
+  side of the hand-off, and still fails 3 of 3 with the hand-off at once.
+- An older fault in phase 4's reads: a follower keeps one connection to its
+  leader for read indexes; once the leader's process restarted and led
+  again, the first read failed on the dead connection and answered
+  `REROUTE` (the next one reconnected). A failure on a kept connection is
+  now asked again on a new one. RED:
+  `replica_roles::a_replica_reads_again_once_its_leader_restarted` failed
+  with `Reroute` (with three voters the restarted member seldom leads
+  again, so the earlier tests did not see it) and passes; with the retry
+  disabled it fails again.

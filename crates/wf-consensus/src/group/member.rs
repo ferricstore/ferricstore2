@@ -4,7 +4,8 @@
 //! the snapshots that let it drop its log behind them. A
 //! member whose log lacks the mark that it votes asks the others what they
 //! hold before it votes, and a fresh group is formed by its lowest-numbered
-//! member once every other member reports an empty log (`join`).
+//! voter once every other member reports an empty log (`join`); its leader
+//! adds the replicas (`roles`, ADR-020).
 
 #[cfg(test)]
 mod tests;
@@ -25,6 +26,7 @@ use super::join::serve_member;
 use super::machine::{Bridge, Taken};
 use super::proposer::{self, Proposer};
 use super::reads::{self, Asking, Reader};
+use super::roles::{self, Role};
 use super::wire::{self, Recipient};
 use super::{Config, Link, LogStore, Peers, peer};
 
@@ -35,6 +37,9 @@ pub struct MemberConfig {
     /// Every member's Raft address (`host:port`, resolved on each
     /// connection), this one's included.
     pub peers: BTreeMap<u64, String>,
+    /// Whether this member joins its group as a voter; a replica joins as a
+    /// learner, which applies every entry but never votes (ADR-020).
+    pub voter: bool,
     /// The bound listener for other members' Raft traffic.
     pub listener: std::net::TcpListener,
     /// Entries applied since the last snapshot at which a follower takes
@@ -66,6 +71,10 @@ fn failed(error: &impl fmt::Display) -> MemberError {
     MemberError(error.to_string())
 }
 
+/// Called once with a role change's outcome: the refusal's reply text when
+/// it was refused.
+pub type Changed = Box<dyn FnOnce(Result<(), String>) + Send>;
+
 /// A running member; [`Member::shutdown`] stops it.
 pub struct Member {
     id: u64,
@@ -74,6 +83,9 @@ pub struct Member {
     tasks: Vec<JoinHandle<()>>,
     /// Lets reads on this member wait until it is current.
     reader: Reader,
+    /// Every member's Raft address, the frame limit, and whether this
+    /// member joins as a voter (ADR-020).
+    group: (BTreeMap<u64, String>, u32, bool),
     /// Closed first as the member stops.
     stores: (Arc<dyn ConsensusLog>, Arc<dyn SnapshotStore>),
 }
@@ -89,7 +101,10 @@ fn epoch() -> u64 {
 }
 
 /// Demotes the machine on every change of what this member knows while it
-/// does not lead (the machine's demote does nothing while it follows).
+/// does not lead, or leads without voting (the machine's demote does
+/// nothing while it follows). A leader demoted to a replica stops taking
+/// writes at once but leads on until what it proposed is committed, then
+/// hands leadership on (`roles::keep`), so none of its rounds is lost.
 async fn watch(
     mut metrics: WatchReceiverOf<Config, RaftMetrics<Config>>,
     id: u64,
@@ -98,7 +113,11 @@ async fn watch(
     loop {
         // Whatever was seen before: a leadership too brief for this task to
         // see may still have promoted the machine.
-        if metrics.borrow_watched().current_leader != Some(id) {
+        let serves = {
+            let seen = metrics.borrow_watched();
+            seen.current_leader == Some(id) && roles::held(&seen, id) == Some(Role::Voter)
+        };
+        if !serves {
             machine.demote();
         }
         if metrics.changed().await.is_err() {
@@ -195,6 +214,7 @@ impl Member {
         let MemberConfig {
             id,
             peers,
+            voter,
             listener,
             snapshot_every,
             keep_logs,
@@ -251,7 +271,10 @@ impl Member {
             group: wire::group_id(&peers),
             member: id,
         };
+        let listed = peers.keys().copied().collect();
+        let group = (peers.clone(), max_frame_bytes, voter);
         let tasks = vec![
+            runtime.spawn(roles::keep(raft.clone(), listed, id)),
             runtime.spawn(snapshots(
                 (raft.clone(), bridge),
                 (peers.clone(), own, max_frame_bytes),
@@ -260,8 +283,7 @@ impl Member {
             runtime.spawn(serve_member(
                 listener,
                 raft.clone(),
-                peers,
-                id,
+                (peers, id, voter),
                 (log, store, max_frame_bytes),
             )),
             runtime.spawn(proposing),
@@ -275,6 +297,7 @@ impl Member {
                 runtime: runtime.clone(),
                 tasks,
                 reader,
+                group,
                 stores: closing,
             },
             proposer,
@@ -304,6 +327,33 @@ impl Member {
     #[must_use]
     pub fn leads(&self) -> bool {
         self.leader() == Some(self.id)
+    }
+
+    /// This member's role in its group's membership as it knows it, or the
+    /// role it joins with before it is in it (ADR-020).
+    #[must_use]
+    pub fn role(&self) -> Role {
+        let joins = if self.group.2 {
+            Role::Voter
+        } else {
+            Role::Replica
+        };
+        roles::held(&self.raft.metrics().borrow_watched(), self.id).unwrap_or(joins)
+    }
+
+    /// Gives member `member` `role`, asking the leader when this member
+    /// does not lead; `done` once the change is committed, or with the
+    /// refusal's reply text.
+    pub fn change(&self, (member, role): (u64, Role), done: Changed) {
+        let (peers, limit, _) = &self.group;
+        if !peers.contains_key(&member) {
+            return done(Err(format!("ERR member {member} is not in this group")));
+        }
+        let raft = self.raft.clone();
+        let (own, peers, limit) = (self.id, peers.clone(), *limit);
+        self.runtime.spawn(async move {
+            done(roles::asked(&raft, (own, &peers, limit), (member, role)).await);
+        });
     }
 
     /// Stops the member: its Raft, listener, proposer and watcher. Its log

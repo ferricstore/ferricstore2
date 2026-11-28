@@ -27,10 +27,24 @@ is found again. Clients connect to any member on the native port
 (`FERRICSTORE_NATIVE_PORT`, 6388); `SHARDS` sends them to the leader by the
 name above, so clients must resolve those names.
 
-The group forms by itself: its lowest-numbered member creates it once every
+The group forms by itself: its lowest-numbered voter creates it once every
 other member answers that it holds no data. A member that lost its data
 rejoins the group instead. Members must keep their data directory: a member
 that loses it may also have forgotten a vote it cast.
+
+## Voters and replicas
+
+Every member votes unless `FERRICSTORE_CLUSTER_ROLE=replica`. A replica
+takes every write and answers reads, but never votes or leads, so adding
+replicas adds read capacity without making writes wait for more members:
+three voters and any number of replicas commit a write on two
+acknowledgements. The setting is the role a member joins with; once it is
+in the group, change a role from any member with the SDK's
+`cluster_promote("ferricstore2-<id>")` and `cluster_demote(...)`
+(`CLUSTER.PROMOTE`, `CLUSTER.DEMOTE`), and read one with `cluster_role()`.
+A group keeps at least one voter. A Kubernetes StatefulSet gives every pod
+the same settings, so set a pod's role from its ordinal in its start
+command, or demote members once the group runs.
 
 Health: with `FERRICSTORE_HEALTH_PORT` (6380 in the image), `GET
 /health/live` is 200 while the process runs and `GET /health/ready` is 200

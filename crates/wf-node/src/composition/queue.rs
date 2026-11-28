@@ -4,8 +4,8 @@
 use std::sync::Arc;
 
 use wf_application::commands::queue::{
-    ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, QueueService, Reply, Route,
-    ServiceError,
+    ClaimFlows, ClaimedFlow, CompleteFlow, CreateFlows, ItemOutcome, MemberRole, QueueService,
+    Reply, Route, ServiceError,
 };
 
 use crate::supervision::shard::Request;
@@ -120,5 +120,20 @@ impl QueueService for QueueNode {
 
     fn route(&self) -> Option<Route> {
         self.group.as_ref().and_then(super::replica::Group::route)
+    }
+
+    fn role(&self) -> MemberRole {
+        self.group
+            .as_ref()
+            .map_or(MemberRole::Voter, super::replica::Group::role)
+    }
+
+    fn change_role(&self, member: u64, role: MemberRole, reply: Reply<()>) {
+        match self.group.as_ref() {
+            Some(group) => group.change_role(member, role, reply),
+            None => reply(Err(ServiceError::rejected(
+                "ERR this node is not in a group".to_owned(),
+            ))),
+        }
     }
 }

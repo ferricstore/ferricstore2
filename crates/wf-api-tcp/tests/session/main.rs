@@ -23,6 +23,7 @@ use wf_domain::value::DomainError;
 mod backpressure;
 mod capabilities;
 mod clock;
+mod cluster;
 mod compact_create;
 mod connection_guards;
 mod flow;

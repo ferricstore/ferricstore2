@@ -37,6 +37,12 @@ pub struct Link {
 type Follows = Option<Box<dyn SnapshotSource>>;
 
 impl Link {
+    /// Whether it holds a connection from an earlier exchange, which the
+    /// member may have closed since.
+    pub(crate) const fn connected(&self) -> bool {
+        self.stream.is_some()
+    }
+
     async fn connect(&self) -> io::Result<TcpStream> {
         let address = self
             .address

@@ -41,6 +41,7 @@ fn a_stopped_member_s_log_and_snapshot_store_take_no_more_changes() -> TestResul
     let config = MemberConfig {
         id: 1,
         peers: BTreeMap::from([(1, listener.local_addr()?.to_string())]),
+        voter: true,
         listener,
         snapshot_every: 0,
         keep_logs: 10,

@@ -18,6 +18,10 @@
 //! Names stay names: members resolve them on each connection, so a pod that
 //! restarts with a new address is found again. Ports default to the node's
 //! own client and peer ports.
+//!
+//! `FERRICSTORE_CLUSTER_ROLE` is the role a member joins its group with
+//! (ADR-020): `voter` (the default) or `replica`, which takes every entry
+//! and answers reads but never votes.
 
 use std::collections::BTreeMap;
 
@@ -47,6 +51,9 @@ pub struct Cluster {
     pub id: u64,
     /// Every member, this one included.
     pub members: BTreeMap<u64, MemberAddress>,
+    /// Whether this node joins as a voter; `false` joins as a replica
+    /// (ADR-020).
+    pub voter: bool,
 }
 
 /// What this node knows of itself.
@@ -84,14 +91,27 @@ fn number<T: std::str::FromStr>(name: &str, value: &str) -> Result<T, String> {
 /// members.
 pub fn cluster(settings: Settings<'_>, local: &Local) -> Result<Option<Cluster>, String> {
     let discovery = settings("FERRICSTORE_DISCOVERY").unwrap_or_default();
-    match discovery.trim() {
-        "" | "none" => Ok(None),
-        "static" => static_cluster(settings, local).map(Some),
-        "dns" => dns_cluster(settings, local).map(Some),
-        other => Err(format!(
-            "FERRICSTORE_DISCOVERY {other:?} is not one of none, static, dns"
-        )),
-    }
+    let found = match discovery.trim() {
+        "" | "none" => return Ok(None),
+        "static" => static_cluster(settings, local)?,
+        "dns" => dns_cluster(settings, local)?,
+        other => {
+            return Err(format!(
+                "FERRICSTORE_DISCOVERY {other:?} is not one of none, static, dns"
+            ));
+        }
+    };
+    let role = settings("FERRICSTORE_CLUSTER_ROLE").unwrap_or_default();
+    let voter = match role.trim() {
+        "" | "voter" => true,
+        "replica" => false,
+        other => {
+            return Err(format!(
+                "FERRICSTORE_CLUSTER_ROLE {other:?} is not one of voter, replica"
+            ));
+        }
+    };
+    Ok(Some(Cluster { voter, ..found }))
 }
 
 /// One `host[:port[:peer_port]]` entry.
@@ -135,7 +155,11 @@ fn static_cluster(settings: Settings<'_>, local: &Local) -> Result<Cluster, Stri
     if !members.contains_key(&id) {
         return Err(format!("member {id} is not in FERRICSTORE_CLUSTER_NODES"));
     }
-    Ok(Cluster { id, members })
+    Ok(Cluster {
+        id,
+        members,
+        voter: true,
+    })
 }
 
 fn dns_cluster(settings: Settings<'_>, local: &Local) -> Result<Cluster, String> {
@@ -170,6 +194,7 @@ fn dns_cluster(settings: Settings<'_>, local: &Local) -> Result<Cluster, String>
     Ok(Cluster {
         id: ordinal.saturating_add(1),
         members,
+        voter: true,
     })
 }
 
@@ -225,6 +250,7 @@ mod tests {
                 (2, member("b", 6400, 7388)),
                 (3, member("c", 6401, 7401)),
             ]),
+            voter: true,
         };
         assert_eq!(cluster(&list, &local("b")), Ok(Some(expected)));
         assert!(cluster(&list, &local("z")).is_err(), "not a member");
@@ -266,5 +292,37 @@ mod tests {
             ("FERRICSTORE_DNS_NAME", "fs-headless"),
         ]);
         assert!(cluster(&unsized_pods, &local("fs-0")).is_err());
+    }
+
+    /// A member joins as a voter unless `FERRICSTORE_CLUSTER_ROLE` makes it
+    /// a replica (ADR-020); Elixir's `readonly` and any other value are
+    /// refused.
+    #[test]
+    fn a_member_joins_with_the_role_its_setting_names() {
+        let with_role = |role: Option<&str>| {
+            let mut pairs = vec![
+                ("FERRICSTORE_DISCOVERY", "static"),
+                ("FERRICSTORE_CLUSTER_NODES", "a,b"),
+            ];
+            pairs.extend(role.map(|role| ("FERRICSTORE_CLUSTER_ROLE", role)));
+            cluster(&settings(&pairs), &local("b")).map(|found| found.map(|cluster| cluster.voter))
+        };
+        assert_eq!(with_role(None), Ok(Some(true)));
+        assert_eq!(with_role(Some("voter")), Ok(Some(true)));
+        assert_eq!(with_role(Some(" replica ")), Ok(Some(false)));
+        assert_eq!(with_role(Some("")), Ok(Some(true)), "empty is unset");
+        for refused in ["readonly", "learner"] {
+            assert!(with_role(Some(refused)).is_err(), "{refused:?}");
+        }
+        let pods = settings(&[
+            ("FERRICSTORE_DISCOVERY", "dns"),
+            ("FERRICSTORE_DNS_NAME", "fs-headless"),
+            ("FERRICSTORE_CLUSTER_SIZE", "3"),
+            ("FERRICSTORE_CLUSTER_ROLE", "replica"),
+        ]);
+        assert_eq!(
+            cluster(&pods, &local("fs-2")).map(|found| found.map(|cluster| cluster.voter)),
+            Ok(Some(false))
+        );
     }
 }

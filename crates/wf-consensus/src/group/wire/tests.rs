@@ -6,6 +6,7 @@ use openraft::type_config::alias::SnapshotOf;
 use openraft::{Snapshot, SnapshotMeta, StoredMembership};
 use wf_ports::consensus::log::EntryId;
 
+use super::super::roles::Role;
 use super::super::{Proposal, codec};
 use super::{
     Held, Recipient, Request, Response, decode_request, decode_response, encode_append,
@@ -65,6 +66,8 @@ fn requests_read_back_as_sent() {
         Request::Snapshot(Vote::new_committed(3, 2), taken().meta, 5),
         Request::Newest { after: 4, upto: 9 },
         Request::ReadIndex,
+        Request::Change(3, Role::Voter),
+        Request::Change(2, Role::Replica),
     ] {
         let bytes = encode_request(RECIPIENT, &request).unwrap_or_default();
         let (recipient, read) = decode_request(&bytes).map_or((None, None), |(recipient, read)| {
@@ -89,6 +92,9 @@ fn requests_read_back_as_sent() {
                 }),
             ) => (after, upto) == (read_after, read_upto),
             (Request::ReadIndex, Some(Request::ReadIndex)) => true,
+            (Request::Change(member, role), Some(Request::Change(read_member, read_role))) => {
+                (member, role) == (read_member, read_role)
+            }
             _ => false,
         };
         assert!(same, "{bytes:?}");
@@ -155,18 +161,22 @@ fn responses_read_back_as_sent() {
         Response::Status(Held {
             last_log: Some(7),
             term: 5,
+            voter: true,
         }),
         Response::Status(Held {
             last_log: Some(0),
             term: 0,
+            voter: true,
         }),
         Response::Status(Held {
             last_log: None,
             term: 2,
+            voter: false,
         }),
         Response::Newest(Some((taken().meta, 5))),
         Response::Newest(None),
         Response::ReadIndex(41),
+        Response::Changed,
     ];
     for response in responses {
         let bytes = encode_response(&response).unwrap_or_default();
@@ -177,7 +187,8 @@ fn responses_read_back_as_sent() {
             (Response::Failed(sent), Some(Response::Failed(read))) => sent == read,
             (Response::Status(sent), Some(Response::Status(read))) => sent == read,
             (Response::Newest(Some(sent)), Some(Response::Newest(Some(read)))) => sent == read,
-            (Response::Newest(None), Some(Response::Newest(None))) => true,
+            (Response::Newest(None), Some(Response::Newest(None)))
+            | (Response::Changed, Some(Response::Changed)) => true,
             (Response::ReadIndex(sent), Some(Response::ReadIndex(read))) => sent == read,
             _ => false,
         };
@@ -187,6 +198,8 @@ fn responses_read_back_as_sent() {
     // answer names whether one follows.
     assert!(decode_response(&[6, 2, 0, 0, 0, 0, 0, 0, 0, 0]).is_err());
     assert!(decode_response(&[7, 2]).is_err());
+    // A status names its role as 0 or 1.
+    assert!(decode_response(&[6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]).is_err());
 }
 
 /// An append whose entries do not fit one frame goes as several, each at

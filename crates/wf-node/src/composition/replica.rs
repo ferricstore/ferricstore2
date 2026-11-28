@@ -16,8 +16,8 @@ use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, OnceLock};
 
-use wf_application::commands::queue::{Route, SLOTS};
-use wf_consensus::group::{Member, MemberConfig};
+use wf_application::commands::queue::{MemberRole, Reply, Route, SLOTS, ServiceError};
+use wf_consensus::group::{Member, MemberConfig, Role as GroupRole};
 use wf_ports::consensus::log::{ConsensusLog, SnapshotStore};
 use wf_storage::log::EntryLog;
 use wf_storage::snapshot::files::group::GroupSnapshots;
@@ -35,6 +35,9 @@ pub struct Replica {
     /// Every member's Raft address (`host:port`, resolved on each
     /// connection), this one's included.
     pub peers: BTreeMap<u64, String>,
+    /// Whether this member joins its group as a voter; a replica takes
+    /// every entry and answers reads but never votes (ADR-020).
+    pub voter: bool,
     /// The bound listener for other members' Raft traffic.
     pub listener: std::net::TcpListener,
     /// Entries applied since the last snapshot at which a follower takes
@@ -67,6 +70,30 @@ impl Group {
             leader: member.leader(),
             term: member.term(),
         })
+    }
+
+    /// This member's role in its group as it knows it (ADR-020).
+    pub(crate) fn role(&self) -> MemberRole {
+        match self.member.as_ref().map(Member::role) {
+            Some(GroupRole::Replica) => MemberRole::Replica,
+            Some(GroupRole::Voter) | None => MemberRole::Voter,
+        }
+    }
+
+    /// Gives member `member` `role`, asking the leader when this member
+    /// does not lead; `reply` once the change is committed (ADR-020).
+    pub(crate) fn change_role(&self, member: u64, role: MemberRole, reply: Reply<()>) {
+        let Some(own) = self.member.as_ref() else {
+            return reply(Err(ServiceError::Unavailable));
+        };
+        let role = match role {
+            MemberRole::Voter => GroupRole::Voter,
+            MemberRole::Replica => GroupRole::Replica,
+        };
+        own.change(
+            (member, role),
+            Box::new(move |outcome| reply(outcome.map_err(ServiceError::rejected))),
+        );
     }
 
     /// Stops the member, then its runtime, waiting up to [`STOP_WAIT`] for
@@ -119,6 +146,7 @@ impl QueueNode {
         let member = MemberConfig {
             id: replica.id,
             peers: replica.peers,
+            voter: replica.voter,
             listener: replica.listener,
             snapshot_every: replica.snapshot_every,
             keep_logs: replica.keep_logs,

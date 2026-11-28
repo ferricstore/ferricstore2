@@ -53,10 +53,18 @@ def free_ports(count: int) -> list[int]:
 class Member:
     """One member process; `start` again reopens its data directory."""
 
-    def __init__(self, binary: Path, member: int, nodes: str, ports: tuple[int, int, int], data: Path):
+    def __init__(
+        self,
+        binary: Path,
+        member: int,
+        nodes: str,
+        ports: tuple[int, int, int],
+        data: Path,
+        role: str = "voter",
+    ):
         self.binary, self.member, self.nodes = binary, member, nodes
         self.native, self.peer, self.health = ports
-        self.data = data
+        self.data, self.role = data, role
         self.process: subprocess.Popen[bytes] | None = None
 
     @property
@@ -72,6 +80,7 @@ class Member:
             FERRICSTORE_NATIVE_PORT=str(self.native),
             FERRICSTORE_PEER_PORT=str(self.peer),
             FERRICSTORE_HEALTH_PORT=str(self.health),
+            FERRICSTORE_CLUSTER_ROLE=self.role,
         )
         with open(self.data.with_suffix(".log"), "ab") as log:
             self.process = subprocess.Popen(

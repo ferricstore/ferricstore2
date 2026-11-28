@@ -12,63 +12,36 @@
 //! `3` a vote response, `4` a failure with its text, `5` a snapshot taken,
 //! with the receiver's vote). Kind `6` asks what a member holds (ADR-019);
 //! its answer is `6`, its last log index as a presence byte and the index,
-//! and the term it knows. Kind `7` asks for the member's newest snapshot if
-//! its last index is past one index and at most another (a leader trimming
-//! its log, ADR-018 phase 3); its answer is `7`, a presence byte, then the
-//! snapshot's metadata and length, its bytes following as for kind `4`. A vote is its term, node
+//! the term it knows, and whether it joins as a voter (ADR-020). Kind `7`
+//! asks for the member's newest snapshot if its last index is past one
+//! index and at most another (a leader trimming its log, ADR-018 phase 3);
+//! its answer is `7`, a presence byte, then the snapshot's metadata and
+//! length, its bytes following as for kind `4`. Kind `8` asks the leader
+//! for its read index; its answer is `8` and the index. Kind `9` asks the
+//! leader to give a member a role (ADR-020): the member's id and `1` for
+//! voter or `0` for replica; its answer is `9`. A vote is its term, node
 //! and committed byte; an optional log id is a presence byte and the id's
 //! term, node and index; an entry is its id, its payload length and payload
 //! (`codec::encode`). Conflict hints are not sent; they are optional.
 
 mod append;
 mod reader;
+mod recipient;
 #[cfg(test)]
 mod tests;
 
-use std::collections::BTreeMap;
 use std::io;
 
 use openraft::raft::{
     AppendEntriesRequest, AppendError, AppendResult, SnapshotResponse, VoteRequest, VoteResponse,
 };
 use openraft::type_config::alias::{LogIdOf, SnapshotMetaOf, VoteOf};
-use sha2::{Digest, Sha256};
 
+use super::roles::Role;
 use super::{Config, codec, snapshot};
 pub(crate) use append::encode_append;
 use reader::Reader;
-
-/// Whom a request is for.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct Recipient {
-    /// The group's id: [`group_id`] of its member list.
-    pub(crate) group: u64,
-    /// The member's id.
-    pub(crate) member: u64,
-}
-
-/// A group's id: the first eight bytes of the SHA-256 of its member list,
-/// each member's id and Raft address in id order. Every member is given the
-/// same list, so they agree on it; another group lists other addresses.
-pub(crate) fn group_id(peers: &BTreeMap<u64, String>) -> u64 {
-    let mut digest = Sha256::new();
-    for (id, address) in peers {
-        digest.update(id.to_be_bytes());
-        digest.update(
-            u64::try_from(address.len())
-                .unwrap_or(u64::MAX)
-                .to_be_bytes(),
-        );
-        digest.update(address.as_bytes());
-    }
-    u64::from_be_bytes(
-        digest
-            .finalize()
-            .first_chunk::<8>()
-            .copied()
-            .unwrap_or_default(),
-    )
-}
+pub(crate) use recipient::{Recipient, group_id};
 
 /// A request from one member to another.
 pub(crate) enum Request {
@@ -95,15 +68,20 @@ pub(crate) enum Request {
     /// The index a follower must apply through before it answers a read
     /// (ADR-018), from a leader that confirmed it still leads.
     ReadIndex,
+    /// Gives member `.0` role `.1`, asked of the leader (ADR-020).
+    Change(u64, Role),
 }
 
-/// What a member holds: its last log index and the term it knows.
+/// What a member holds: its last log index and the term it knows, and the
+/// role it joins with.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct Held {
     /// Its last log index, if it holds any log.
     pub(crate) last_log: Option<u64>,
     /// The highest term it knows.
     pub(crate) term: u64,
+    /// Whether it joins as a voter; a replica joins as a learner (ADR-020).
+    pub(crate) voter: bool,
 }
 
 /// The answer to a [`Request`].
@@ -123,6 +101,8 @@ pub(crate) enum Response {
     Newest(Option<(SnapshotMetaOf<Config>, u64)>),
     /// To a read index request.
     ReadIndex(u64),
+    /// To a role change: committed.
+    Changed,
 }
 
 fn invalid() -> io::Error {
@@ -193,6 +173,11 @@ pub(crate) fn encode_request(recipient: Recipient, request: &Request) -> io::Res
         }
         Request::Status => out.push(6),
         Request::ReadIndex => out.push(8),
+        Request::Change(member, role) => {
+            out.push(9);
+            put_u64(&mut out, *member);
+            out.push(u8::from(*role == Role::Voter));
+        }
         Request::Newest { after, upto } => {
             out.push(7);
             put_u64(&mut out, *after);
@@ -254,6 +239,7 @@ pub(crate) fn encode_response(response: &Response) -> io::Result<Vec<u8>> {
                 }
             }
             put_u64(&mut out, held.term);
+            out.push(u8::from(held.voter));
         }
         Response::Newest(newest) => {
             out.push(7);
@@ -266,6 +252,7 @@ pub(crate) fn encode_response(response: &Response) -> io::Result<Vec<u8>> {
             out.push(8);
             put_u64(&mut out, *index);
         }
+        Response::Changed => out.push(9),
     }
     Ok(out)
 }
@@ -305,6 +292,14 @@ pub(crate) fn decode_request(bytes: &[u8]) -> io::Result<(Recipient, Request)> {
         }
         6 => Request::Status,
         8 => Request::ReadIndex,
+        9 => {
+            let member = reader.u64()?;
+            match reader.u8()? {
+                0 => Request::Change(member, Role::Replica),
+                1 => Request::Change(member, Role::Voter),
+                _ => return Err(invalid()),
+            }
+        }
         7 => Request::Newest {
             after: reader.u64()?,
             upto: reader.u64()?,
@@ -348,9 +343,16 @@ pub(crate) fn decode_response(bytes: &[u8]) -> io::Result<Response> {
                 1 => Some(reader.u64()?),
                 _ => return Err(invalid()),
             };
+            let term = reader.u64()?;
+            let voter = match reader.u8()? {
+                0 => false,
+                1 => true,
+                _ => return Err(invalid()),
+            };
             Response::Status(Held {
                 last_log,
-                term: reader.u64()?,
+                term,
+                voter,
             })
         }
         7 => Response::Newest(match reader.u8()? {
@@ -359,6 +361,7 @@ pub(crate) fn decode_response(bytes: &[u8]) -> io::Result<Response> {
             _ => return Err(invalid()),
         }),
         8 => Response::ReadIndex(reader.u64()?),
+        9 => Response::Changed,
         _ => return Err(invalid()),
     };
     reader.done(response)

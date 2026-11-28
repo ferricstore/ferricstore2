@@ -30,7 +30,7 @@ fn run(
     call(|reply| node.execute(command, reply))
 }
 
-fn create(node: &QueueNode, id: &str) -> TestResult<Result<Term, ServiceError>> {
+pub(super) fn create(node: &QueueNode, id: &str) -> TestResult<Result<Term, ServiceError>> {
     run(
         node,
         "FLOW.CREATE",
@@ -43,7 +43,7 @@ fn create(node: &QueueNode, id: &str) -> TestResult<Result<Term, ServiceError>> 
     )
 }
 
-fn state(node: &QueueNode, id: &str) -> TestResult<Result<Term, ServiceError>> {
+pub(super) fn state(node: &QueueNode, id: &str) -> TestResult<Result<Term, ServiceError>> {
     let found = run(
         node,
         "FLOW.GET",

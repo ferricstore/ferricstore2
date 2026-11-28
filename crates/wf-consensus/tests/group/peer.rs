@@ -96,8 +96,7 @@ async fn start_as(
         Serving::Joining { .. } => tokio::spawn(serve_member(
             listener,
             raft.clone(),
-            names(addresses),
-            id,
+            (names(addresses), id, true),
             (log, machine.store(), wf_consensus::group::MAX_FRAME_BYTES),
         )),
     };

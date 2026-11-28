@@ -14,6 +14,7 @@ use tokio::net::{TcpListener, TcpStream};
 use wf_ports::consensus::log::SnapshotStore;
 
 use super::super::ballot::Ballot;
+use super::super::roles;
 use super::super::snapshot::{self, Stored};
 use super::super::wire::{self, Held, Recipient, Request, Response};
 use super::super::{Config, snapshot::aside};
@@ -21,6 +22,15 @@ use super::{MAX_FRAME_BYTES, frame};
 
 /// What a member serves with: the largest frame and its snapshot store.
 pub(in super::super) type Serving = (u32, Arc<dyn SnapshotStore>);
+
+/// The member a server answers for: whether it may vote now, its own
+/// address, and whether it joins its group as a voter (ADR-020).
+#[derive(Clone)]
+pub(in super::super) struct Answering {
+    pub(in super::super) ballot: Arc<Ballot>,
+    pub(in super::super) own: Recipient,
+    pub(in super::super) voter: bool,
+}
 
 /// The answer to a vote request while this member may not vote.
 const NOT_VOTING: &str = "member catching up: no vote";
@@ -40,17 +50,21 @@ pub async fn serve<SM>(
         group: wire::group_id(&peers),
         member: id,
     };
-    let ballot = Arc::new(Ballot::new(false));
-    serving(listener, raft, (ballot, own), (MAX_FRAME_BYTES, store)).await;
+    let answering = Answering {
+        ballot: Arc::new(Ballot::new(false)),
+        own,
+        voter: true,
+    };
+    serving(listener, raft, answering, (MAX_FRAME_BYTES, store)).await;
 }
 
-/// Serves Raft requests for `own` to `raft`, which votes as `ballot`
-/// allows, in frames of at most the limit `serving` names, keeping the
-/// snapshots it receives in its store.
+/// Serves Raft requests for the member `answering` names to `raft`, which
+/// votes as its ballot allows, in frames of at most the limit `serving`
+/// names, keeping the snapshots it receives in its store.
 pub(in super::super) async fn serving<SM>(
     listener: TcpListener,
     raft: Raft<Config, SM>,
-    (ballot, own): (Arc<Ballot>, Recipient),
+    answering: Answering,
     serving: Serving,
 ) where
     SM: RaftStateMachine<Config, SnapshotData = Stored>,
@@ -63,20 +77,20 @@ pub(in super::super) async fn serving<SM>(
         if stream.set_nodelay(true).is_err() {
             continue;
         }
-        let served = (Arc::clone(&ballot), own);
         let with = (serving.0, Arc::clone(&serving.1));
-        connections.spawn(connection(stream, raft.clone(), served, with));
+        connections.spawn(connection(stream, raft.clone(), answering.clone(), with));
     }
 }
 
 async fn connection<SM>(
     mut stream: TcpStream,
     raft: Raft<Config, SM>,
-    (ballot, own): (Arc<Ballot>, Recipient),
+    answering: Answering,
     (limit, store): Serving,
 ) where
     SM: RaftStateMachine<Config, SnapshotData = Stored>,
 {
+    let own = answering.own;
     while let Ok(body) = frame::read_frame(&mut stream, limit).await {
         let (response, follows) = match wire::decode_request(&body) {
             Ok((recipient, Request::Snapshot(vote, meta, length))) if recipient == own => {
@@ -94,7 +108,7 @@ async fn connection<SM>(
             Ok((recipient, _)) if recipient != own => {
                 (Response::Failed(misdirected(recipient, own)), None)
             }
-            Ok((_, request)) => handle(&raft, &ballot, request).await,
+            Ok((_, request)) => handle(&raft, &answering, request).await,
             Err(error) => (Response::Failed(error.to_string()), None),
         };
         let Ok(bytes) = wire::encode_response(&response) else {
@@ -163,12 +177,13 @@ where
 /// fetched one).
 async fn handle<SM>(
     raft: &Raft<Config, SM>,
-    ballot: &Ballot,
+    answering: &Answering,
     request: Request,
 ) -> (Response, Option<Stored>)
 where
     SM: RaftStateMachine<Config, SnapshotData = Stored>,
 {
+    let ballot = &answering.ballot;
     let failed = |error: &dyn std::fmt::Display| Response::Failed(error.to_string());
     let response = match request {
         Request::Append(append) => {
@@ -196,11 +211,16 @@ where
             Response::Status(Held {
                 last_log: metrics.last_log_index,
                 term: metrics.current_term,
+                voter: answering.voter,
             })
         }
         // Read with its bytes by `connection`.
         Request::Snapshot(..) => failed(&"snapshot without its bytes"),
         Request::Newest { after, upto } => return own_newest(raft, after, upto).await,
+        // Asked of the leader by a member that does not lead (ADR-020).
+        Request::Change(member, role) => roles::change(raft, member, role)
+            .await
+            .map_or_else(Response::Failed, |()| Response::Changed),
         // The leader confirms with a quorum that it still leads; a member
         // that does not lead refuses.
         Request::ReadIndex => raft

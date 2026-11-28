@@ -21,6 +21,7 @@
 //! | `--discovery` | `FERRICSTORE_DISCOVERY` | `none`; `static`, `dns` (see `configuration`) |
 //! | `--cluster-nodes` | `FERRICSTORE_CLUSTER_NODES` | for `static` |
 //! | `--node-id` | `FERRICSTORE_NODE_ID` | from the advertised host |
+//! | `--cluster-role` | `FERRICSTORE_CLUSTER_ROLE` | `voter`; `replica` takes every entry and answers reads but never votes (ADR-020) |
 //! | `--dns-name`, `--cluster-size` | `FERRICSTORE_DNS_NAME`, `FERRICSTORE_CLUSTER_SIZE` | for `dns` |
 //! | `--snapshot-every`, `--keep-logs` | `FERRICSTORE_SNAPSHOT_EVERY`, `FERRICSTORE_KEEP_LOGS` | `100000`, `1000` |
 //!
@@ -48,7 +49,7 @@ use wf_node::supervision::health;
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 /// Each flag and the variable it overrides.
-const FLAGS: [(&str, &str); 21] = [
+const FLAGS: [(&str, &str); 22] = [
     ("--data-dir", "FERRICSTORE_DATA_DIR"),
     ("--host", "FERRICSTORE_BIND_HOST"),
     ("--port", "FERRICSTORE_NATIVE_PORT"),
@@ -65,6 +66,7 @@ const FLAGS: [(&str, &str); 21] = [
     ("--discovery", "FERRICSTORE_DISCOVERY"),
     ("--cluster-nodes", "FERRICSTORE_CLUSTER_NODES"),
     ("--node-id", "FERRICSTORE_NODE_ID"),
+    ("--cluster-role", "FERRICSTORE_CLUSTER_ROLE"),
     ("--dns-name", "FERRICSTORE_DNS_NAME"),
     ("--cluster-size", "FERRICSTORE_CLUSTER_SIZE"),
     ("--snapshot-every", "FERRICSTORE_SNAPSHOT_EVERY"),
@@ -280,6 +282,7 @@ fn open(options: &Options) -> Result<QueueNode, String> {
             .iter()
             .map(|(id, member)| (*id, member.peer()))
             .collect(),
+        voter: cluster.voter,
         listener,
         snapshot_every: options.snapshot_every,
         keep_logs: options.keep_logs,

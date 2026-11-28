@@ -1,6 +1,7 @@
 //! How a member that starts without the mark that it votes joins its group
 //! (ADR-019): it asks every other member what it holds before it votes
-//! (`Ballot`), and the lowest member of a new group forms it. The mark is
+//! (`Ballot`), and the lowest voter of a new group forms it with the voters
+//! alone (ADR-020). The mark is
 //! saved once it may vote: a member stopped before its first entry votes
 //! when it starts again, and one whose storage was lost, or that stopped
 //! while catching up, asks again.
@@ -20,39 +21,54 @@ use wf_ports::consensus::log::{ConsensusLog, SnapshotStore};
 
 use super::Config;
 use super::ballot::Ballot;
-use super::peer;
+use super::peer::{self, Answering};
 use super::wire::{self, Held, Recipient};
 
 /// What a member that started without a log makes of what the others hold.
 #[derive(Debug, PartialEq, Eq)]
 pub(super) enum Settled {
-    /// The group is new; `form` when this is its lowest member and no other
-    /// member holds any log.
-    New { form: bool },
+    /// The group is new; `forms` names its voters when this member is the
+    /// lowest of them and no other member holds any log.
+    New { forms: Option<BTreeSet<u64>> },
     /// Another member holds a log past a forming group's first entry, so
     /// this member lost its own; `term` is the highest the others know.
     Lost { term: u64 },
 }
 
-/// Settles member `id` of `peers`, which has no log, from what every other
-/// member holds.
-pub(super) fn settle(held: &[Held], id: u64, peers: &BTreeMap<u64, String>) -> Settled {
+/// Settles member `id` of `peers`, which has no log and joins as a voter
+/// when `voter`, from what every other member holds (`held`, by member).
+pub(super) fn settle(
+    held: &BTreeMap<u64, Held>,
+    (id, voter): (u64, bool),
+    peers: &BTreeMap<u64, String>,
+) -> Settled {
     if held
-        .iter()
+        .values()
         .any(|held| held.last_log.is_some_and(|index| index > 0))
     {
-        Settled::Lost {
-            term: held.iter().map(|held| held.term).max().unwrap_or(0),
-        }
-    } else {
-        Settled::New {
-            form: peers.keys().next() == Some(&id)
-                && held.iter().all(|held| held.last_log.is_none()),
-        }
+        return Settled::Lost {
+            term: held.values().map(|held| held.term).max().unwrap_or(0),
+        };
+    }
+    let voters: BTreeSet<u64> = peers
+        .keys()
+        .copied()
+        .filter(|member| {
+            if *member == id {
+                voter
+            } else {
+                held.get(member).is_some_and(|held| held.voter)
+            }
+        })
+        .collect();
+    let forms = voters.first() == Some(&id) && held.values().all(|held| held.last_log.is_none());
+    Settled::New {
+        forms: forms.then_some(voters),
     }
 }
 
-/// Serves Raft requests to `raft`, member `id` of `peers` keeping `log`
+/// Serves Raft requests to `raft`, member `id` of `peers` that joins as a
+/// voter when `voter`, keeping `log`
 /// and its snapshots in `store`, in frames of at most `limit` bytes, until
 /// the listener fails. A member
 /// whose log lacks the mark that it votes first settles whether it may
@@ -60,8 +76,7 @@ pub(super) fn settle(held: &[Held], id: u64, peers: &BTreeMap<u64, String>) -> S
 pub async fn serve_member<SM>(
     listener: TcpListener,
     raft: Raft<Config, SM>,
-    peers: BTreeMap<u64, String>,
-    id: u64,
+    (peers, id, voter): (BTreeMap<u64, String>, u64, bool),
     (log, store, limit): (Arc<dyn ConsensusLog>, Arc<dyn SnapshotStore>, u32),
 ) where
     SM: RaftStateMachine<Config, SnapshotData = super::Stored>,
@@ -74,7 +89,7 @@ pub async fn serve_member<SM>(
     };
     let settling = async {
         if fresh {
-            join(&raft, &peers, own, &ballot).await;
+            join(&raft, &peers, (own, voter), &ballot).await;
             // `join` also returns when the member stops. A mark that is not
             // saved only makes the next start ask again.
             if ballot.votes() {
@@ -86,7 +101,11 @@ pub async fn serve_member<SM>(
         peer::serving(
             listener,
             raft.clone(),
-            (Arc::clone(&ballot), own),
+            Answering {
+                ballot: Arc::clone(&ballot),
+                own,
+                voter,
+            },
             (limit, store),
         ),
         settling,
@@ -96,14 +115,14 @@ pub async fn serve_member<SM>(
 
 /// Asks every other member what it holds, again every half second until
 /// each has answered once, then settles this member: one that lost its log
-/// votes once it caught up; in a new group it votes, and the lowest member
-/// forms it. The answers need not come together: a member's term only
+/// votes once it caught up; in a new group it votes, and the lowest voter
+/// forms it with the voters. The answers need not come together: a member's term only
 /// grows, so an earlier answer still bounds the term it knew when this
 /// member lost its log.
 async fn join<SM>(
     raft: &Raft<Config, SM>,
     peers: &BTreeMap<u64, String>,
-    own: Recipient,
+    (own, voter): (Recipient, bool),
     ballot: &Ballot,
 ) where
     SM: RaftStateMachine<Config, SnapshotData = super::Stored>,
@@ -131,18 +150,16 @@ async fn join<SM>(
         }
         tokio::time::sleep(Duration::from_millis(500)).await;
     }
-    let held: Vec<Held> = held.into_values().collect();
-    match settle(&held, id, peers) {
+    match settle(&held, (id, voter), peers) {
         Settled::Lost { term } => {
             ballot.catch_up(term);
             caught_up(raft, ballot).await;
         }
-        Settled::New { form } => {
+        Settled::New { forms } => {
             ballot.open();
-            if form {
-                let members: BTreeSet<u64> = peers.keys().copied().collect();
+            if let Some(voters) = forms {
                 // Another start of the same member may have formed it.
-                let _formed = raft.initialize(members).await;
+                let _formed = raft.initialize(voters).await;
             }
         }
     }

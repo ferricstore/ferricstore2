@@ -32,10 +32,10 @@ mod server;
 #[cfg(test)]
 mod tests;
 
-pub(super) use ask::{newest, read_index, status};
+pub(super) use ask::{change, newest, read_index, status};
 pub use link::Link;
 pub use server::serve;
-pub(super) use server::serving;
+pub(super) use server::{Answering, serving};
 
 /// The largest frame a member sends or accepts unless configured
 /// otherwise: an append part or a snapshot chunk fits well within it.
